@@ -1,0 +1,2 @@
+observations,ridge_alpha,intercept_percent,r_squared,rmse_percent,coefficient_2Y_US,coefficient_20Y_US,coefficient_10Y_US,coefficient_EUR,coefficient_SPX,coefficient_Crude_Oil,coefficient_Emerging
+265,1,0.046,0.225,0.744,-0.569,-0.109,-0.141,0.071,0.111,0.040,0.086
