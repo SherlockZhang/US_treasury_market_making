@@ -9,13 +9,24 @@ from scipy.signal import find_peaks, periodogram
 from scipy.stats import norm
 
 
+# Configuration
 INPUT_FILE = Path(__file__).with_name("DBMF_COMP.csv")
 OUTPUT_DIR = Path(__file__).with_name("results")
 OUTPUT_CYCLE_PLOT = OUTPUT_DIR / "DBMF_COMP_cycle_analysis.png"
+PERFORMANCE_RESULTS_FILE = OUTPUT_DIR / "DBMF_COMP_performance_metrics.csv"
+CORRELATION_RESULTS_FILE = OUTPUT_DIR / "DBMF_COMP_correlations.csv"
 DBMF_COLUMN = "DBMF"
 COMPARISON_COLUMNS = {
     "SPX": "SPX",
     "IEF": "IEF",
+}
+STRATEGY_WEIGHTS = {
+    "60% SPX / 40% IEF": {"SPX": 0.60, "IEF": 0.40},
+    "54% SPX / 36% IEF / 10% DBMF": {
+        "SPX": 0.54,
+        "IEF": 0.36,
+        DBMF_COLUMN: 0.10,
+    },
 }
 ROLLING_WINDOWS = {
     "60 trading days": 60,
@@ -29,6 +40,7 @@ CYCLE_MAX_PERIOD = 252
 CONFIDENCE_LEVEL = 0.95
 
 
+# Data loading and processing
 def load_prices():
     data = pd.read_csv(INPUT_FILE, parse_dates=["Date"])
     required_columns = ["Date", DBMF_COLUMN, *COMPARISON_COLUMNS.values()]
@@ -54,13 +66,14 @@ def load_returns(prices=None):
     return returns
 
 
+# Calculations
 def calculate_performance_metrics(prices, returns):
     """Calculate annualized Sharpe and maximum drawdown for each price series."""
     daily_risk_free_rate = (1 + ANNUAL_RISK_FREE_RATE) ** (
         1 / TRADING_DAYS_PER_YEAR
     ) - 1
     metrics = {}
-    for ticker in [DBMF_COLUMN, *COMPARISON_COLUMNS.values()]:
+    for ticker in returns.columns:
         asset_returns = returns[ticker].dropna()
         excess_returns = asset_returns - daily_risk_free_rate
         return_volatility = excess_returns.std(ddof=1)
@@ -70,7 +83,11 @@ def calculate_performance_metrics(prices, returns):
             else np.nan
         )
 
-        initial_date = prices[ticker].first_valid_index()
+        initial_date = (
+            prices[ticker].first_valid_index()
+            if ticker in prices
+            else asset_returns.index[0]
+        )
         wealth = (1 + asset_returns).cumprod()
         wealth = pd.concat([pd.Series([1.0], index=[initial_date]), wealth])
         drawdown = wealth / wealth.cummax() - 1
@@ -79,6 +96,37 @@ def calculate_performance_metrics(prices, returns):
             "maximum_drawdown": drawdown.min(),
         }
     return pd.DataFrame.from_dict(metrics, orient="index")
+
+
+def calculate_strategy_returns(returns):
+    """Calculate daily rebalanced returns for each configured portfolio strategy."""
+    strategy_returns = returns.copy()
+    for strategy, weights in STRATEGY_WEIGHTS.items():
+        components = list(weights)
+        strategy_returns[strategy] = (
+            returns[components]
+            .mul(pd.Series(weights))
+            .sum(axis=1, min_count=len(components))
+        )
+    return strategy_returns
+
+
+def calculate_full_sample_correlations(daily_returns, monthly_returns):
+    """Return daily and monthly full-sample correlations in one row per pair."""
+    rows = []
+    for ticker, column in COMPARISON_COLUMNS.items():
+        rows.append(
+            {
+                "comparison": f"{DBMF_COLUMN} vs {ticker}",
+                "daily_return_correlation": daily_returns[DBMF_COLUMN].corr(
+                    daily_returns[column]
+                ),
+                "monthly_return_correlation": monthly_returns[DBMF_COLUMN].corr(
+                    monthly_returns[column]
+                ),
+            }
+        )
+    return pd.DataFrame(rows)
 
 
 def calculate_rolling_correlations(returns):
@@ -106,6 +154,58 @@ def calculate_rolling_monthly_return_correlation(monthly_returns, ticker):
     return pair_returns[DBMF_COLUMN].rolling(ROLLING_MONTH_COUNT).corr(
         pair_returns[ticker]
     )
+
+
+def analyze_correlation_cycles(series, min_period=10, max_period=252, top_n=3):
+    """Return a detrended periodogram and its strongest peaks."""
+    values = series.dropna().to_numpy(dtype=float)
+    max_period = min(max_period, len(values) // 2)
+    if max_period < min_period * 2:
+        return {"periods": np.array([]), "relative_power": np.array([]), "peaks": []}
+
+    frequencies, power = periodogram(
+        values, fs=1.0, window="hann", detrend="linear", scaling="spectrum"
+    )
+    positive = frequencies > 0
+    periods = 1 / frequencies[positive]
+    power = power[positive]
+    in_range = (periods >= min_period) & (periods <= max_period)
+    periods, power = periods[in_range], power[in_range]
+    if not len(power):
+        return {"periods": np.array([]), "relative_power": np.array([]), "peaks": []}
+
+    peaks, _ = find_peaks(power)
+    strongest = int(np.argmax(power))
+    if strongest not in peaks:
+        peaks = np.append(peaks, strongest)
+    peaks = peaks[np.argsort(power[peaks])[::-1]][:top_n]
+    total_band_power = power.sum()
+    peak_summaries = [
+        {
+            "period_trading_days": float(periods[index]),
+            "band_power_share": float(power[index] / total_band_power),
+            "relative_power": float(power[index] / power.max()),
+        }
+        for index in peaks
+    ]
+    return {
+        "periods": periods,
+        "relative_power": power / power.max(),
+        "peaks": peak_summaries,
+    }
+
+
+# Output
+def save_summary_results(performance, correlations):
+    """Save performance metrics and full-sample correlations to separate CSVs."""
+    performance.rename_axis("ticker").to_csv(
+        PERFORMANCE_RESULTS_FILE, float_format="%.3f"
+    )
+    correlations.to_csv(
+        CORRELATION_RESULTS_FILE, index=False, float_format="%.3f"
+    )
+    print(f"Saved performance metrics to {PERFORMANCE_RESULTS_FILE}")
+    print(f"Saved full-sample correlations to {CORRELATION_RESULTS_FILE}")
 
 
 def plot_correlation_series(series, ticker, title, filename, description):
@@ -168,7 +268,7 @@ def save_rolling_correlation_csvs(rolling):
             }
         )
         output_path = OUTPUT_DIR / f"DBMF_COMP_{ticker}_rolling_correlations.csv"
-        output.to_csv(output_path, index=False)
+        output.to_csv(output_path, index=False, float_format="%.3f")
         print(f"Saved {ticker} rolling correlations to {output_path}")
 
 
@@ -222,45 +322,6 @@ def plot_rolling_correlations(rolling, ticker):
     figure.savefig(output_path, dpi=150)
     plt.close(figure)
     print(f"Saved {ticker} rolling correlation chart to {output_path}")
-
-
-def analyze_correlation_cycles(series, min_period=10, max_period=252, top_n=3):
-    """Return a detrended periodogram and its strongest peaks."""
-    values = series.dropna().to_numpy(dtype=float)
-    max_period = min(max_period, len(values) // 2)
-    if max_period < min_period * 2:
-        return {"periods": np.array([]), "relative_power": np.array([]), "peaks": []}
-
-    frequencies, power = periodogram(
-        values, fs=1.0, window="hann", detrend="linear", scaling="spectrum"
-    )
-    positive = frequencies > 0
-    periods = 1 / frequencies[positive]
-    power = power[positive]
-    in_range = (periods >= min_period) & (periods <= max_period)
-    periods, power = periods[in_range], power[in_range]
-    if not len(power):
-        return {"periods": np.array([]), "relative_power": np.array([]), "peaks": []}
-
-    peaks, _ = find_peaks(power)
-    strongest = int(np.argmax(power))
-    if strongest not in peaks:
-        peaks = np.append(peaks, strongest)
-    peaks = peaks[np.argsort(power[peaks])[::-1]][:top_n]
-    total_band_power = power.sum()
-    peak_summaries = [
-        {
-            "period_trading_days": float(periods[index]),
-            "band_power_share": float(power[index] / total_band_power),
-            "relative_power": float(power[index] / power.max()),
-        }
-        for index in peaks
-    ]
-    return {
-        "periods": periods,
-        "relative_power": power / power.max(),
-        "peaks": peak_summaries,
-    }
 
 
 def plot_cycle_analysis(cycle_analyses):
@@ -320,11 +381,20 @@ def plot_cycle_analysis(cycle_analyses):
     plt.close(fig)
 
 
+# Main analysis
 def main():
     OUTPUT_DIR.mkdir(exist_ok=True)
     prices = load_prices()
     returns = load_returns(prices)
-    performance = calculate_performance_metrics(prices, returns)
+    performance_returns = calculate_strategy_returns(returns)
+    performance = calculate_performance_metrics(prices, performance_returns)
+    monthly_prices = prices.resample("ME").last()
+    monthly_returns = load_returns(monthly_prices)
+    correlations = calculate_full_sample_correlations(
+        returns, monthly_returns
+    )
+    save_summary_results(performance, correlations)
+
     print("Performance metrics (daily returns; annual risk-free rate = 3%):")
     for ticker, row in performance.iterrows():
         print(
@@ -333,17 +403,19 @@ def main():
         )
 
     print("Full-sample Pearson correlations of daily percentage returns:")
-    for ticker, column in COMPARISON_COLUMNS.items():
-        correlation = returns[DBMF_COLUMN].corr(returns[column])
-        print(f"  DBMF vs {ticker}: {correlation:.4f}")
+    for _, row in correlations.iterrows():
+        print(
+            f"  {row['comparison']}: "
+            f"{row['daily_return_correlation']:.4f}"
+        )
     plot_rebased_prices(prices)
 
-    monthly_prices = prices.resample("ME").last()
-    monthly_returns = load_returns(monthly_prices)
     print("\nFull-sample Pearson correlations of monthly percentage returns:")
-    for ticker, column in COMPARISON_COLUMNS.items():
-        correlation = monthly_returns[DBMF_COLUMN].corr(monthly_returns[column])
-        print(f"  DBMF vs {ticker}: {correlation:.4f}")
+    for _, row in correlations.iterrows():
+        print(
+            f"  {row['comparison']}: "
+            f"{row['monthly_return_correlation']:.4f}"
+        )
 
     rolling = calculate_rolling_correlations(returns)
     save_rolling_correlation_csvs(rolling)

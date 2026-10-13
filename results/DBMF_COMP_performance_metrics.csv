@@ -1,0 +1,6 @@
+ticker,sharpe_ratio,maximum_drawdown
+DBMF,0.131,-0.293
+SPX,0.637,-0.339
+IEF,-0.690,-0.277
+60% SPX / 40% IEF,0.461,-0.220
+54% SPX / 36% IEF / 10% DBMF,0.468,-0.183
