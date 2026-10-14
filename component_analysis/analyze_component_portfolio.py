@@ -1,10 +1,13 @@
 """Compare DBMF with a portfolio weighted by ridge regression coefficients."""
 
 import argparse
+import sys
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from analyze_future_data import (
     TARGET_COLUMN,

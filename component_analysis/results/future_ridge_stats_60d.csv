@@ -1,2 +1,2 @@
-observations,ridge_alpha,intercept_percent,r_squared,rmse_percent,coefficient_2Y_US,coefficient_20Y_US,coefficient_10Y_US,coefficient_EUR,coefficient_SPX,coefficient_Crude_Oil,coefficient_Emerging
-60,1,0.032,0.524,0.444,-1.428,-0.183,-0.324,-0.283,0.013,0.035,0.001
+observations,ridge_alpha,intercept_percent,r_squared,rmse_percent,ols_p_value_intercept,coefficient_2Y_US,ols_p_value_2Y_US,coefficient_20Y_US,ols_p_value_20Y_US,coefficient_10Y_US,ols_p_value_10Y_US,coefficient_EUR,ols_p_value_EUR,coefficient_SPX,ols_p_value_SPX,coefficient_Crude_Oil,ols_p_value_Crude_Oil,coefficient_Emerging,ols_p_value_Emerging
+60,1,0.032,0.524,0.444,0.580,-1.428,0.241,-0.183,0.179,-0.324,0.859,-0.283,0.013,0.013,0.066,0.035,0.001,0.001,0.746

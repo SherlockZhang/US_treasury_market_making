@@ -5,7 +5,7 @@ import pandas as pd
 
 from analyze_future_data import (
     OUTPUT_DIR,
-    TARGET_COLUMN,
+    REGRESSION_TICKERS,
     calculate_aligned_returns,
     fit_ridge_regression,
     load_price_series,
@@ -21,7 +21,7 @@ R_SQUARED_PLOT_FILE = OUTPUT_DIR / "future_rolling_60d_tuesday_r_squared.png"
 
 def calculate_rolling_regressions(return_data):
     """Fit one model per Tuesday using that date and the prior 59 returns."""
-    predictors = [column for column in return_data.columns if column != TARGET_COLUMN]
+    predictors = REGRESSION_TICKERS
     results = []
 
     for end_position, date in enumerate(return_data.index):

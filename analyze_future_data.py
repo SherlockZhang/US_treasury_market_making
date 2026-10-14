@@ -8,6 +8,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from scipy.stats import t as student_t
 
 
 # Configuration
@@ -18,6 +19,7 @@ PRICE_PLOT_FILE = OUTPUT_DIR / "future_price_series.png"
 REGRESSION_PLOT_FILE = OUTPUT_DIR / "future_dbmf_ridge_fit.png"
 REGRESSION_STATS_FILE = OUTPUT_DIR / "future_ridge_stats.csv"
 TARGET_COLUMN = "DBMF"
+REGRESSION_TICKERS = ["2Y US", "20Y US", "10Y US", "EUR", "SPX", "Crude Oil", "Emerging"]
 TREASURY_FUTURES_COLUMNS = {"2Y US", "20Y US", "10Y US"}
 RIDGE_ALPHA = 1
 
@@ -125,7 +127,22 @@ def calculate_aligned_returns(prices):
 # Calculations
 def fit_ridge_regression(return_data):
     """Fit standardized ridge regression to DBMF returns."""
-    predictors = return_data.drop(columns=TARGET_COLUMN)
+    if not REGRESSION_TICKERS:
+        raise ValueError("REGRESSION_TICKERS must include at least one ticker.")
+    if len(REGRESSION_TICKERS) != len(set(REGRESSION_TICKERS)):
+        raise ValueError("REGRESSION_TICKERS must not contain duplicate tickers.")
+    if TARGET_COLUMN in REGRESSION_TICKERS:
+        raise ValueError(f"REGRESSION_TICKERS must not include {TARGET_COLUMN!r}.")
+    missing_tickers = [
+        ticker for ticker in REGRESSION_TICKERS if ticker not in return_data.columns
+    ]
+    if missing_tickers:
+        raise ValueError(
+            f"Configured regression tickers are missing from the return data: "
+            f"{missing_tickers}"
+        )
+
+    predictors = return_data[REGRESSION_TICKERS]
     target = return_data[TARGET_COLUMN]
     predictor_mean = predictors.mean()
     predictor_scale = predictors.std(ddof=0)
@@ -164,9 +181,30 @@ def fit_ridge_regression(return_data):
         "r_squared": 1 - (residuals**2).sum() / total_sum_squares,
         "rmse_percent": np.sqrt((residuals**2).mean()),
     }
-    for column, coefficient in zip(predictors.columns, coefficients):
+    ols_design = np.column_stack([np.ones(len(predictors)), predictors.to_numpy()])
+    ols_coefficients = np.linalg.lstsq(ols_design, target.to_numpy(), rcond=None)[0]
+    residual_degrees_of_freedom = len(target) - np.linalg.matrix_rank(ols_design)
+    ols_p_values = np.full(len(ols_coefficients), np.nan)
+    if residual_degrees_of_freedom > 0:
+        ols_residuals = target.to_numpy() - ols_design @ ols_coefficients
+        ols_variance = (ols_residuals @ ols_residuals) / residual_degrees_of_freedom
+        ols_covariance = ols_variance * np.linalg.pinv(ols_design.T @ ols_design)
+        standard_errors = np.sqrt(np.maximum(np.diag(ols_covariance), 0))
+        valid_standard_errors = standard_errors > 0
+        t_statistics = ols_coefficients[valid_standard_errors] / standard_errors[
+            valid_standard_errors
+        ]
+        ols_p_values[valid_standard_errors] = 2 * student_t.sf(
+            np.abs(t_statistics), residual_degrees_of_freedom
+        )
+
+    stats["ols_p_value_intercept"] = ols_p_values[0]
+    for position, (column, coefficient) in enumerate(
+        zip(predictors.columns, coefficients)
+    ):
         safe_column = re.sub(r"\W+", "_", column).strip("_")
         stats[f"coefficient_{safe_column}"] = coefficient
+        stats[f"ols_p_value_{safe_column}"] = ols_p_values[position + 1]
     return fitted, pd.Series(
         coefficients, index=predictors.columns
     ), stats
