@@ -1,0 +1,2 @@
+correlation_method,5y_future_measure,5y_yield_measure,observations,start_date,end_date,correlation
+Pearson,daily percentage return,daily change in percentage points,2716,2016-01-05,2026-10-15,-0.90724526
