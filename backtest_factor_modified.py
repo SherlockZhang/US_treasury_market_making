@@ -174,9 +174,9 @@ def run_backtest(
             dates, factor_data
         )
         results["factor_multiplier"] = np.where(
-            (results["spx_12_month_return"] < -0.03)
+            (results["spx_12_month_return"] < -0.1)
             & (results["signal"] > 0),
-            1.5,
+            2.0,
             1.0,
         )
         factor_available = results["spx_12_month_return"].notna()
