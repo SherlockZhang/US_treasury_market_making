@@ -1,0 +1,2 @@
+observations,start_date,end_date,annualized_mean_excess_return_percent,annualized_excess_return_volatility_percent,sharpe_ratio,beta_vs_spx,daily_alpha_percent,annualized_alpha_percent
+1857,2019-05-09,2026-10-09,7.234225,12.296913,0.588296,0.112974,0.022603,5.695987
