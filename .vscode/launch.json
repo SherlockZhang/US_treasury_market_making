@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Backtest factor modified (SPX)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/backtest_factor_modified.py",
+      "args": ["--factor", "spx"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Backtest factor modified (CPI)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/backtest_factor_modified.py",
+      "args": ["--factor", "cpi"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    }
+  ]
+}

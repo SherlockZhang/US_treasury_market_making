@@ -9,6 +9,7 @@ from backtest_5y_trend_strategy import (
     calculate_annual_statistics,
     calculate_statistics,
     load_5y_yield,
+    load_risk_free_returns,
     load_spx_index,
     run_backtest,
     summarize_spx_change,
@@ -75,10 +76,12 @@ def load_spread() -> pd.DataFrame:
     return prices
 
 
-def calculate_spread_statistics(results: pd.DataFrame) -> tuple[dict, list[dict]]:
+def calculate_spread_statistics(
+    results: pd.DataFrame, risk_free_returns: pd.Series
+) -> tuple[dict, list[dict]]:
     """Calculate full-period and calendar-year metrics for the spread."""
-    full_stats = calculate_statistics(results)
-    annual_stats = calculate_annual_statistics(results)
+    full_stats = calculate_statistics(results, risk_free_returns)
+    annual_stats = calculate_annual_statistics(results, risk_free_returns)
     full_stats["instrument"] = INSTRUMENT_NAME
     for annual_stat in annual_stats:
         annual_stat["instrument"] = INSTRUMENT_NAME
@@ -114,7 +117,10 @@ def main() -> None:
     )
     results = results.rename(columns={"price": "spread"})
     results = results.join(prices.loc[:, ["2y_future", "10y_future"]])
-    full_stats, annual_stats = calculate_spread_statistics(results)
+    risk_free_returns = load_risk_free_returns()
+    full_stats, annual_stats = calculate_spread_statistics(
+        results, risk_free_returns
+    )
     yields = load_5y_yield()
     spx = load_spx_index()
     full_stats.update(summarize_5y_yield_change(yields))
