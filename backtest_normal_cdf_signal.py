@@ -27,10 +27,12 @@ from backtest_5y_trend_strategy import (
 
 OUTPUT_DIR = Path(__file__).with_name("results_refining_parameter")
 DEFAULT_LOOKBACK_DAYS = 252
+AVERAGED_SIGNAL_LOOKBACK_DAYS = (32, 64, 126, 252, 504)
 NORMAL_CDF_VOLATILITY_LOOKBACK_DAYS = 63
 NORMAL_CDF_SIGNAL_CUTOFF = 0.1
 REBALANCE_POSITION_CHANGE_THRESHOLD_FRACTION = 0.25
 RebalanceFrequency = Literal["daily", "weekly", "monthly"]
+SignalMode = Literal["single", "average"]
 DEFAULT_REBALANCE_FREQUENCY: RebalanceFrequency = "weekly"
 
 STRATEGIES = {
@@ -125,6 +127,7 @@ def run_backtest(
         REBALANCE_POSITION_CHANGE_THRESHOLD_FRACTION
     ),
     signal_cutoff: float = NORMAL_CDF_SIGNAL_CUTOFF,
+    signal_mode: SignalMode = "single",
 ) -> pd.DataFrame:
     """Apply the signal with daily, Monday-weekly, or month-end volatility sizing."""
     if lookback_days <= 0:
@@ -142,6 +145,8 @@ def run_backtest(
         )
     if not np.isfinite(signal_cutoff) or signal_cutoff < 0:
         raise ValueError("Signal cutoff must be finite and non-negative.")
+    if signal_mode not in ("single", "average"):
+        raise ValueError(f"Unsupported signal mode: {signal_mode}")
     if prices.empty:
         raise ValueError("No prices are available for this backtest.")
     if prices.isna().any() or not np.isfinite(prices).all() or (prices <= 0).any():
@@ -157,6 +162,20 @@ def run_backtest(
     signal_data = calculate_normal_cdf_signal(
         results["daily_return"], lookback_days, signal_cutoff
     )
+    if signal_mode == "average":
+        component_signals = pd.DataFrame(
+            {
+                f"signal_t{component_lookback}": calculate_normal_cdf_signal(
+                    results["daily_return"],
+                    component_lookback,
+                    signal_cutoff,
+                )["signal"]
+                for component_lookback in AVERAGED_SIGNAL_LOOKBACK_DAYS
+            },
+            index=results.index,
+        )
+        signal_data["signal"] = component_signals.mean(axis=1, skipna=False)
+        signal_data = signal_data.join(component_signals)
     results = results.join(signal_data)
     results["realized_volatility"] = (
         results["daily_return"]
@@ -242,12 +261,24 @@ def calculate_stats(
     rebalance_frequency: RebalanceFrequency,
     position_change_threshold_fraction: float,
     signal_cutoff: float,
+    signal_mode: SignalMode,
 ) -> pd.DataFrame:
     """Calculate risk-free-adjusted full-period and annual statistics."""
     full_stats = calculate_statistics(results, risk_free_returns)
     annual_stats = calculate_annual_statistics(results, risk_free_returns)
     full_stats["instrument"] = instrument
-    full_stats["signal_lookback_days"] = lookback_days
+    full_stats["signal_mode"] = signal_mode
+    full_stats["signal_lookback_days"] = (
+        lookback_days if signal_mode == "single" else np.nan
+    )
+    full_stats["signal_lookbacks_days"] = ",".join(
+        str(days)
+        for days in (
+            (lookback_days,)
+            if signal_mode == "single"
+            else AVERAGED_SIGNAL_LOOKBACK_DAYS
+        )
+    )
     full_stats["volatility_lookback_days"] = (
         NORMAL_CDF_VOLATILITY_LOOKBACK_DAYS
     )
@@ -258,7 +289,13 @@ def calculate_stats(
     full_stats["rebalance_frequency"] = rebalance_frequency
     for annual_stat in annual_stats:
         annual_stat["instrument"] = instrument
-        annual_stat["signal_lookback_days"] = lookback_days
+        annual_stat["signal_mode"] = signal_mode
+        annual_stat["signal_lookback_days"] = (
+            lookback_days if signal_mode == "single" else np.nan
+        )
+        annual_stat["signal_lookbacks_days"] = full_stats[
+            "signal_lookbacks_days"
+        ]
         annual_stat["volatility_lookback_days"] = (
             NORMAL_CDF_VOLATILITY_LOOKBACK_DAYS
         )
@@ -288,10 +325,10 @@ def save_plots(
     prices: pd.Series,
     instrument: str,
     color: str,
-    lookback_days: int,
     rebalance_frequency: RebalanceFrequency,
     position_change_threshold_fraction: float,
     signal_cutoff: float,
+    signal_label: str,
     plot_path: Path,
     comparison_path: Path,
 ) -> None:
@@ -305,7 +342,7 @@ def save_plots(
     )
     axis.axhline(0, color="black", linewidth=0.8, alpha=0.6)
     axis.set_title(
-        f"{instrument} Normal-CDF Signal (T={lookback_days}) — "
+        f"{instrument} Normal-CDF Signal ({signal_label}) — "
         f"{rebalance_frequency.capitalize()} Rebalance — "
         f"{NORMAL_CDF_VOLATILITY_LOOKBACK_DAYS}-Day Volatility Scaling — "
         f"Signal Cutoff ±{signal_cutoff:.1f} — "
@@ -331,7 +368,7 @@ def save_plots(
         results.index,
         results["cumulative_pnl_pct"],
         label=(
-            f"Normal-CDF signal (T={lookback_days}, "
+            f"Normal-CDF signal ({signal_label}, "
             f"{rebalance_frequency} rebalance, |signal|>{signal_cutoff:.1f}, "
             f"{position_change_threshold_fraction:.0%} threshold)"
         ),
@@ -356,11 +393,27 @@ def run_instrument(
     rebalance_frequency: RebalanceFrequency,
     position_change_threshold_fraction: float,
     signal_cutoff: float,
+    signal_mode: SignalMode,
 ) -> None:
     """Run one instrument and save daily, summary, and plot outputs."""
     instrument = strategy["instrument"]
+    signal_lookbacks = (
+        (lookback_days,)
+        if signal_mode == "single"
+        else AVERAGED_SIGNAL_LOOKBACK_DAYS
+    )
+    signal_label = (
+        f"T={lookback_days}"
+        if signal_mode == "single"
+        else f"average T={','.join(str(days) for days in signal_lookbacks)}"
+    )
+    lookback_tag = (
+        f"{lookback_days}d"
+        if signal_mode == "single"
+        else f"avg{'-'.join(str(days) for days in signal_lookbacks)}d"
+    )
     stem = (
-        f"{strategy['stem']}_{rebalance_frequency}_{lookback_days}d_"
+        f"{strategy['stem']}_{rebalance_frequency}_{lookback_tag}_"
         f"vol{NORMAL_CDF_VOLATILITY_LOOKBACK_DAYS}d_"
         f"step{int(position_change_threshold_fraction * 100)}pct_"
         f"sig{int(signal_cutoff * 100)}"
@@ -371,6 +424,7 @@ def run_instrument(
         rebalance_frequency,
         position_change_threshold_fraction,
         signal_cutoff,
+        signal_mode,
     )
     stats_frame = calculate_stats(
         results,
@@ -380,6 +434,7 @@ def run_instrument(
         rebalance_frequency,
         position_change_threshold_fraction,
         signal_cutoff,
+        signal_mode,
     )
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -395,7 +450,9 @@ def run_instrument(
         :,
         [
             "period",
+            "signal_mode",
             "signal_lookback_days",
+            "signal_lookbacks_days",
             "volatility_lookback_days",
             "signal_cutoff",
             "rebalance_position_change_threshold_fraction",
@@ -411,17 +468,17 @@ def run_instrument(
         prices,
         instrument,
         strategy["color"],
-        lookback_days,
         rebalance_frequency,
         position_change_threshold_fraction,
         signal_cutoff,
+        signal_label,
         plot_path,
         comparison_path,
     )
 
     full_stats = stats_frame.iloc[0]
     print(
-        f"{instrument} (T={lookback_days}, {rebalance_frequency} rebalance): "
+        f"{instrument} ({signal_label}, {rebalance_frequency} rebalance): "
         f"{full_stats['data_start_date']} to {full_stats['data_end_date']}, "
         f"Sharpe {full_stats['sharpe_ratio']:.4f}, max drawdown "
         f"{full_stats['max_drawdown_pct']:.2f}%, total return "
@@ -442,6 +499,16 @@ def main() -> None:
         default=DEFAULT_LOOKBACK_DAYS,
         metavar="T",
         help=f"Rolling return lookback in trading days (default: {DEFAULT_LOOKBACK_DAYS}).",
+    )
+    parser.add_argument(
+        "--signal-mode",
+        choices=("single", "average"),
+        default="single",
+        help=(
+            "Use one lookback signal or average signals for T="
+            f"{','.join(str(days) for days in AVERAGED_SIGNAL_LOOKBACK_DAYS)} "
+            "(default: single)."
+        ),
     )
     parser.add_argument(
         "--rebalance-frequency",
@@ -475,6 +542,7 @@ def main() -> None:
     )
     args = parser.parse_args()
     rebalance_frequency: RebalanceFrequency = args.rebalance_frequency
+    signal_mode: SignalMode = args.signal_mode
 
     risk_free_returns = load_risk_free_returns()
     five_year_prices = load_prices()["price"]
@@ -487,6 +555,7 @@ def main() -> None:
         rebalance_frequency,
         args.rebalance_threshold_fraction,
         args.signal_cutoff,
+        signal_mode,
     )
     run_instrument(
         spread_prices,
@@ -496,6 +565,7 @@ def main() -> None:
         rebalance_frequency,
         args.rebalance_threshold_fraction,
         args.signal_cutoff,
+        signal_mode,
     )
 
 
