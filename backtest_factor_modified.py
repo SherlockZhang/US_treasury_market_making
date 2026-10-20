@@ -18,7 +18,6 @@ from backtest_5y_trend_strategy import (
     calculate_statistics,
     load_5y_yield,
     load_prices,
-    load_risk_free_returns,
     load_spx_index,
     run_backtest as run_trend_backtest,
     summarize_5y_yield_change,
@@ -239,11 +238,10 @@ def calculate_stats(
     results: pd.DataFrame,
     instrument: str,
     factor: FactorName,
-    risk_free_returns: pd.Series,
 ) -> pd.DataFrame:
     """Calculate full-period and annual stats plus 5Y yield and SPX changes."""
-    full_stats = calculate_statistics(results, risk_free_returns)
-    annual_stats = calculate_annual_statistics(results, risk_free_returns)
+    full_stats = calculate_statistics(results)
+    annual_stats = calculate_annual_statistics(results)
     full_stats["instrument"] = instrument
     full_stats["factor"] = factor
     for annual_stat in annual_stats:
@@ -332,9 +330,7 @@ def run_instrument(
     instrument = strategy["instrument"]
     stem = strategy["stem"] if factor == "spx" else f"cpi_{strategy['stem']}"
     results = run_backtest(prices, factor_data, factor)
-    stats_frame = calculate_stats(
-        results, instrument, factor, load_risk_free_returns()
-    )
+    stats_frame = calculate_stats(results, instrument, factor)
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     daily_path = OUTPUT_DIR / f"{stem}_daily.csv"

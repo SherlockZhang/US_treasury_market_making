@@ -17,7 +17,6 @@ from backtest_5y_trend_strategy import (
     calculate_statistics,
     load_5y_yield,
     load_prices,
-    load_risk_free_returns,
     load_spx_index,
     run_backtest as run_trend_backtest,
     summarize_5y_yield_change,
@@ -256,16 +255,15 @@ def run_backtest(
 def calculate_stats(
     results: pd.DataFrame,
     instrument: str,
-    risk_free_returns: pd.Series,
     lookback_days: int,
     rebalance_frequency: RebalanceFrequency,
     position_change_threshold_fraction: float,
     signal_cutoff: float,
     signal_mode: SignalMode,
 ) -> pd.DataFrame:
-    """Calculate risk-free-adjusted full-period and annual statistics."""
-    full_stats = calculate_statistics(results, risk_free_returns)
-    annual_stats = calculate_annual_statistics(results, risk_free_returns)
+    """Calculate full-period and annual statistics."""
+    full_stats = calculate_statistics(results)
+    annual_stats = calculate_annual_statistics(results)
     full_stats["instrument"] = instrument
     full_stats["signal_mode"] = signal_mode
     full_stats["signal_lookback_days"] = (
@@ -388,7 +386,6 @@ def save_plots(
 def run_instrument(
     prices: pd.Series,
     strategy: dict[str, str],
-    risk_free_returns: pd.Series,
     lookback_days: int,
     rebalance_frequency: RebalanceFrequency,
     position_change_threshold_fraction: float,
@@ -429,7 +426,6 @@ def run_instrument(
     stats_frame = calculate_stats(
         results,
         instrument,
-        risk_free_returns,
         lookback_days,
         rebalance_frequency,
         position_change_threshold_fraction,
@@ -544,13 +540,11 @@ def main() -> None:
     rebalance_frequency: RebalanceFrequency = args.rebalance_frequency
     signal_mode: SignalMode = args.signal_mode
 
-    risk_free_returns = load_risk_free_returns()
     five_year_prices = load_prices()["price"]
     spread_prices = load_spread()["weighted_spread"]
     run_instrument(
         five_year_prices,
         STRATEGIES["5y_future"],
-        risk_free_returns,
         args.lookback_days,
         rebalance_frequency,
         args.rebalance_threshold_fraction,
@@ -560,7 +554,6 @@ def main() -> None:
     run_instrument(
         spread_prices,
         STRATEGIES["10y_2y_spread"],
-        risk_free_returns,
         args.lookback_days,
         rebalance_frequency,
         args.rebalance_threshold_fraction,

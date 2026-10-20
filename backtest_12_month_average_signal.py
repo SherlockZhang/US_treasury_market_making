@@ -11,7 +11,6 @@ from backtest_5y_trend_strategy import (
     calculate_statistics,
     load_5y_yield,
     load_prices,
-    load_risk_free_returns,
     load_spx_index,
     run_backtest as run_trend_backtest,
     summarize_5y_yield_change,
@@ -133,11 +132,10 @@ def run_backtest(prices: pd.Series) -> pd.DataFrame:
 def calculate_stats(
     results: pd.DataFrame,
     instrument: str,
-    risk_free_returns: pd.Series,
 ) -> pd.DataFrame:
     """Calculate full-period and annual stats with yield and SPX movements."""
-    full_stats = calculate_statistics(results, risk_free_returns)
-    annual_stats = calculate_annual_statistics(results, risk_free_returns)
+    full_stats = calculate_statistics(results)
+    annual_stats = calculate_annual_statistics(results)
     full_stats["instrument"] = instrument
     for annual_stat in annual_stats:
         annual_stat["instrument"] = instrument
@@ -215,7 +213,7 @@ def run_instrument(
     """Backtest one instrument and save its daily, summary, and plot outputs."""
     instrument = strategy["instrument"]
     results = run_backtest(prices)
-    stats_frame = calculate_stats(results, instrument, load_risk_free_returns())
+    stats_frame = calculate_stats(results, instrument)
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     daily_path = OUTPUT_DIR / strategy["daily_file"]
