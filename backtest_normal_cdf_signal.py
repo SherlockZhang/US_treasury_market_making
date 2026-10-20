@@ -42,8 +42,8 @@ STRATEGIES = {
         "color": "#245a84",
     },
     "10y_2y_spread": {
-        "instrument": "10Y-2Y futures spread",
-        "stem": "10y_2y_spread_normal_cdf_signal",
+        "instrument": "5x2Y - 3x10Y futures basket",
+        "stem": "5x2y_minus_3x10y_normal_cdf_signal",
         "color": "#8c4a2f",
     },
 }
@@ -546,7 +546,7 @@ def main() -> None:
 
     risk_free_returns = load_risk_free_returns()
     five_year_prices = load_prices()["price"]
-    spread_prices = load_spread()["spread"]
+    spread_prices = load_spread()["weighted_spread"]
     run_instrument(
         five_year_prices,
         STRATEGIES["5y_future"],

@@ -27,11 +27,13 @@ SIMPLIFIED_STATS_OUTPUT_FILE = (
 )
 PLOT_OUTPUT_FILE = OUTPUT_DIR / "2y_10y_spread_cumulative_pnl.png"
 
-INSTRUMENT_NAME = "10Y-2Y futures spread"
+TWO_YEAR_CONTRACTS = 5
+TEN_YEAR_CONTRACTS = 3
+INSTRUMENT_NAME = "5x2Y - 3x10Y futures basket"
 
 
 def load_spread() -> pd.DataFrame:
-    """Load both futures by date and calculate the positive 10Y-minus-2Y spread."""
+    """Load both futures and calculate the standard and weighted price series."""
     frame = pd.read_excel(INPUT_FILE, sheet_name=SHEET_NAME)
     required_columns = {"Date.1", "2Y future", "Date ", "10Y future"}
     missing_columns = required_columns.difference(frame.columns)
@@ -72,6 +74,15 @@ def load_spread() -> pd.DataFrame:
             "The 10Y-minus-2Y spread must remain positive to use "
             "percentage returns consistently."
         )
+    prices["weighted_spread"] = (
+        TWO_YEAR_CONTRACTS * prices["2y_future"]
+        - TEN_YEAR_CONTRACTS * prices["10y_future"]
+    )
+    if (prices["weighted_spread"] <= 0).any():
+        raise ValueError(
+            "The 5x2Y-minus-3x10Y weighted futures price must remain positive "
+            "to calculate percentage returns consistently."
+        )
     prices.index.name = "Date"
     return prices
 
@@ -99,7 +110,7 @@ def save_cumulative_pnl_plot(results: pd.DataFrame) -> None:
     )
     axis.axhline(0, color="black", linewidth=0.8, alpha=0.6)
     axis.set_title(
-        "10Y-2Y Treasury Futures Spread Trend Strategy — "
+        "5x2Y-minus-3x10Y Treasury Futures Basket Trend Strategy — "
         "Full-Period Cumulative PnL"
     )
     axis.set_xlabel("Date")
@@ -113,9 +124,11 @@ def save_cumulative_pnl_plot(results: pd.DataFrame) -> None:
 def main() -> None:
     prices = load_spread()
     results = run_backtest(
-        prices.loc[:, ["spread"]].rename(columns={"spread": "price"})
+        prices.loc[:, ["weighted_spread"]].rename(
+            columns={"weighted_spread": "price"}
+        )
     )
-    results = results.rename(columns={"price": "spread"})
+    results = results.rename(columns={"price": "weighted_spread"})
     results = results.join(prices.loc[:, ["2y_future", "10y_future"]])
     risk_free_returns = load_risk_free_returns()
     full_stats, annual_stats = calculate_spread_statistics(
