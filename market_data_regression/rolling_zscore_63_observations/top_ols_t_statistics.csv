@@ -1,0 +1,121 @@
+target,model,scaling,predictor,coefficient,standardized_coefficient,statistic_type,ranking_statistic,absolute_ranking_statistic,t_statistic,absolute_t_statistic,train_observations,train_start_date,train_end_date,model_set
+5Y future,OLS,rolling_zscore_63_observations,CTA US Equity,-0.2586356764,-0.2823054499,OLS t-statistic,-4.926737168,4.926737168,-4.926737168,4.926737168,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,OLS,rolling_zscore_63_observations,CL1 COMB Comdty,-0.1590310467,-0.157871168,OLS t-statistic,-2.713427799,2.713427799,-2.713427799,2.713427799,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,OLS,rolling_zscore_63_observations,JPYUSD BGN Curncy,0.2025146806,0.1909024711,OLS t-statistic,2.466943381,2.466943381,2.466943381,2.466943381,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,OLS,rolling_zscore_63_observations,TFF2GLFN Index,-0.0231875591,-0.127037711,OLS t-statistic,-2.299312771,2.299312771,-2.299312771,2.299312771,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,OLS,rolling_zscore_63_observations,EURUSD BGN Curncy,-0.2821522595,-0.2751238734,OLS t-statistic,-1.972948791,1.972948791,-1.972948791,1.972948791,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,OLS,rolling_zscore_63_observations,BBDXY Index,-0.353624927,-0.3431575321,OLS t-statistic,-1.960300189,1.960300189,-1.960300189,1.960300189,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,OLS,rolling_zscore_63_observations,UKX,-0.1112670123,-0.112932451,OLS t-statistic,-1.396067634,1.396067634,-1.396067634,1.396067634,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,OLS,rolling_zscore_63_observations,XAU BGN Curncy,0.0759335141,0.07863533524,OLS t-statistic,1.234812571,1.234812571,1.234812571,1.234812571,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,OLS,rolling_zscore_63_observations,NDX,0.4367518117,0.397882095,OLS t-statistic,1.177291999,1.177291999,1.177291999,1.177291999,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,OLS,rolling_zscore_63_observations,TFF2ILFN Index,0.07785202455,0.06697209717,OLS t-statistic,1.171316137,1.171316137,1.171316137,1.171316137,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,Ridge,rolling_zscore_63_observations,CTA US Equity,-0.2160005035,-0.2357683988,standardized coefficient,-0.2357683988,0.2357683988,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,Ridge,rolling_zscore_63_observations,JPYUSD BGN Curncy,0.2196825483,0.2070859317,standardized coefficient,0.2070859317,0.2070859317,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,Ridge,rolling_zscore_63_observations,CL1 COMB Comdty,-0.1419269817,-0.1408918499,standardized coefficient,-0.1408918499,0.1408918499,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,Ridge,rolling_zscore_63_observations,BBDXY Index,-0.1331039653,-0.1291640514,standardized coefficient,-0.1291640514,0.1291640514,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,Ridge,rolling_zscore_63_observations,TFF2GLFN Index,-0.01983103463,-0.1086483159,standardized coefficient,-0.1086483159,0.1086483159,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,Ridge,rolling_zscore_63_observations,XAU BGN Curncy,0.07885656556,0.08166239299,standardized coefficient,0.08166239299,0.08166239299,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,Ridge,rolling_zscore_63_observations,UKX,-0.07706003839,-0.07821346888,standardized coefficient,-0.07821346888,0.07821346888,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,Ridge,rolling_zscore_63_observations,DJI,0.06950777652,0.06945165284,standardized coefficient,0.06945165284,0.06945165284,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,Ridge,rolling_zscore_63_observations,EURUSD BGN Curncy,-0.06997098056,-0.06822801006,standardized coefficient,-0.06822801006,0.06822801006,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,Ridge,rolling_zscore_63_observations,TFF2ILFN Index,0.07532524151,0.06479843553,standardized coefficient,0.06479843553,0.06479843553,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,Lasso,rolling_zscore_63_observations,JPYUSD BGN Curncy,0.2538562695,0.2393001288,standardized coefficient,0.2393001288,0.2393001288,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,Lasso,rolling_zscore_63_observations,CTA US Equity,-0.2120887201,-0.2314986176,standardized coefficient,-0.2314986176,0.2314986176,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,Lasso,rolling_zscore_63_observations,CL1 COMB Comdty,-0.1082565746,-0.1074670149,standardized coefficient,-0.1074670149,0.1074670149,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,Lasso,rolling_zscore_63_observations,BBDXY Index,-0.06211408684,-0.06027549282,standardized coefficient,-0.06027549282,0.06027549282,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,Lasso,rolling_zscore_63_observations,TFF2GLFN Index,-0.01065877013,-0.05839621814,standardized coefficient,-0.05839621814,0.05839621814,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,Lasso,rolling_zscore_63_observations,XAU BGN Curncy,0.04214212589,0.04364160196,standardized coefficient,0.04364160196,0.04364160196,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,Lasso,rolling_zscore_63_observations,DJI,0.04185905458,0.04182525571,standardized coefficient,0.04182525571,0.04182525571,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,Lasso,rolling_zscore_63_observations,TFF2ILFN Index,0.01396195312,0.01201075099,standardized coefficient,0.01201075099,0.01201075099,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,Lasso,rolling_zscore_63_observations,TFF2HLFN Index,0,0,standardized coefficient,0,0,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,Lasso,rolling_zscore_63_observations,SOFRRATE Index,-0,-0,standardized coefficient,-0,0,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,OLS,rolling_zscore_63_observations,CL1 COMB Comdty,0.2390105961,0.2372673936,OLS t-statistic,3.444936382,3.444936382,3.444936382,3.444936382,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,OLS,rolling_zscore_63_observations,CTA US Equity,0.1802807559,0.1967796578,OLS t-statistic,2.90100202,2.90100202,2.90100202,2.90100202,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,OLS,rolling_zscore_63_observations,EURUSD BGN Curncy,0.3406402721,0.3321549552,OLS t-statistic,2.012129693,2.012129693,2.012129693,2.012129693,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,OLS,rolling_zscore_63_observations,TFF2GLFN Index,0.02228547263,0.1220954486,OLS t-statistic,1.866777532,1.866777532,1.866777532,1.866777532,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,OLS,rolling_zscore_63_observations,SOFRRATE Index,0.1149027074,0.1247781357,OLS t-statistic,1.846943691,1.846943691,1.846943691,1.846943691,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,OLS,rolling_zscore_63_observations,BBDXY Index,0.3177507266,0.3083452179,OLS t-statistic,1.487969268,1.487969268,1.487969268,1.487969268,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,OLS,rolling_zscore_63_observations,S5INFT Index,0.3495500704,0.3397198742,OLS t-statistic,1.34574337,1.34574337,1.34574337,1.34574337,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,OLS,rolling_zscore_63_observations,TFF2ILFN Index,-0.09622866764,-0.08278057914,OLS t-statistic,-1.223027963,1.223027963,-1.223027963,1.223027963,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,OLS,rolling_zscore_63_observations,DAX,-0.1036362448,-0.1119764301,OLS t-statistic,-1.110142915,1.110142915,-1.110142915,1.110142915,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,OLS,rolling_zscore_63_observations,DJI,-0.1815165112,-0.1813699467,OLS t-statistic,-1.004998972,1.004998972,-1.004998972,1.004998972,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,Ridge,rolling_zscore_63_observations,CL1 COMB Comdty,0.181769238,0.1804435202,standardized coefficient,0.1804435202,0.1804435202,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,Ridge,rolling_zscore_63_observations,CTA US Equity,0.1299557331,0.1418489986,standardized coefficient,0.1418489986,0.1418489986,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,Ridge,rolling_zscore_63_observations,DJI,-0.1075568469,-0.1074700007,standardized coefficient,-0.1074700007,0.1074700007,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,Ridge,rolling_zscore_63_observations,JPYUSD BGN Curncy,-0.1139971669,-0.1074605594,standardized coefficient,-0.1074605594,0.1074605594,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,Ridge,rolling_zscore_63_observations,SOFRRATE Index,0.08536739949,0.09270438612,standardized coefficient,0.09270438612,0.09270438612,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,Ridge,rolling_zscore_63_observations,TFF2GLFN Index,0.01568566232,0.08593705908,standardized coefficient,0.08593705908,0.08593705908,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,Ridge,rolling_zscore_63_observations,DAX,-0.07863187022,-0.08495981435,standardized coefficient,-0.08495981435,0.08495981435,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,Ridge,rolling_zscore_63_observations,EURUSD BGN Curncy,0.07879419683,0.07683144084,standardized coefficient,0.07683144084,0.07683144084,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,Ridge,rolling_zscore_63_observations,S5INFT Index,0.07306238709,0.07100769546,standardized coefficient,0.07100769546,0.07100769546,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,Ridge,rolling_zscore_63_observations,TFF2ILFN Index,-0.07420958057,-0.06383868973,standardized coefficient,-0.06383868973,0.06383868973,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,Lasso,rolling_zscore_63_observations,CL1 COMB Comdty,0.189952865,0.1885674608,standardized coefficient,0.1885674608,0.1885674608,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,Lasso,rolling_zscore_63_observations,CTA US Equity,0.1353751923,0.147764435,standardized coefficient,0.147764435,0.147764435,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,Lasso,rolling_zscore_63_observations,JPYUSD BGN Curncy,-0.1298269446,-0.1223826562,standardized coefficient,-0.1223826562,0.1223826562,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,Lasso,rolling_zscore_63_observations,DJI,-0.1048169076,-0.1047322737,standardized coefficient,-0.1047322737,0.1047322737,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,Lasso,rolling_zscore_63_observations,SOFRRATE Index,0.06876898755,0.07467940704,standardized coefficient,0.07467940704,0.07467940704,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,Lasso,rolling_zscore_63_observations,DAX,-0.05487803709,-0.05929437809,standardized coefficient,-0.05929437809,0.05929437809,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,Lasso,rolling_zscore_63_observations,TFF2GLFN Index,0.01050199233,0.05753727938,standardized coefficient,0.05753727938,0.05753727938,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,Lasso,rolling_zscore_63_observations,TFF2ILFN Index,-0.03648841457,-0.03138910851,standardized coefficient,-0.03138910851,0.03138910851,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,Lasso,rolling_zscore_63_observations,S5INFT Index,0.01162578007,0.01129883492,standardized coefficient,0.01129883492,0.01129883492,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5x2Y - 3x10Y futures basket,Lasso,rolling_zscore_63_observations,XAU BGN Curncy,-0.001087107826,-0.00112578865,standardized coefficient,-0.00112578865,0.00112578865,,,176,2022-06-14,2025-12-02,with_weekly_tff
+5Y future,OLS,rolling_zscore_63_observations,CTA US Equity,-0.2545190174,-0.2783198957,OLS t-statistic,-10.12175957,10.12175957,-10.12175957,10.12175957,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,OLS,rolling_zscore_63_observations,CL1 COMB Comdty,-0.2192106651,-0.2249570465,OLS t-statistic,-8.10845983,8.10845983,-8.10845983,8.10845983,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,OLS,rolling_zscore_63_observations,JPYUSD BGN Curncy,0.303134809,0.3228666646,OLS t-statistic,7.930772485,7.930772485,7.930772485,7.930772485,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,OLS,rolling_zscore_63_observations,XAU BGN Curncy,0.1604450164,0.1777702185,OLS t-statistic,5.841188939,5.841188939,5.841188939,5.841188939,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,OLS,rolling_zscore_63_observations,BBDXY Index,-0.1412568539,-0.146806582,OLS t-statistic,-1.689343154,1.689343154,-1.689343154,1.689343154,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,OLS,rolling_zscore_63_observations,S5INFT Index,-0.1040290336,-0.1112487884,OLS t-statistic,-1.112267529,1.112267529,-1.112267529,1.112267529,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,OLS,rolling_zscore_63_observations,XBTUSD BGN Curncy,-0.02525808897,-0.03004023375,OLS t-statistic,-1.053633886,1.053633886,-1.053633886,1.053633886,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,OLS,rolling_zscore_63_observations,SPX,0.1315654942,0.1418841073,OLS t-statistic,0.836786707,0.836786707,0.836786707,0.836786707,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,OLS,rolling_zscore_63_observations,DJI,-0.05252862035,-0.05593334785,OLS t-statistic,-0.726782694,0.726782694,-0.726782694,0.726782694,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,OLS,rolling_zscore_63_observations,UKX,0.02601759685,0.02806482866,OLS t-statistic,0.7226233855,0.7226233855,0.7226233855,0.7226233855,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,Ridge,rolling_zscore_63_observations,JPYUSD BGN Curncy,0.2933987922,0.3124969044,standardized coefficient,0.3124969044,0.3124969044,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,Ridge,rolling_zscore_63_observations,CTA US Equity,-0.2472217564,-0.2703402447,standardized coefficient,-0.2703402447,0.2703402447,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,Ridge,rolling_zscore_63_observations,CL1 COMB Comdty,-0.2088492901,-0.2143240588,standardized coefficient,-0.2143240588,0.2143240588,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,Ridge,rolling_zscore_63_observations,XAU BGN Curncy,0.1553316912,0.1721047454,standardized coefficient,0.1721047454,0.1721047454,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,Ridge,rolling_zscore_63_observations,BBDXY Index,-0.1293857095,-0.1344690416,standardized coefficient,-0.1344690416,0.1344690416,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,Ridge,rolling_zscore_63_observations,S5INFT Index,-0.06774865574,-0.07245050355,standardized coefficient,-0.07245050355,0.07245050355,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,Ridge,rolling_zscore_63_observations,SPX,0.05150835711,0.0555481307,standardized coefficient,0.0555481307,0.0555481307,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,Ridge,rolling_zscore_63_observations,GSTMTAIP Index,-0.02883477132,-0.03133503841,standardized coefficient,-0.03133503841,0.03133503841,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,Ridge,rolling_zscore_63_observations,XBTUSD BGN Curncy,-0.02344053589,-0.02787856113,standardized coefficient,-0.02787856113,0.02787856113,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,Ridge,rolling_zscore_63_observations,UKX,0.02300300681,0.0248130313,standardized coefficient,0.0248130313,0.0248130313,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,Lasso,rolling_zscore_63_observations,JPYUSD BGN Curncy,0.3041545254,0.3239527571,standardized coefficient,0.3239527571,0.3239527571,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,Lasso,rolling_zscore_63_observations,CTA US Equity,-0.2451529234,-0.2680779486,standardized coefficient,-0.2680779486,0.2680779486,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,Lasso,rolling_zscore_63_observations,CL1 COMB Comdty,-0.1930708495,-0.1981320026,standardized coefficient,-0.1981320026,0.1981320026,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,Lasso,rolling_zscore_63_observations,XAU BGN Curncy,0.144889535,0.1605350224,standardized coefficient,0.1605350224,0.1605350224,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,Lasso,rolling_zscore_63_observations,BBDXY Index,-0.1120252389,-0.1164265094,standardized coefficient,-0.1164265094,0.1164265094,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,Lasso,rolling_zscore_63_observations,S5INFT Index,-0.02630403476,-0.02812957014,standardized coefficient,-0.02812957014,0.02812957014,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,Lasso,rolling_zscore_63_observations,XBTUSD BGN Curncy,-0.006935020988,-0.008248036967,standardized coefficient,-0.008248036967,0.008248036967,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,Lasso,rolling_zscore_63_observations,GSTMTAIP Index,-0.007216060402,-0.007841766019,standardized coefficient,-0.007841766019,0.007841766019,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,Lasso,rolling_zscore_63_observations,SOFRRATE Index,-0,-0,standardized coefficient,-0,0,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5Y future,Lasso,rolling_zscore_63_observations,EURUSD BGN Curncy,0,0,standardized coefficient,0,0,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,OLS,rolling_zscore_63_observations,CL1 COMB Comdty,0.2414467374,0.2477760146,OLS t-statistic,7.930440134,7.930440134,7.930440134,7.930440134,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,OLS,rolling_zscore_63_observations,CTA US Equity,0.1512551909,0.1653995422,OLS t-statistic,5.341279777,5.341279777,5.341279777,5.341279777,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,OLS,rolling_zscore_63_observations,JPYUSD BGN Curncy,-0.2092069246,-0.222824763,OLS t-statistic,-4.86020958,4.86020958,-4.86020958,4.86020958,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,OLS,rolling_zscore_63_observations,XAU BGN Curncy,-0.1293548375,-0.1433228544,OLS t-statistic,-4.181739324,4.181739324,-4.181739324,4.181739324,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,OLS,rolling_zscore_63_observations,XBTUSD BGN Curncy,0.04626585925,0.05502543079,OLS t-statistic,1.713756572,1.713756572,1.713756572,1.713756572,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,OLS,rolling_zscore_63_observations,S5INFT Index,0.1799548601,0.1924439693,OLS t-statistic,1.708510038,1.708510038,1.708510038,1.708510038,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,OLS,rolling_zscore_63_observations,BBDXY Index,0.1567954449,0.1629556563,OLS t-statistic,1.66510279,1.66510279,1.66510279,1.66510279,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,OLS,rolling_zscore_63_observations,UKX,-0.0602504685,-0.06499136276,OLS t-statistic,-1.485951109,1.485951109,-1.485951109,1.485951109,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,OLS,rolling_zscore_63_observations,SOFRRATE Index,-0.02350906776,-0.03565122221,OLS t-statistic,-1.212607298,1.212607298,-1.212607298,1.212607298,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,OLS,rolling_zscore_63_observations,SPX,-0.1915566326,-0.2065803194,OLS t-statistic,-1.081855419,1.081855419,-1.081855419,1.081855419,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,Ridge,rolling_zscore_63_observations,CL1 COMB Comdty,0.2203886978,0.2261659601,standardized coefficient,0.2261659601,0.2261659601,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,Ridge,rolling_zscore_63_observations,JPYUSD BGN Curncy,-0.2045535194,-0.2178684551,standardized coefficient,-0.2178684551,0.2178684551,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,Ridge,rolling_zscore_63_observations,CTA US Equity,0.1446975422,0.158228667,standardized coefficient,0.158228667,0.158228667,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,Ridge,rolling_zscore_63_observations,XAU BGN Curncy,-0.1221662236,-0.1353579984,standardized coefficient,-0.1353579984,0.1353579984,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,Ridge,rolling_zscore_63_observations,BBDXY Index,0.1171437595,0.1217461274,standardized coefficient,0.1217461274,0.1217461274,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,Ridge,rolling_zscore_63_observations,S5INFT Index,0.08558789994,0.09152781529,standardized coefficient,0.09152781529,0.09152781529,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,Ridge,rolling_zscore_63_observations,SPX,-0.05956296891,-0.0642344615,standardized coefficient,-0.0642344615,0.0642344615,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,Ridge,rolling_zscore_63_observations,UKX,-0.05399606148,-0.05824481879,standardized coefficient,-0.05824481879,0.05824481879,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,Ridge,rolling_zscore_63_observations,XBTUSD BGN Curncy,0.04008180626,0.04767054351,standardized coefficient,0.04767054351,0.04767054351,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,Ridge,rolling_zscore_63_observations,SOFRRATE Index,-0.02403853152,-0.03645414771,standardized coefficient,-0.03645414771,0.03645414771,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,Lasso,rolling_zscore_63_observations,JPYUSD BGN Curncy,-0.2130457252,-0.2269134414,standardized coefficient,-0.2269134414,0.2269134414,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,Lasso,rolling_zscore_63_observations,CL1 COMB Comdty,0.2130498475,0.2186347294,standardized coefficient,0.2186347294,0.2186347294,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,Lasso,rolling_zscore_63_observations,CTA US Equity,0.1412074975,0.1544122572,standardized coefficient,0.1544122572,0.1544122572,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,Lasso,rolling_zscore_63_observations,XAU BGN Curncy,-0.1160558486,-0.1285878117,standardized coefficient,-0.1285878117,0.1285878117,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,Lasso,rolling_zscore_63_observations,BBDXY Index,0.09264397723,0.0962837927,standardized coefficient,0.0962837927,0.0962837927,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,Lasso,rolling_zscore_63_observations,UKX,-0.05465832746,-0.05895919611,standardized coefficient,-0.05895919611,0.05895919611,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,Lasso,rolling_zscore_63_observations,XBTUSD BGN Curncy,0.02091049739,0.02486950735,standardized coefficient,0.02486950735,0.02486950735,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,Lasso,rolling_zscore_63_observations,SOFRRATE Index,-0.01523653626,-0.02310602637,standardized coefficient,-0.02310602637,0.02310602637,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,Lasso,rolling_zscore_63_observations,DJI,-0.02047303545,-0.02180002836,standardized coefficient,-0.02180002836,0.02180002836,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff
+5x2Y - 3x10Y futures basket,Lasso,rolling_zscore_63_observations,EURUSD BGN Curncy,-0,-0,standardized coefficient,-0,0,,,847,2022-06-08,2025-11-28,daily_without_weekly_tff

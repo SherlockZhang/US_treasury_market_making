@@ -1,0 +1,515 @@
+date,target,model_set,scaling,actual,ols_fitted,ridge_fitted,lasso_fitted
+2025-12-09,5Y future,with_weekly_tff,rolling_zscore_63_observations,-0.7636543227,0.02399048452,-0.05340694296,-0.1864073127
+2025-12-16,5Y future,with_weekly_tff,rolling_zscore_63_observations,1.252878422,0.5712587208,0.3539904403,0.2802349799
+2025-12-23,5Y future,with_weekly_tff,rolling_zscore_63_observations,-0.3740058326,0.421805903,0.4256854404,0.4071955932
+2025-12-30,5Y future,with_weekly_tff,rolling_zscore_63_observations,0.006860675591,-0.02366310432,-0.01744900515,-0.009588695651
+2026-01-06,5Y future,with_weekly_tff,rolling_zscore_63_observations,-0.3452864707,0.01053499349,-0.04439952525,-0.01750881702
+2026-01-13,5Y future,with_weekly_tff,rolling_zscore_63_observations,0.7372135406,-0.8354607193,-0.7419639966,-0.598401879
+2026-01-20,5Y future,with_weekly_tff,rolling_zscore_63_observations,-0.5554129821,-0.5480304177,-0.3745885379,-0.1588122359
+2026-01-27,5Y future,with_weekly_tff,rolling_zscore_63_observations,0.3181441303,0.6039393462,0.8232983732,1.067560789
+2026-02-03,5Y future,with_weekly_tff,rolling_zscore_63_observations,-0.06041561089,-0.01614240578,-0.04814831323,-0.207006175
+2026-02-10,5Y future,with_weekly_tff,rolling_zscore_63_observations,1.259437369,0.6011740491,0.4738002146,0.5293698015
+2026-02-17,5Y future,with_weekly_tff,rolling_zscore_63_observations,-0.4013073688,-0.4646902745,-0.2510969215,-0.1022880692
+2026-02-24,5Y future,with_weekly_tff,rolling_zscore_63_observations,-0.5299137097,0.07688319771,-0.06411730308,-0.1175647885
+2026-03-03,5Y future,with_weekly_tff,rolling_zscore_63_observations,-0.1736572991,0.1058615295,-0.02241897296,-0.02728478675
+2026-03-10,5Y future,with_weekly_tff,rolling_zscore_63_observations,0.6612354017,0.6818515869,0.4460153804,0.2725480804
+2026-03-17,5Y future,with_weekly_tff,rolling_zscore_63_observations,0.3968207406,-0.7636878849,-0.6175589216,-0.4756355696
+2026-03-24,5Y future,with_weekly_tff,rolling_zscore_63_observations,-1.565334227,-1.210689902,-0.8367413166,-0.4090837986
+2026-03-31,5Y future,with_weekly_tff,rolling_zscore_63_observations,1.293679992,1.069704557,1.095385174,0.9765534483
+2026-04-07,5Y future,with_weekly_tff,rolling_zscore_63_observations,0.2512493332,0.2576903092,0.3201591109,0.3070030086
+2026-04-14,5Y future,with_weekly_tff,rolling_zscore_63_observations,0.9905692546,1.130425939,0.9337930215,0.7999516548
+2026-04-21,5Y future,with_weekly_tff,rolling_zscore_63_observations,-1.261635996,-0.624189602,-0.577588185,-0.5411046237
+2026-04-28,5Y future,with_weekly_tff,rolling_zscore_63_observations,-0.6861091888,-0.4365137313,-0.33040763,-0.3192722691
+2026-05-05,5Y future,with_weekly_tff,rolling_zscore_63_observations,0.5144712492,0.7477700787,0.5603584563,0.2378332269
+2026-05-12,5Y future,with_weekly_tff,rolling_zscore_63_observations,-0.9798788329,-0.68492175,-0.549967799,-0.4270147624
+2026-05-19,5Y future,with_weekly_tff,rolling_zscore_63_observations,-0.6826054682,-0.1513384661,-0.1850716768,-0.1509588473
+2026-05-26,5Y future,with_weekly_tff,rolling_zscore_63_observations,1.807304908,0.1037282088,-0.09306856428,0.2517876631
+2026-06-02,5Y future,with_weekly_tff,rolling_zscore_63_observations,0.3046265319,0.1953411313,0.1836881159,-0.01413922653
+2026-06-09,5Y future,with_weekly_tff,rolling_zscore_63_observations,0.7238038748,0.4164066846,0.3686548692,0.1991962446
+2026-06-16,5Y future,with_weekly_tff,rolling_zscore_63_observations,0.8013523207,0.4730768516,0.5307580971,0.3985177984
+2026-06-23,5Y future,with_weekly_tff,rolling_zscore_63_observations,0.7708187769,-0.1453847472,-0.08036758073,0.08242091413
+2026-06-30,5Y future,with_weekly_tff,rolling_zscore_63_observations,-0.4942757242,-0.1628480797,-0.13580881,-0.1281422973
+2026-07-07,5Y future,with_weekly_tff,rolling_zscore_63_observations,-0.8997865766,-0.3252295974,-0.1805062806,-0.1038467624
+2026-07-14,5Y future,with_weekly_tff,rolling_zscore_63_observations,1.067057665,0.0636956538,0.03698953246,0.07226802171
+2026-07-21,5Y future,with_weekly_tff,rolling_zscore_63_observations,-0.6424157758,-0.4625182291,-0.3908588379,-0.3574773073
+2026-07-28,5Y future,with_weekly_tff,rolling_zscore_63_observations,0.9654877367,0.3852590169,0.4431675812,0.422954696
+2026-08-04,5Y future,with_weekly_tff,rolling_zscore_63_observations,1.524281428,0.9899061116,0.8951807065,0.5641963761
+2026-08-11,5Y future,with_weekly_tff,rolling_zscore_63_observations,0.6210873874,-0.1634651087,-0.201548097,-0.1164932395
+2026-08-18,5Y future,with_weekly_tff,rolling_zscore_63_observations,0.2743074714,-0.2004413386,-0.1497999976,-0.1188701016
+2026-08-25,5Y future,with_weekly_tff,rolling_zscore_63_observations,1.267437536,0.6550990537,0.5401103414,0.5546026456
+2026-09-01,5Y future,with_weekly_tff,rolling_zscore_63_observations,-0.9374988113,-1.029966516,-0.8450971996,-0.7807434356
+2026-09-08,5Y future,with_weekly_tff,rolling_zscore_63_observations,-0.4657255074,-0.4506012866,-0.4731966354,-0.250853982
+2026-09-15,5Y future,with_weekly_tff,rolling_zscore_63_observations,-0.595324564,-1.055799475,-0.8522349954,-0.6887432529
+2026-09-22,5Y future,with_weekly_tff,rolling_zscore_63_observations,0.06358581303,0.301147262,0.06134364742,0.08531807345
+2026-09-29,5Y future,with_weekly_tff,rolling_zscore_63_observations,0.3438123773,1.193355289,0.8880482078,0.490340986
+2026-10-06,5Y future,with_weekly_tff,rolling_zscore_63_observations,1.210568202,0.1289603477,0.2741583957,0.103287336
+2026-10-13,5Y future,with_weekly_tff,rolling_zscore_63_observations,0.7687541183,-0.4091432333,-0.1074315152,0.00895008764
+2025-12-09,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,0.2684487798,-0.2163913222,-0.1021299905,-0.03912180403
+2025-12-16,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-1.035170167,-0.4507627226,-0.2389129656,-0.2704206561
+2025-12-23,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-0.5539975383,-0.08916273103,-0.175467754,-0.1662360406
+2025-12-30,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,0.7931804153,-0.2542350947,-0.2005490684,-0.1397734665
+2026-01-06,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,0.08155963961,-0.5409615889,-0.3606455412,-0.3327649566
+2026-01-13,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-0.5366117153,0.7243777697,0.6012436217,0.6083317453
+2026-01-20,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,1.877060311,0.9642405131,0.6444029858,0.5168542463
+2026-01-27,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,0.4570643358,0.6146965292,0.1442282118,0.00528210429
+2026-02-03,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-0.2338327403,-0.017486645,0.1342824956,0.3422669726
+2026-02-10,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-1.59620744,-0.3775806589,-0.2933216724,-0.3235858961
+2026-02-17,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-0.2882449225,0.3283160676,0.02484637229,-0.05662499361
+2026-02-24,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,0.1379631322,-0.2661511219,-0.09202518232,-0.1356103101
+2026-03-03,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-0.1468921718,0.6295594171,0.5146408297,0.4033573168
+2026-03-10,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-0.1427538008,-1.433873965,-0.9870854531,-0.9050056398
+2026-03-17,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-0.4778776785,0.5249880682,0.3252142907,0.2637044513
+2026-03-24,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,1.148470472,1.0597377,0.6176287919,0.4605576984
+2026-03-31,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-0.7493507102,-0.5160738084,-0.6439647234,-0.7242405165
+2026-04-07,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,0.001169989176,-0.06519120467,-0.1279809637,-0.2008358967
+2026-04-14,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-1.100352889,-0.8983047325,-0.7080590974,-0.7201825319
+2026-04-21,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,0.9566763332,0.5237689974,0.4043475723,0.3529713983
+2026-04-28,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,0.2255331566,0.2732514286,0.1048240287,0.1370149724
+2026-05-05,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-0.521056699,-0.8008725395,-0.5592772141,-0.4838014255
+2026-05-12,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,1.163637538,0.4647965635,0.3185279989,0.3327355673
+2026-05-19,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,0.9153078632,-0.1665704742,-0.07757911434,-0.07136756176
+2026-05-26,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-1.723936938,0.3372480756,0.345132606,0.0757861814
+2026-06-02,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-0.5432098548,-0.455613571,-0.2821580184,-0.1852037148
+2026-06-09,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-0.6546012287,-0.6226554974,-0.400423442,-0.3545430377
+2026-06-16,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-1.132415478,-0.8887848405,-0.7263051346,-0.6456912955
+2026-06-23,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,0.02502115107,-0.1101296592,-0.1322316798,-0.1241361232
+2026-06-30,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,1.53899096,0.3172787418,0.1643539588,0.08805266595
+2026-07-07,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,0.9235221008,0.2253190199,0.09734066348,0.1478718522
+2026-07-14,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-0.09747242635,0.2542191543,0.1606214698,0.160298092
+2026-07-21,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,0.349279113,0.3664561025,0.2512083048,0.2603999173
+2026-07-28,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-0.5397221222,-0.4606363114,-0.5364721256,-0.5460694746
+2026-08-04,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-1.206784827,-0.9437469671,-0.8141703621,-0.7888537618
+2026-08-11,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-0.3200798937,0.1879797648,0.2026614334,0.1732040035
+2026-08-18,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-0.4458970369,0.1359986101,0.02593454704,0.03696463993
+2026-08-25,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-1.65491015,-0.5936352566,-0.459048961,-0.5035238567
+2026-09-01,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,0.7197616638,0.8164797915,0.6061834363,0.6269041926
+2026-09-08,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,0.4763290043,0.4265650769,0.4317543404,0.3334047176
+2026-09-15,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,0.8012782384,1.063080419,0.7390429087,0.6527101537
+2026-09-22,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,1.763975662,-0.1152459833,0.03375375846,-0.0436618113
+2026-09-29,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,0.6417725389,-1.264131698,-0.7767599399,-0.6114484022
+2026-10-06,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-0.9222192064,-0.3053524235,-0.3192477866,-0.2429699392
+2026-10-13,5x2Y - 3x10Y futures basket,with_weekly_tff,rolling_zscore_63_observations,-0.6651035673,0.5656921116,0.183413064,0.07534129778
+2025-12-01,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.860885857,0.2487228138,0.2498711149,0.2389240341
+2025-12-02,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.4468993045,-0.1973789039,-0.1571991468,-0.09824059283
+2025-12-03,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.8526781999,0.5079748169,0.516181245,0.5175593288
+2025-12-04,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.499460489,-0.1083852894,-0.1170786039,-0.06856173959
+2025-12-05,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.8337601225,0.22748334,0.22834294,0.2437948165
+2025-12-08,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.9089700525,-0.2159837992,-0.1760089121,-0.108340037
+2025-12-09,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.7636543227,-0.2347845439,-0.2370416796,-0.228771478
+2025-12-10,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.8509364085,0.690552496,0.6875609616,0.6425438668
+2025-12-11,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.073045283,0.3841456514,0.4124475979,0.368611163
+2025-12-12,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.6894049341,0.2324720448,0.2112300955,0.1512412838
+2025-12-15,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.5310417246,0.4323552153,0.3969387702,0.3145957619
+2025-12-16,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.252878422,0.4320863994,0.406621181,0.4237071597
+2025-12-17,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.23499862,-0.4546809827,-0.4259908527,-0.4897498699
+2025-12-18,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.022357196,-0.2217172483,-0.2464929886,-0.2308286151
+2025-12-19,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.9842870438,-1.110747795,-1.075193039,-1.04234606
+2025-12-22,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.6784033848,0.2439698529,0.2424802903,0.2443044159
+2025-12-23,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.3740058326,0.4784166473,0.4671930605,0.4527995115
+2025-12-29,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.3912800492,-0.1014824364,-0.09664553266,-0.02259580438
+2025-12-30,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.006860675591,-0.0704831038,-0.08794703595,-0.08984564459
+2026-01-02,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.129568898,0.01274771182,0.01190753836,0.06014042094
+2026-01-05,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.8617599621,-0.07159085974,-0.06159271722,-0.04689409429
+2026-01-06,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.3452864707,-0.01122477886,-0.02166564473,-0.07225330765
+2026-01-07,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.5819516508,0.2182921563,0.1937930992,0.2266439698
+2026-01-08,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.09841726,-0.4521743828,-0.4555054016,-0.4630711344
+2026-01-09,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.7345142063,-1.161599757,-1.136433958,-1.118930589
+2026-01-12,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.1887904155,-0.0600181813,-0.03441978909,-0.01994966813
+2026-01-13,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.7372135406,-0.9659623433,-0.9645280721,-0.893838568
+2026-01-14,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.7827289696,-0.04820569913,-0.04282595807,-0.0295004167
+2026-01-15,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.407909297,0.8365750856,0.7969544394,0.7600564426
+2026-01-16,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.798180531,0.6109365869,0.5857103332,0.6120396707
+2026-01-20,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.5554129821,0.01321601184,0.09889184941,0.07818931879
+2026-01-21,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.7678770304,0.1995593181,0.1455031356,0.1141676066
+2026-01-22,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.4136060946,0.4584562428,0.4817226409,0.433548342
+2026-01-23,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.4567488641,1.122525549,1.101016786,1.114739332
+2026-01-26,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.7749564415,0.6076819984,0.6145990623,0.6291738501
+2026-01-27,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.3181441303,1.604913306,1.591546497,1.53601005
+2026-01-28,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.5468456645,-0.9542711893,-0.9380129572,-0.8891363859
+2026-01-29,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.229737443,-0.2504538152,-0.2785180471,-0.4006591903
+2026-01-30,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.4025786013,-1.074744727,-1.099493422,-1.022434121
+2026-02-02,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.182029399,0.0780930275,0.06196846326,0.0611697034
+2026-02-03,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.06041561089,0.07865465167,0.08391418328,0.03824078492
+2026-02-04,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.162440549,-0.965881294,-0.9258865213,-1.027292304
+2026-02-05,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,2.648438441,0.1924618425,0.1825904248,0.13330394
+2026-02-06,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.1942965609,-0.2167334853,-0.1475609506,-0.02004035683
+2026-02-09,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.4192259548,0.3585551114,0.3879330417,0.430990051
+2026-02-10,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.259437369,0.5460405557,0.536601415,0.5676906052
+2026-02-11,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.386007947,0.2667677451,0.24442706,0.2218071799
+2026-02-12,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,2.165094709,0.488180546,0.484838118,0.518438217
+2026-02-13,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.736183445,0.05604364101,0.04098830029,0.04426195452
+2026-02-17,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.4013073688,-0.3107911985,-0.2968509987,-0.2884917672
+2026-02-18,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.7879599465,-1.573723397,-1.553720768,-1.541322617
+2026-02-19,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.2045634882,-0.50158253,-0.4983122949,-0.4626815819
+2026-02-20,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.08993742425,0.2416999034,0.2092037814,0.1718587478
+2026-02-23,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.915690846,0.2197762498,0.1978259645,0.1570784431
+2026-02-24,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.5299137097,-0.3503764441,-0.3465253533,-0.353539212
+2026-02-25,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.5617222726,-0.1792346082,-0.1531328474,-0.1388336881
+2026-02-26,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.9102868474,0.189376551,0.1790193389,0.1581580816
+2026-02-27,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,2.119854046,-0.1147949294,-0.1653380009,-0.2490887422
+2026-03-02,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-3.291557369,-1.544108903,-1.512437446,-1.390434283
+2026-03-03,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.1736572991,-0.6034675779,-0.5678715096,-0.4646482074
+2026-03-04,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.004140231,0.01695546844,0.009873870801,0.04498540503
+2026-03-05,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.97589507,-1.195608347,-1.15442819,-1.049696266
+2026-03-06,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.7590034793,-1.12073282,-1.024126385,-0.931614732
+2026-03-09,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.539383184,-0.1495527347,-0.1392017745,-0.09079039909
+2026-03-10,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.6612354017,0.6370518495,0.6122289331,0.565913449
+2026-03-11,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.813398818,-0.5210709774,-0.5235271357,-0.48870765
+2026-03-12,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-2.883183183,-1.261392024,-1.191896307,-1.063189506
+2026-03-13,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.5022859761,-0.5222707595,-0.514786071,-0.4462118743
+2026-03-16,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.747055418,1.360213932,1.322592047,1.274857696
+2026-03-17,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.3968207406,-0.6342514756,-0.6112641311,-0.6204833801
+2026-03-18,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.965809788,-0.8041931882,-0.78530601,-0.7200191894
+2026-03-19,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.440667792,1.257154893,1.268968589,1.309169883
+2026-03-20,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-2.142988646,-0.9771851133,-0.907086453,-0.883270668
+2026-03-23,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.573723181,2.15450014,2.09148526,2.078135969
+2026-03-24,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.565334227,-0.5284898866,-0.5008724137,-0.4851491892
+2026-03-25,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.247230332,0.07305696044,0.05097274064,0.02282962383
+2026-03-26,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-2.484027692,-0.812399305,-0.7538404012,-0.7129727554
+2026-03-27,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.9154371903,-0.7414593333,-0.7036813497,-0.6998194089
+2026-03-30,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.735724801,-0.1409309966,-0.1526064247,-0.1890906134
+2026-03-31,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.293679992,1.113826308,1.073818816,1.037307755
+2026-04-01,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.5131483003,0.7999430998,0.7803186193,0.7509635799
+2026-04-02,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.2525420057,-1.839536856,-1.787149105,-1.74170744
+2026-04-07,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.2512493332,0.4090238698,0.4044208436,0.3873176948
+2026-04-08,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.305832631,2.480949084,2.39663196,2.31167419
+2026-04-09,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.1921646417,-0.2661772331,-0.2609624133,-0.2964456302
+2026-04-10,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.4601444426,0.06033911224,0.07523243878,0.1020912199
+2026-04-13,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.5913331662,-0.4748939599,-0.4562725048,-0.4197882288
+2026-04-14,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.9905692546,1.074456495,1.030995212,1.006209057
+2026-04-15,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.4739151762,-0.1167283148,-0.1200029683,-0.09304052574
+2026-04-16,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.3093356826,-0.4167671395,-0.3993400729,-0.3765124387
+2026-04-17,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.704842108,1.411536213,1.374341357,1.364092718
+2026-04-20,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.25418338,-0.6484960886,-0.6006852766,-0.553842949
+2026-04-21,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.261635996,-0.9164592775,-0.8751925627,-0.8126692054
+2026-04-22,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.1923809737,-0.2068801266,-0.2032708335,-0.1528638734
+2026-04-23,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.7115686704,-0.4832821787,-0.4878700939,-0.4945289472
+2026-04-24,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.8150415258,0.3374010324,0.3387158446,0.3559664905
+2026-04-27,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.4769460059,-0.222109826,-0.2199156592,-0.2208332398
+2026-04-28,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.6861091888,-0.5205185086,-0.5037613019,-0.5273930371
+2026-04-29,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.595619322,-1.252518702,-1.224918154,-1.177778061
+2026-04-30,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.8845939649,2.419879396,2.327013546,2.298302562
+2026-05-05,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.5144712492,0.1525052672,0.1623501286,0.2110556154
+2026-05-06,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.431674515,1.993987551,1.942869152,1.871831164
+2026-05-07,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.7352165504,-0.1354413046,-0.1330751937,-0.1592717933
+2026-05-08,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.7024993241,0.2309045649,0.2606068308,0.256277834
+2026-05-11,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.008802556,-0.5645149949,-0.5255216065,-0.4794255621
+2026-05-12,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.9798788329,-0.5771175686,-0.5869638418,-0.6332559011
+2026-05-13,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.01782667234,0.1706653538,0.1319255453,0.1031646993
+2026-05-14,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.2952008331,-0.3853089028,-0.367735121,-0.31402455
+2026-05-15,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-2.502444625,-0.6416686345,-0.6212684413,-0.6113576229
+2026-05-18,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.188699446,0.2190467397,0.2120438524,0.1199153493
+2026-05-19,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.6826054682,-0.3500277012,-0.3462020942,-0.3189719991
+2026-05-20,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,2.207607484,1.123998431,1.108269749,1.075081706
+2026-05-21,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.4372960626,0.2582670109,0.265782463,0.2771629379
+2026-05-22,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.03914776153,-0.009447232477,-0.002403468245,0.008529606294
+2026-05-26,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.807304908,0.2184718011,0.2041693302,0.1952776139
+2026-05-27,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.3639381778,0.4144481493,0.3999166282,0.3505080032
+2026-05-28,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.5373469327,0.4047203914,0.3891987474,0.356604421
+2026-05-29,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.3573781683,0.2188528139,0.2702661367,0.3124341216
+2026-06-01,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.5392998066,-0.985040601,-0.9171299271,-0.8464949346
+2026-06-02,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.3046265319,-0.1638221906,-0.1312784887,-0.1461935055
+2026-06-03,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.5445297995,-0.2415552384,-0.27541173,-0.3304162662
+2026-06-04,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.6712226719,0.6270575588,0.6056199111,0.5209400449
+2026-06-05,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.651284197,-0.02860193465,-0.06867461057,-0.127674292
+2026-06-08,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.161336167,-0.06192106656,-0.04402018214,-0.01573005974
+2026-06-09,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.7238038748,0.2372476498,0.2087940156,0.1569097048
+2026-06-10,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.001462014895,-0.5795783852,-0.5765121468,-0.5852091548
+2026-06-11,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.479192951,0.9903581797,0.9892465955,0.9769324089
+2026-06-12,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.2917991687,0.1919487278,0.1809207071,0.1636366503
+2026-06-15,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.5909559608,0.4739905149,0.4662009488,0.5102314275
+2026-06-16,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.8013523207,0.64801741,0.6345004934,0.5485442389
+2026-06-17,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.502919452,-0.5192030814,-0.5111972722,-0.4308889192
+2026-06-18,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.2005855178,-0.6012314262,-0.6091335471,-0.5770141649
+2026-06-22,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.22620642,0.03647631852,0.05360302438,0.08611142972
+2026-06-23,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.7708187769,0.08434280012,0.07500213363,0.02918788578
+2026-06-24,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.753360014,0.0171083873,0.00994257382,-0.02139705402
+2026-06-25,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.389727527,0.04336387549,0.05473029038,0.03583578295
+2026-06-26,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.6298972094,0.7153392226,0.6641259757,0.5727842112
+2026-06-29,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.3232613805,-0.4049869205,-0.3924470987,-0.3799742498
+2026-06-30,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.4942757242,-0.302478831,-0.2806780477,-0.2554365204
+2026-07-01,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.736493177,0.239189433,0.1802558753,0.1526271075
+2026-07-02,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.3693988674,1.239009828,1.232085259,1.180713247
+2026-07-06,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.4059454004,-0.6264262233,-0.6184041721,-0.6008533144
+2026-07-07,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.8997865766,-0.2436093784,-0.264691771,-0.2913536112
+2026-07-08,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.033399676,-0.6316291235,-0.6018773842,-0.5734502112
+2026-07-09,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.000520388,0.3848069134,0.3655975132,0.3863614456
+2026-07-10,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.8127594402,0.5109865765,0.4729744575,0.4612768975
+2026-07-13,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.9874985615,-1.700358042,-1.640390853,-1.59938938
+2026-07-14,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.067057665,0.067010738,0.08382188329,0.1009797451
+2026-07-15,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.550606694,0.3245521859,0.3081562117,0.2500490191
+2026-07-16,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.4773730352,0.01144922742,-0.006802968454,-0.05898778484
+2026-07-17,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.279313035,-0.5386583693,-0.4922645318,-0.4576046013
+2026-07-20,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.013387368,-0.2734266123,-0.2833554411,-0.2387321638
+2026-07-21,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.6424157758,-0.6196515058,-0.5872826491,-0.5426410029
+2026-07-22,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.6714871054,-0.06010741684,-0.03896223047,-0.0514142243
+2026-07-23,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.9553622556,-1.506110787,-1.433868742,-1.345908171
+2026-07-24,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.9920982288,0.7141004046,0.6774914022,0.6107161318
+2026-07-27,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.7696425092,1.466636831,1.419100736,1.35983955
+2026-07-28,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.9654877367,0.515104606,0.5047147947,0.408193869
+2026-07-29,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.4041319632,-0.1769784172,-0.150601683,-0.1696766579
+2026-07-30,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.3360594062,3.378261979,3.305372624,3.430257007
+2026-07-31,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.647050801,0.8065029124,0.737070826,0.7359557234
+2026-08-03,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.376059403,0.9664213197,0.8927571723,0.8748255234
+2026-08-04,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.524281428,0.4920030498,0.5014711616,0.4913236125
+2026-08-05,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.2267750909,0.4591303602,0.4813011356,0.4472242197
+2026-08-06,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.279190766,-0.9176728845,-0.9224755573,-0.9029050751
+2026-08-07,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.7733772951,0.7781456099,0.7516071624,0.7210848536
+2026-08-10,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.7734599612,-1.660787503,-1.628793915,-1.64706502
+2026-08-11,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.6210873874,-0.2434694761,-0.2286082071,-0.1992418718
+2026-08-12,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.3297063176,-0.0572868959,-0.06446094188,-0.0514930603
+2026-08-13,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.391069775,0.1140152084,0.08171057704,0.0648917163
+2026-08-14,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.9323630262,-0.03361009465,-0.01186129057,-0.005686559126
+2026-08-17,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.1170363232,-0.6310330981,-0.5826521897,-0.5208277581
+2026-08-18,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.2743074714,-0.315684426,-0.3035678386,-0.3307729538
+2026-08-19,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.1431196038,1.212231414,1.193165611,1.162568024
+2026-08-20,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.5615643346,-0.90994264,-0.8692486175,-0.7967765324
+2026-08-21,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.7926675162,0.2190766705,0.2186281098,0.2348298312
+2026-08-24,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.4345443069,0.4850751335,0.4651698793,0.4330007954
+2026-08-25,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.267437536,0.6573972581,0.6452420463,0.6257145845
+2026-08-26,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.6313458372,-0.3263622797,-0.32671153,-0.2876940113
+2026-08-27,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.1864833607,-0.5664073387,-0.5299960151,-0.4423887528
+2026-08-28,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-2.112163745,-0.6799765847,-0.6970328878,-0.7135298651
+2026-09-01,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.9374988113,-1.266522539,-1.233524064,-1.208782582
+2026-09-02,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.2137003255,0.8626339331,0.8191219445,0.8114547753
+2026-09-03,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.164373697,1.85356427,1.794860248,1.805236542
+2026-09-04,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.7230470129,-0.4081383933,-0.3854824218,-0.3617303051
+2026-09-08,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.4657255074,-0.3970136252,-0.3883750557,-0.3466338362
+2026-09-09,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.7563388047,-0.4467218067,-0.4197767016,-0.381655244
+2026-09-10,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-2.492358082,-1.721435225,-1.666017032,-1.627605601
+2026-09-11,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.284183759,0.8721399278,0.8285481909,0.8167433735
+2026-09-14,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.2885305638,-0.5435805903,-0.5533718448,-0.5847144441
+2026-09-15,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.595324564,-0.9924194691,-0.951068007,-0.9292282751
+2026-09-16,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.61819727,-0.345241237,-0.3875604098,-0.3623198441
+2026-09-17,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.339136679,0.6596417987,0.6291366524,0.6134436154
+2026-09-18,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-1.025564211,-0.1718733222,-0.1585750944,-0.1004763175
+2026-09-21,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.7245118697,0.2959340767,0.226585997,0.2225203124
+2026-09-22,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.06358581303,0.117697826,0.1101191756,0.118540143
+2026-09-23,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-3.207232968,-0.9066103276,-0.8808357629,-0.8543125642
+2026-09-24,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.1957138015,-0.4432445689,-0.4359223985,-0.4301071196
+2026-09-25,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.6987654674,1.139993631,1.126680294,1.12786148
+2026-09-28,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.9924232071,-0.5699828859,-0.5281477451,-0.4732124337
+2026-09-29,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.3438123773,0.6198195475,0.5882814931,0.5914482228
+2026-09-30,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.2519119389,-0.4491873269,-0.4370851677,-0.4198540633
+2026-10-01,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.3536108018,-0.7706354551,-0.7829854689,-0.6876592574
+2026-10-02,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.9023560536,0.3188924024,0.2919516318,0.2716096611
+2026-10-05,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.1284211136,0.3536992061,0.2850076376,0.2272729234
+2026-10-06,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,1.210568202,0.09392423447,0.09265229559,0.06340953509
+2026-10-07,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.4585396387,0.0201974257,-0.02686406424,-0.0469112541
+2026-10-08,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.8547594858,-0.2707415609,-0.2487074066,-0.2999991171
+2026-10-09,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,-0.4784809719,0.06914850929,0.05867170208,0.02551610177
+2026-10-13,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.7687541183,-0.01664786021,-0.001895026043,-0.005807527019
+2026-10-14,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,0.5824607073,-0.124325081,-0.101410328,-0.1332813075
+2026-10-15,5Y future,daily_without_weekly_tff,rolling_zscore_63_observations,2.404658091,0.4618799629,0.4882626889,0.4073471459
+2025-12-01,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,2.151024641,0.03612307043,-0.006300437987,-0.0558337714
+2025-12-02,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.09117094789,0.2325833214,0.157489135,0.08232621185
+2025-12-03,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.8226205283,-0.3421686551,-0.3267323201,-0.2949944659
+2025-12-04,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.561640439,0.0769543545,0.09750184169,0.1045237785
+2025-12-05,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.6859447065,-0.1129514011,-0.115121345,-0.07479288486
+2025-12-08,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.276822612,0.1981229254,0.1168396611,0.02641305067
+2025-12-09,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.2684487798,0.1509865367,0.1566264638,0.1479159248
+2025-12-10,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.1185990264,-0.5634039792,-0.5333683281,-0.4808781482
+2025-12-11,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.144834995,-0.391608347,-0.4094777783,-0.395112441
+2025-12-12,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.574150546,-0.07226753196,-0.03946152302,0.01365980878
+2025-12-15,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.3887493257,-0.5532198025,-0.4715722827,-0.4043815033
+2025-12-16,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.035170167,-0.3170700204,-0.2792624423,-0.3233385392
+2025-12-17,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.0598656629,0.4451895698,0.3903465204,0.3747589353
+2025-12-18,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.197904457,0.01892973204,0.06577392189,0.0907688861
+2025-12-19,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.131801276,0.8257775238,0.7655446304,0.7245359452
+2025-12-22,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.716480319,-0.1527567428,-0.1345481612,-0.09935356883
+2025-12-23,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.5539975383,-0.3335646266,-0.330143974,-0.3399547515
+2025-12-29,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.4913931705,0.3747078443,0.3386394837,0.2963100174
+2025-12-30,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.7931804153,0.03678795604,0.05791767903,0.04508094231
+2026-01-02,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.210990257,-0.08595949167,-0.03738675036,-0.02548853462
+2026-01-05,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.9640905608,-0.04078935283,-0.04242477323,0.002819346259
+2026-01-06,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.08155963961,-0.2930869515,-0.2485810325,-0.2084188215
+2026-01-07,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.474813467,-0.1165334789,-0.110413942,-0.1132436083
+2026-01-08,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.566110499,0.5058614387,0.4891659673,0.5174464309
+2026-01-09,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.8725569327,0.7632945352,0.7443951992,0.7651125185
+2026-01-12,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.3508050244,-0.001330048128,-0.01968355679,-0.01303914923
+2026-01-13,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.5366117153,0.9009079099,0.8939629304,0.8475904738
+2026-01-14,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.090000466,0.07730752933,0.08530139113,0.05392973435
+2026-01-15,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.4319807887,-0.9616642526,-0.8610442385,-0.7946754209
+2026-01-16,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,2.201402405,-0.3549231522,-0.3228179462,-0.3324532317
+2026-01-20,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.877060311,0.2191322114,0.1188087752,0.1026479629
+2026-01-21,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.544166828,-0.2789612654,-0.1723510528,-0.1048506891
+2026-01-22,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.1121548996,-0.5245535499,-0.5566191398,-0.515148479
+2026-01-23,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.4203639574,-0.7051546669,-0.7003060049,-0.7385980294
+2026-01-26,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.8054047111,-0.5023587782,-0.523868658,-0.5568731982
+2026-01-27,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.4570643358,-1.055486756,-1.037756306,-1.068004517
+2026-01-28,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.5737405962,0.6629049312,0.6556480789,0.6491712098
+2026-01-29,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.8976298671,0.2058987752,0.2983597323,0.4053778681
+2026-01-30,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.4777893124,0.972583547,0.9707397119,0.9551384244
+2026-02-02,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.550557856,-0.3496364441,-0.3099544567,-0.2848481347
+2026-02-03,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.2338327403,-0.1651588844,-0.1022199507,-0.006843520664
+2026-02-04,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.02943273334,0.8825403988,0.7763999526,0.7636269357
+2026-02-05,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.801318413,-0.2094531695,-0.1742752851,-0.08862155469
+2026-02-06,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.3028672252,0.05977797431,-0.04830142035,-0.1518964602
+2026-02-09,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.2151650715,-0.262242574,-0.3230196256,-0.3600938826
+2026-02-10,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.59620744,-0.3999967391,-0.3923124687,-0.3935083098
+2026-02-11,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.2168288551,-0.3099588765,-0.2540313143,-0.2528219629
+2026-02-12,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-2.452447817,-0.3363950561,-0.3004135609,-0.2876430848
+2026-02-13,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.191921205,-0.1491053361,-0.09472920762,-0.06737710793
+2026-02-17,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.2882449225,0.117561629,0.07621745235,0.05307290922
+2026-02-18,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.5898976581,1.127506904,1.078620288,1.085838589
+2026-02-19,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.3679957214,0.5454191383,0.5460701891,0.5083880655
+2026-02-20,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.09178233298,-0.2804729439,-0.2361850874,-0.1978296665
+2026-02-23,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.967927146,-0.05310470114,-0.03505466037,-0.07927582903
+2026-02-24,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.1379631322,0.1854761687,0.1894001676,0.2131576397
+2026-02-25,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.4423410193,0.07607494516,0.01993676442,-0.03878255973
+2026-02-26,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.108761901,-0.2120202136,-0.1743977123,-0.1252712322
+2026-02-27,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.283248961,0.05957994536,0.1666424488,0.2577835462
+2026-03-02,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,2.192817886,1.630279337,1.541337175,1.409061227
+2026-03-03,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.1468921718,1.220601878,1.084922495,0.9475655094
+2026-03-04,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.4291237133,-0.1396335831,-0.1351933095,-0.1443853759
+2026-03-05,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.854221596,1.504117834,1.36556074,1.234001984
+2026-03-06,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.1635057923,1.407254259,1.234559858,1.169634529
+2026-03-09,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.2641814472,0.2320957111,0.2114249771,0.1824270956
+2026-03-10,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.1427538008,-1.010164839,-0.9337680024,-0.8954030255
+2026-03-11,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.471552947,0.5748649171,0.5744445176,0.5387130144
+2026-03-12,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.108154654,1.316579215,1.184177629,1.088353926
+2026-03-13,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.5074341773,0.4973431319,0.4924700736,0.4832659994
+2026-03-16,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.808824054,-1.169541711,-1.111694381,-1.07490179
+2026-03-17,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.4778776785,0.4021813893,0.3738098288,0.3643400896
+2026-03-18,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.357544995,0.7134405744,0.7009938544,0.6530213406
+2026-03-19,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.3820364873,-0.6183701434,-0.6495844179,-0.7121128781
+2026-03-20,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.840977279,1.091016628,0.9451047268,0.8557326431
+2026-03-23,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.3025368871,-1.738972027,-1.648429572,-1.593502379
+2026-03-24,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.148470472,0.3887040438,0.3585546002,0.3518423841
+2026-03-25,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.685283378,-0.2724836057,-0.2282360667,-0.1799192305
+2026-03-26,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,2.291160113,0.9119396544,0.7959216699,0.7318557028
+2026-03-27,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.119030715,0.6589674037,0.6219529013,0.5829782638
+2026-03-30,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-2.270735253,0.08457120697,0.06715716288,0.07264228283
+2026-03-31,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.7493507102,-1.046709518,-1.009351746,-0.9599450542
+2026-04-01,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.5636780647,-0.7308867546,-0.703690582,-0.6593789795
+2026-04-02,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.1415004418,1.433525804,1.34825755,1.296222126
+2026-04-07,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.001169989176,-0.2030914905,-0.1976824426,-0.2150329319
+2026-04-08,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.293713304,-2.376042037,-2.232600974,-2.095753308
+2026-04-09,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.1793404743,0.2454080021,0.2363135531,0.2348191476
+2026-04-10,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.3930343743,-0.04535389396,-0.08166680711,-0.1104492172
+2026-04-13,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.3880893824,0.2920706844,0.2724714613,0.2578669858
+2026-04-14,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.100352889,-1.026275821,-0.9630042458,-0.9097864913
+2026-04-15,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.6639988766,0.08890432612,0.05575310662,0.03436352415
+2026-04-16,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.4755011099,0.3771989039,0.342226676,0.3053309818
+2026-04-17,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.354334341,-1.226738111,-1.183594424,-1.152836086
+2026-04-20,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.08152672124,0.6492258928,0.5752879829,0.5141210949
+2026-04-21,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.9566763332,0.7800347301,0.7102575129,0.6661717143
+2026-04-22,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.181652242,0.1141502955,0.1082275408,0.08156374874
+2026-04-23,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.8133779382,0.3177048209,0.3487911517,0.3915441993
+2026-04-24,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.07917801351,-0.2175782513,-0.2506693559,-0.2823885292
+2026-04-27,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.5993961286,0.198895251,0.1816424642,0.1709475907
+2026-04-28,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.2255331566,0.502017026,0.4497812889,0.4248545326
+2026-04-29,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.212966314,0.990286039,0.9556952623,0.9498312373
+2026-04-30,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.5219796214,-2.182420775,-1.974620804,-1.822344403
+2026-05-05,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.521056699,-0.1195619334,-0.1460194828,-0.1430667781
+2026-05-06,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.287042625,-1.687466231,-1.62277205,-1.576628538
+2026-05-07,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.7017235481,0.3024556573,0.2431955829,0.2021402646
+2026-05-08,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.9026008049,-0.03469502038,-0.1274027636,-0.1974432407
+2026-05-11,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.9933866065,0.3806405854,0.3390714873,0.3087289508
+2026-05-12,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.163637538,0.4473399437,0.4627162844,0.4791691663
+2026-05-13,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.1699645343,-0.223386021,-0.1612301038,-0.1234592289
+2026-05-14,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.7833034775,0.3314448914,0.2696926826,0.2041380036
+2026-05-15,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,3.623940224,0.7184471911,0.6645033848,0.6288391638
+2026-05-18,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.4276498938,-0.1570473218,-0.1671613145,-0.1262221222
+2026-05-19,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.9153078632,0.2830385267,0.2775196157,0.2567106162
+2026-05-20,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-2.420318252,-1.032221757,-1.000383982,-0.9653160171
+2026-05-21,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.005856088054,-0.3070472391,-0.2780122276,-0.2428375947
+2026-05-22,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.7653756092,-0.156981197,-0.1437258394,-0.07388480595
+2026-05-26,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.723936938,-0.3152514125,-0.2807008616,-0.2297316171
+2026-05-27,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.2560796409,-0.3631837486,-0.342267891,-0.3070797393
+2026-05-28,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.7020276454,-0.2706202643,-0.2668828577,-0.2613024671
+2026-05-29,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.1473420987,-0.1326891529,-0.2312182796,-0.2913060107
+2026-06-01,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.4504674609,0.8062091242,0.6724179723,0.6018043759
+2026-06-02,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.5432098548,-0.05080533532,-0.04802845827,0.02062929729
+2026-06-03,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.5950694507,0.1824016136,0.2618845727,0.3251162052
+2026-06-04,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.2509106686,-0.66163982,-0.5916660322,-0.4603919612
+2026-06-05,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.7436434775,0.07837939624,0.1578474726,0.2163581685
+2026-06-08,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.1752256031,0.1161190939,0.07446593922,0.01886936059
+2026-06-09,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.6546012287,-0.1627960634,-0.09523607027,-0.03280056861
+2026-06-10,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.2259743702,0.5776057947,0.576049344,0.533268704
+2026-06-11,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-2.020234368,-0.8681731001,-0.8596591915,-0.8335643843
+2026-06-12,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.6610631084,-0.4168134175,-0.3664765625,-0.2918571346
+2026-06-15,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.4663581067,-0.4558145283,-0.457048709,-0.4648964466
+2026-06-16,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.132415478,-0.5229624661,-0.48058829,-0.4420507382
+2026-06-17,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.007000714923,0.4210878604,0.4149707432,0.3896768368
+2026-06-18,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.8161430487,0.4243924335,0.4319774866,0.4443812233
+2026-06-22,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,2.69068661,-0.1019599458,-0.1019009184,-0.1064614823
+2026-06-23,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.02502115107,-0.002053003277,0.008033148878,0.03241075305
+2026-06-24,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-2.294469204,-0.05490948979,-0.03425161608,-0.008693978698
+2026-06-25,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.2894870611,-0.1733778319,-0.1468957026,-0.07075234805
+2026-06-26,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.4917289658,-0.419794813,-0.3771092187,-0.3919067384
+2026-06-29,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.2069446135,0.3359013373,0.3200694374,0.3195515251
+2026-06-30,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.53899096,0.08247956872,0.04648555608,0.07082357322
+2026-07-01,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.0371649652,-0.06715635067,-0.008100339366,-0.01588244843
+2026-07-02,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.5540197395,-0.8742028259,-0.9086188848,-0.9262515329
+2026-07-06,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.1871309352,0.4315440679,0.4361111543,0.4286082081
+2026-07-07,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.9235221008,0.3330764099,0.3527910007,0.3278126476
+2026-07-08,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.009783382,0.7647770895,0.7084777859,0.6224200689
+2026-07-09,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.7792009836,-0.2602870978,-0.2412807962,-0.2615020509
+2026-07-10,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.4023255645,-0.4234511966,-0.3710382488,-0.3666042015
+2026-07-13,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.7777598758,1.377428419,1.29075196,1.301166882
+2026-07-14,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.09747242635,-0.0566821398,-0.07680813414,-0.1087416824
+2026-07-15,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.9337824143,-0.1835139093,-0.1708345845,-0.16790811
+2026-07-16,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.214189439,0.07461775964,0.08425594811,0.07715622727
+2026-07-17,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.9585865866,0.5311524432,0.4659237789,0.4001020914
+2026-07-20,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.389894571,0.2710301603,0.2907424743,0.2657181946
+2026-07-21,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.349279113,0.3094517504,0.2764244722,0.2836532707
+2026-07-22,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.3751829102,0.0004035093031,-0.02927020547,-0.0371044604
+2026-07-23,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.6740569743,1.288223912,1.203153806,1.136916294
+2026-07-24,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.8130224246,-0.6190395992,-0.5793378917,-0.5334185831
+2026-07-27,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.134171558,-1.185172762,-1.115119025,-1.053641138
+2026-07-28,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.5397221222,-0.4433655939,-0.4509798052,-0.4100076607
+2026-07-29,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.6207498633,0.390693756,0.3178867754,0.2448708863
+2026-07-30,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.173033852,-2.540442387,-2.471786641,-2.544544444
+2026-07-31,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.684230429,-0.6753142386,-0.5665264723,-0.4895734406
+2026-08-03,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.559170078,-0.9157311823,-0.7874585084,-0.6926824836
+2026-08-04,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.206784827,-0.4994701335,-0.5285249709,-0.5156002926
+2026-08-05,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.02410397157,-0.2985442199,-0.3407873224,-0.3701135041
+2026-08-06,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.8548728675,0.6992473698,0.7118707963,0.7033977703
+2026-08-07,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.1725646097,-0.5652553751,-0.5298608418,-0.5197578813
+2026-08-10,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.7371784972,1.200439005,1.177197351,1.221622171
+2026-08-11,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.3200798937,0.1775162877,0.1736869707,0.1799823903
+2026-08-12,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.1063515019,0.0395146135,0.0595747521,0.05263244766
+2026-08-13,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.9550551039,-0.09966220039,-0.05467388265,-0.03316530136
+2026-08-14,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.187643548,0.02816158023,0.01207633765,0.03161799139
+2026-08-17,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.3679572695,0.5113098773,0.4532403581,0.4100268911
+2026-08-18,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.4458970369,0.4064854535,0.3600335908,0.3134230827
+2026-08-19,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.254207642,-0.7371200165,-0.7262832637,-0.7893900361
+2026-08-20,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.409459129,0.8649152238,0.794698513,0.682488758
+2026-08-21,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.4887107367,-0.2398373237,-0.2345952842,-0.244676488
+2026-08-24,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.074729046,-0.3525558522,-0.3255452397,-0.311848438
+2026-08-25,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.65491015,-0.5633373661,-0.5435960901,-0.5134823231
+2026-08-26,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.709687136,0.2749064502,0.2766236728,0.2532532303
+2026-08-27,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.3287512578,0.5902177111,0.4750541924,0.3694434586
+2026-08-28,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.5622852741,0.4040002233,0.4367989024,0.5012281702
+2026-09-01,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.7197616638,1.12388208,1.07242778,1.021363896
+2026-09-02,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.2272079488,-0.6215428584,-0.5581404027,-0.5389218071
+2026-09-03,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.6070735348,-1.406676002,-1.338083324,-1.339679512
+2026-09-04,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.2835720169,0.2672153184,0.2602532361,0.2690934408
+2026-09-08,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.4763290043,0.3050087055,0.3205402622,0.3064385562
+2026-09-09,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.7520048172,0.5527072623,0.5020374216,0.4429965341
+2026-09-10,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.707079177,1.526551762,1.420716917,1.355430132
+2026-09-11,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.05839527186,-0.8029844906,-0.7310310452,-0.6751323471
+2026-09-14,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.4065624257,0.5307736322,0.5133503299,0.4840793019
+2026-09-15,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.8012782384,0.7897166734,0.7311823746,0.7379399589
+2026-09-16,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.5453028076,0.1840556096,0.2536521741,0.2437507094
+2026-09-17,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.594172463,-0.9464558701,-0.8968333494,-0.7707687783
+2026-09-18,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.7986176126,0.313767322,0.2912840379,0.2204848126
+2026-09-21,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.582980173,-0.3872517709,-0.2986235137,-0.2900713046
+2026-09-22,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,1.763975662,-0.1122796918,-0.1037053454,-0.09491040509
+2026-09-23,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,3.527464436,0.6301978411,0.5967348003,0.5624116303
+2026-09-24,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.6231394837,0.448399561,0.4254319311,0.4152215837
+2026-09-25,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.246187908,-0.9332973207,-0.9192565083,-0.8929193431
+2026-09-28,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.7995670516,0.5685720393,0.4852520705,0.4231464768
+2026-09-29,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.6417725389,-0.5276265792,-0.4600034016,-0.4210445809
+2026-09-30,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.9997712342,0.4322067502,0.3922404796,0.3343259061
+2026-10-01,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-3.688676729,0.6974362707,0.7276993038,0.7129243471
+2026-10-02,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.6066749253,-0.4404892804,-0.3822521415,-0.3170642607
+2026-10-05,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.3707701604,-0.4178033557,-0.3075253305,-0.2474809525
+2026-10-06,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.9222192064,-0.2534202124,-0.2152299866,-0.148961454
+2026-10-07,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,0.2727811586,0.06004184386,0.1278595478,0.1246266228
+2026-10-08,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-1.255817507,0.3024121916,0.278850246,0.2896270436
+2026-10-09,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.1008347472,-0.216515014,-0.1942089909,-0.1406662719
+2026-10-13,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.6651035673,0.04199106583,0.01490622201,-0.005681641203
+2026-10-14,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-0.9305423884,0.1616611058,0.1183383296,0.1260142262
+2026-10-15,5x2Y - 3x10Y futures basket,daily_without_weekly_tff,rolling_zscore_63_observations,-2.470847633,-0.3402849156,-0.3854914863,-0.3461745541
