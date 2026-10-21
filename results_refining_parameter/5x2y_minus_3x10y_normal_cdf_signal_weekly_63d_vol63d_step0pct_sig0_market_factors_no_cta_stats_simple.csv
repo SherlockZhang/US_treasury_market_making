@@ -1,0 +1,13 @@
+period,signal_mode,factor_mode,signal_lookback_days,signal_lookbacks_days,volatility_lookback_days,signal_cutoff,rebalance_position_change_threshold_fraction,rebalance_frequency,sharpe_ratio,max_drawdown_pct,5y_yield_change_percentage_points,spx_change_index_points
+Full dataset,single,market-data-no-cta,63,63,63,0.000000,0.000000,weekly,0.496669,-9.556313,3.117700,5731.400000
+2016,single,market-data-no-cta,63,63,63,0.000000,0.000000,weekly,,0.000000,0.167600,226.170000
+2017,single,market-data-no-cta,63,63,63,0.000000,0.000000,weekly,-0.087604,-4.316522,0.279000,415.780000
+2018,single,market-data-no-cta,63,63,63,0.000000,0.000000,weekly,0.536771,-8.082631,0.304700,-188.960000
+2019,single,market-data-no-cta,63,63,63,0.000000,0.000000,weekly,1.136040,-7.207975,-0.820100,720.750000
+2020,single,market-data-no-cta,63,63,63,0.000000,0.000000,weekly,0.498685,-6.476021,-1.330200,498.220000
+2021,single,market-data-no-cta,63,63,63,0.000000,0.000000,weekly,1.227962,-5.152012,0.902200,1065.530000
+2022,single,market-data-no-cta,63,63,63,0.000000,0.000000,weekly,-0.561289,-5.175955,2.649900,-957.060000
+2023,single,market-data-no-cta,63,63,63,0.000000,0.000000,weekly,-0.699859,-3.851286,-0.156800,945.690000
+2024,single,market-data-no-cta,63,63,63,0.000000,0.000000,weekly,0.939672,-3.374859,0.534900,1138.800000
+2025,single,market-data-no-cta,63,63,63,0.000000,0.000000,weekly,-0.207226,-3.625675,-0.656800,976.950000
+2026,single,market-data-no-cta,63,63,63,0.000000,0.000000,weekly,0.290131,-8.652586,1.152300,885.590000

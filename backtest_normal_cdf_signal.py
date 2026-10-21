@@ -25,14 +25,29 @@ from backtest_5y_trend_strategy import (
 
 
 OUTPUT_DIR = Path(__file__).with_name("results_refining_parameter")
+FACTOR_DATA_FILE = Path(__file__).with_name("market_data.xlsx")
+FACTOR_DATA_SHEET = "Sheet1"
 DEFAULT_LOOKBACK_DAYS = 252
 AVERAGED_SIGNAL_LOOKBACK_DAYS = (32, 64, 126, 252, 504)
 NORMAL_CDF_VOLATILITY_LOOKBACK_DAYS = 63
+FACTOR_SCORE_LOOKBACK_DAYS = 63
+FACTOR_SCORE_ZSCORE_LOOKBACK_DAYS = 63
+FACTOR_SIGNAL_BOOST_THRESHOLD = 2.0
+FACTOR_SIGNAL_BOOST_MULTIPLIER = 1.1
 NORMAL_CDF_SIGNAL_CUTOFF = 0.1
 REBALANCE_POSITION_CHANGE_THRESHOLD_FRACTION = 0.25
 RebalanceFrequency = Literal["daily", "weekly", "monthly"]
 SignalMode = Literal["single", "average"]
+FactorMode = Literal["none", "market-data"]
 DEFAULT_REBALANCE_FREQUENCY: RebalanceFrequency = "weekly"
+FACTOR_TICKERS = {
+    "JPYUSD": ("JPYUSD BGN Curncy", 1),
+    "CL1": ("CL1 COMB Comdty", -1),
+    "BBDXY": ("BBDXY Index", -1),
+    "TFF2GLFN": ("TFF2GLFN Index", -1),
+    "XAU": ("XAU BGN Curncy", 1),
+    "DJI": ("DJI", 1),
+}
 
 STRATEGIES = {
     "5y_future": {
@@ -74,6 +89,107 @@ def nonnegative_float(value: str) -> float:
             "threshold fraction must be a finite non-negative number"
         )
     return fraction
+
+
+def calculate_factor_returns(
+    values: pd.Series, zero_crossing_returns: bool
+) -> pd.Series:
+    """Calculate percentage changes, neutralizing sign-crossing observations."""
+    returns = values.pct_change(fill_method=None)
+    if zero_crossing_returns:
+        previous_values = values.shift(1)
+        crosses_zero = (
+            previous_values.notna()
+            & (values * previous_values <= 0)
+            & values.ne(previous_values)
+        )
+        returns.loc[crosses_zero] = 0.0
+    return returns
+
+
+def load_factor_scores(
+    target_dates: pd.DatetimeIndex,
+) -> pd.DataFrame:
+    """Load and average signed rolling factor t-statistics on target dates."""
+    frame = pd.read_excel(FACTOR_DATA_FILE, sheet_name=FACTOR_DATA_SHEET)
+    columns = list(frame.columns)
+    factor_scores: dict[str, pd.Series] = {}
+
+    for factor_name, (ticker, sign) in FACTOR_TICKERS.items():
+        if ticker not in columns:
+            raise ValueError(
+                f"Required factor ticker {ticker!r} for {factor_name!r} "
+                f"was not found in {FACTOR_DATA_FILE.name}."
+            )
+        ticker_column_index = columns.index(ticker)
+        if ticker_column_index == 0:
+            raise ValueError(f"No date column found for factor ticker {ticker!r}.")
+        date_column = columns[ticker_column_index - 1]
+        if not isinstance(date_column, str) or not date_column.strip().startswith(
+            "Date"
+        ):
+            raise ValueError(
+                f"Expected a date column immediately before factor {ticker!r}."
+            )
+
+        observations = frame.loc[:, [date_column, ticker]].copy()
+        observations[date_column] = pd.to_datetime(
+            observations[date_column], errors="raise"
+        )
+        observations[ticker] = pd.to_numeric(
+            observations[ticker], errors="raise"
+        )
+        partially_blank = observations.isna().any(axis=1) & observations.notna().any(
+            axis=1
+        )
+        if partially_blank.any():
+            raise ValueError(
+                f"Factor ticker {ticker!r} has rows with only a date or value."
+            )
+        observations = observations.dropna(how="all")
+        if observations.empty:
+            raise ValueError(f"No observations found for factor ticker {ticker!r}.")
+        if observations[date_column].duplicated().any():
+            raise ValueError(f"Factor ticker {ticker!r} contains duplicate dates.")
+        values = observations.sort_values(date_column).set_index(date_column)[ticker]
+        if not np.isfinite(values).all():
+            raise ValueError(
+                f"Factor ticker {ticker!r} values must be finite."
+            )
+
+        returns = calculate_factor_returns(
+            values, factor_name in ("CL1", "TFF2GLFN")
+        )
+        rolling_returns = returns.rolling(
+            FACTOR_SCORE_LOOKBACK_DAYS,
+            min_periods=FACTOR_SCORE_LOOKBACK_DAYS,
+        )
+        rolling_mean = rolling_returns.mean()
+        rolling_std = rolling_returns.std(ddof=1)
+        t_statistic = (
+            np.sqrt(FACTOR_SCORE_LOOKBACK_DAYS)
+            * rolling_mean
+            / rolling_std.where(rolling_std > 0)
+        )
+        factor_scores[factor_name] = (sign * t_statistic).reindex(
+            target_dates, method="ffill"
+        )
+
+    signed_scores = pd.DataFrame(factor_scores, index=target_dates)
+    signed_scores["factor_score"] = signed_scores.mean(axis=1, skipna=False)
+    prior_scores = signed_scores["factor_score"].shift(1)
+    rolling_mean = prior_scores.rolling(
+        FACTOR_SCORE_ZSCORE_LOOKBACK_DAYS,
+        min_periods=FACTOR_SCORE_ZSCORE_LOOKBACK_DAYS,
+    ).mean()
+    rolling_std = prior_scores.rolling(
+        FACTOR_SCORE_ZSCORE_LOOKBACK_DAYS,
+        min_periods=FACTOR_SCORE_ZSCORE_LOOKBACK_DAYS,
+    ).std(ddof=1)
+    signed_scores["factor_score_zscore"] = (
+        signed_scores["factor_score"] - rolling_mean
+    ) / rolling_std.where(rolling_std > 0)
+    return signed_scores
 
 
 def calculate_normal_cdf_signal(
@@ -127,6 +243,7 @@ def run_backtest(
     ),
     signal_cutoff: float = NORMAL_CDF_SIGNAL_CUTOFF,
     signal_mode: SignalMode = "single",
+    factor_scores: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
     """Apply the signal with daily, Monday-weekly, or month-end volatility sizing."""
     if lookback_days <= 0:
@@ -146,6 +263,11 @@ def run_backtest(
         raise ValueError("Signal cutoff must be finite and non-negative.")
     if signal_mode not in ("single", "average"):
         raise ValueError(f"Unsupported signal mode: {signal_mode}")
+    if factor_scores is not None and rebalance_frequency == "daily":
+        raise ValueError(
+            "Market-data factor enhancement supports weekly and monthly "
+            "rebalancing only."
+        )
     if prices.empty:
         raise ValueError("No prices are available for this backtest.")
     if prices.isna().any() or not np.isfinite(prices).all() or (prices <= 0).any():
@@ -176,6 +298,29 @@ def run_backtest(
         signal_data["signal"] = component_signals.mean(axis=1, skipna=False)
         signal_data = signal_data.join(component_signals)
     results = results.join(signal_data)
+    if factor_scores is not None:
+        required_score_column = "factor_score"
+        if required_score_column not in factor_scores:
+            raise ValueError(
+                f"Factor scores must include a {required_score_column!r} column."
+            )
+        aligned_scores = factor_scores.reindex(results.index)
+        score = aligned_scores[required_score_column]
+        score_zscore = aligned_scores["factor_score_zscore"]
+        signal_boost = (
+            (score_zscore > FACTOR_SIGNAL_BOOST_THRESHOLD)
+            & (results["signal"] > 0)
+        ) | (
+            (score_zscore < -FACTOR_SIGNAL_BOOST_THRESHOLD)
+            & (results["signal"] < 0)
+        )
+        results["base_signal"] = results["signal"]
+        results["factor_score"] = score
+        results["factor_score_zscore"] = score_zscore
+        results["factor_signal_multiplier"] = np.where(
+            signal_boost, FACTOR_SIGNAL_BOOST_MULTIPLIER, 1.0
+        )
+        results["signal"] *= results["factor_signal_multiplier"]
     results["realized_volatility"] = (
         results["daily_return"]
         .rolling(
@@ -260,12 +405,27 @@ def calculate_stats(
     position_change_threshold_fraction: float,
     signal_cutoff: float,
     signal_mode: SignalMode,
+    factor_mode: str,
 ) -> pd.DataFrame:
     """Calculate full-period and annual statistics."""
     full_stats = calculate_statistics(results)
     annual_stats = calculate_annual_statistics(results)
     full_stats["instrument"] = instrument
     full_stats["signal_mode"] = signal_mode
+    full_stats["factor_mode"] = factor_mode
+    full_stats["factor_score_zscore_lookback_days"] = (
+        FACTOR_SCORE_ZSCORE_LOOKBACK_DAYS
+        if factor_mode == "market-data"
+        else np.nan
+    )
+    full_stats["factor_signal_boost_threshold"] = (
+        FACTOR_SIGNAL_BOOST_THRESHOLD if factor_mode == "market-data" else np.nan
+    )
+    full_stats["factor_signal_boost_multiplier"] = (
+        FACTOR_SIGNAL_BOOST_MULTIPLIER
+        if factor_mode == "market-data"
+        else np.nan
+    )
     full_stats["signal_lookback_days"] = (
         lookback_days if signal_mode == "single" else np.nan
     )
@@ -288,6 +448,22 @@ def calculate_stats(
     for annual_stat in annual_stats:
         annual_stat["instrument"] = instrument
         annual_stat["signal_mode"] = signal_mode
+        annual_stat["factor_mode"] = factor_mode
+        annual_stat["factor_score_zscore_lookback_days"] = (
+            FACTOR_SCORE_ZSCORE_LOOKBACK_DAYS
+            if factor_mode == "market-data"
+            else np.nan
+        )
+        annual_stat["factor_signal_boost_threshold"] = (
+            FACTOR_SIGNAL_BOOST_THRESHOLD
+            if factor_mode == "market-data"
+            else np.nan
+        )
+        annual_stat["factor_signal_boost_multiplier"] = (
+            FACTOR_SIGNAL_BOOST_MULTIPLIER
+            if factor_mode == "market-data"
+            else np.nan
+        )
         annual_stat["signal_lookback_days"] = (
             lookback_days if signal_mode == "single" else np.nan
         )
@@ -329,6 +505,7 @@ def save_plots(
     signal_label: str,
     plot_path: Path,
     comparison_path: Path,
+    factor_mode: FactorMode,
 ) -> None:
     """Save cumulative PnL and comparison against the original trend strategy."""
     figure, axis = plt.subplots(figsize=(12, 6))
@@ -345,6 +522,7 @@ def save_plots(
         f"{NORMAL_CDF_VOLATILITY_LOOKBACK_DAYS}-Day Volatility Scaling — "
         f"Signal Cutoff ±{signal_cutoff:.1f} — "
         f"{position_change_threshold_fraction:.0%} Rebalance Threshold — "
+        f"{factor_mode} factors — "
         "Full-Period Cumulative PnL"
     )
     axis.set_xlabel("Date")
@@ -368,7 +546,8 @@ def save_plots(
         label=(
             f"Normal-CDF signal ({signal_label}, "
             f"{rebalance_frequency} rebalance, |signal|>{signal_cutoff:.1f}, "
-            f"{position_change_threshold_fraction:.0%} threshold)"
+            f"{position_change_threshold_fraction:.0%} threshold, "
+            f"{factor_mode} factors)"
         ),
         linewidth=1.5,
     )
@@ -391,6 +570,8 @@ def run_instrument(
     position_change_threshold_fraction: float,
     signal_cutoff: float,
     signal_mode: SignalMode,
+    factor_mode: FactorMode = "none",
+    factor_scores: pd.DataFrame | None = None,
 ) -> None:
     """Run one instrument and save daily, summary, and plot outputs."""
     instrument = strategy["instrument"]
@@ -404,6 +585,8 @@ def run_instrument(
         if signal_mode == "single"
         else f"average T={','.join(str(days) for days in signal_lookbacks)}"
     )
+    if factor_mode == "market-data":
+        signal_label = f"{signal_label}, market-data factors (no CTA)"
     lookback_tag = (
         f"{lookback_days}d"
         if signal_mode == "single"
@@ -415,6 +598,8 @@ def run_instrument(
         f"step{int(position_change_threshold_fraction * 100)}pct_"
         f"sig{int(signal_cutoff * 100)}"
     )
+    if factor_mode == "market-data":
+        stem = f"{stem}_market_factors_zscore"
     results = run_backtest(
         prices,
         lookback_days,
@@ -422,6 +607,7 @@ def run_instrument(
         position_change_threshold_fraction,
         signal_cutoff,
         signal_mode,
+        factor_scores,
     )
     stats_frame = calculate_stats(
         results,
@@ -431,6 +617,7 @@ def run_instrument(
         position_change_threshold_fraction,
         signal_cutoff,
         signal_mode,
+        factor_mode,
     )
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -447,6 +634,10 @@ def run_instrument(
         [
             "period",
             "signal_mode",
+            "factor_mode",
+            "factor_score_zscore_lookback_days",
+            "factor_signal_boost_threshold",
+            "factor_signal_boost_multiplier",
             "signal_lookback_days",
             "signal_lookbacks_days",
             "volatility_lookback_days",
@@ -470,6 +661,7 @@ def run_instrument(
         signal_label,
         plot_path,
         comparison_path,
+        factor_mode,
     )
 
     full_stats = stats_frame.iloc[0]
@@ -507,6 +699,15 @@ def main() -> None:
         ),
     )
     parser.add_argument(
+        "--factor-mode",
+        choices=("none", "market-data"),
+        default="none",
+        help=(
+            "Optionally scale the normal-CDF signal with the signed average "
+            "63-observation market-data factor score (weekly/monthly only)."
+        ),
+    )
+    parser.add_argument(
         "--rebalance-frequency",
         choices=("daily", "weekly", "monthly"),
         default=DEFAULT_REBALANCE_FREQUENCY,
@@ -539,9 +740,25 @@ def main() -> None:
     args = parser.parse_args()
     rebalance_frequency: RebalanceFrequency = args.rebalance_frequency
     signal_mode: SignalMode = args.signal_mode
+    factor_mode: FactorMode = args.factor_mode
+    if factor_mode == "market-data" and rebalance_frequency == "daily":
+        parser.error(
+            "--factor-mode market-data supports weekly and monthly "
+            "rebalancing only."
+        )
 
     five_year_prices = load_prices()["price"]
     spread_prices = load_spread()["weighted_spread"]
+    factor_dates = pd.DatetimeIndex(five_year_prices.index).union(
+        pd.DatetimeIndex(spread_prices.index)
+    ).sort_values()
+    factor_scores = (
+        load_factor_scores(
+            factor_dates,
+        )
+        if factor_mode == "market-data"
+        else None
+    )
     run_instrument(
         five_year_prices,
         STRATEGIES["5y_future"],
@@ -550,6 +767,8 @@ def main() -> None:
         args.rebalance_threshold_fraction,
         args.signal_cutoff,
         signal_mode,
+        factor_mode,
+        factor_scores,
     )
     run_instrument(
         spread_prices,
@@ -559,6 +778,8 @@ def main() -> None:
         args.rebalance_threshold_fraction,
         args.signal_cutoff,
         signal_mode,
+        factor_mode,
+        factor_scores,
     )
 
 
