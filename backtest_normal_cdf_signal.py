@@ -18,6 +18,7 @@ from backtest_5y_trend_strategy import (
     load_5y_yield,
     load_prices,
     load_spx_index,
+    parse_excel_dates,
     run_backtest as run_trend_backtest,
     summarize_5y_yield_change,
     summarize_spx_change,
@@ -53,6 +54,18 @@ FACTOR_TICKERS = {
     "TFF2GLFN": ("TFF2GLFN Index", -1),
     "XAU": ("XAU BGN Curncy", 1),
     "DJI": ("DJI", 1),
+    "TFF2ILFN": ("TFF2ILFN Index", 1),
+}
+SPREAD_FACTOR_TICKERS = {
+    "CL1": ("CL1 COMB Comdty", 1),
+    "DJI": ("DJI", -1),
+    "JPY": ("JPYUSD BGN Curncy", -1),
+    "SOFR": ("SOFRRATE Index", 1),
+    "TFF2GLFN": ("TFF2GLFN Index", 1),
+    "DAX": ("DAX", -1),
+    "EURUSD": ("EURUSD BGN Curncy", 1),
+    "S5INFT": ("S5INFT Index", 1),
+    "TFF2ILFN": ("TFF2ILFN Index", -1),
 }
 
 STRATEGIES = {
@@ -150,9 +163,7 @@ def load_etf_benchmark_prices() -> dict[str, pd.Series]:
             )
 
         observations = frame.loc[:, [date_column, ticker]].copy()
-        observations[date_column] = pd.to_datetime(
-            observations[date_column], errors="raise"
-        )
+        observations[date_column] = parse_excel_dates(observations[date_column])
         observations[ticker] = pd.to_numeric(
             observations[ticker], errors="raise"
         )
@@ -181,13 +192,14 @@ def load_etf_benchmark_prices() -> dict[str, pd.Series]:
 
 def load_factor_scores(
     target_dates: pd.DatetimeIndex,
+    factor_tickers: dict[str, tuple[str, int]] = FACTOR_TICKERS,
 ) -> pd.DataFrame:
     """Load and average signed rolling factor t-statistics on target dates."""
     frame = pd.read_excel(FACTOR_DATA_FILE, sheet_name=FACTOR_DATA_SHEET)
     columns = list(frame.columns)
     factor_scores: dict[str, pd.Series] = {}
 
-    for factor_name, (ticker, sign) in FACTOR_TICKERS.items():
+    for factor_name, (ticker, sign) in factor_tickers.items():
         if ticker not in columns:
             raise ValueError(
                 f"Required factor ticker {ticker!r} for {factor_name!r} "
@@ -205,9 +217,7 @@ def load_factor_scores(
             )
 
         observations = frame.loc[:, [date_column, ticker]].copy()
-        observations[date_column] = pd.to_datetime(
-            observations[date_column], errors="raise"
-        )
+        observations[date_column] = parse_excel_dates(observations[date_column])
         observations[ticker] = pd.to_numeric(
             observations[ticker], errors="raise"
         )
@@ -339,11 +349,6 @@ def run_backtest(
         raise ValueError("Signal cutoff must be finite and non-negative.")
     if signal_mode not in ("single", "average"):
         raise ValueError(f"Unsupported signal mode: {signal_mode}")
-    if factor_scores is not None and rebalance_frequency == "daily":
-        raise ValueError(
-            "Market-data factor enhancement supports weekly and monthly "
-            "rebalancing only."
-        )
     if prices.empty:
         raise ValueError("No prices are available for this backtest.")
     if prices.isna().any() or not np.isfinite(prices).all() or (prices <= 0).any():
@@ -708,6 +713,8 @@ def run_instrument(
     )
     if factor_mode == "market-data":
         stem = f"{stem}_market_factors_zscore"
+    if etf_benchmark_prices:
+        stem = f"{stem}_with_etf_benchmarks"
     if start_date is not None:
         stem = f"{stem}_from{start_date:%Y%m%d}"
     results = run_backtest(
@@ -834,7 +841,7 @@ def main() -> None:
         default="none",
         help=(
             "Optionally scale the normal-CDF signal with the signed average "
-            "63-observation market-data factor score (weekly/monthly only)."
+            "63-observation market-data factor score."
         ),
     )
     parser.add_argument(
@@ -879,12 +886,6 @@ def main() -> None:
     rebalance_frequency: RebalanceFrequency = args.rebalance_frequency
     signal_mode: SignalMode = args.signal_mode
     factor_mode: FactorMode = args.factor_mode
-    if factor_mode == "market-data" and rebalance_frequency == "daily":
-        parser.error(
-            "--factor-mode market-data supports weekly and monthly "
-            "rebalancing only."
-        )
-
     five_year_prices = load_prices()["price"]
     spread_prices = load_spread()["weighted_spread"]
     etf_benchmark_prices = (
@@ -923,13 +924,17 @@ def main() -> None:
     factor_dates = pd.DatetimeIndex(five_year_prices.index).union(
         pd.DatetimeIndex(spread_prices.index)
     ).sort_values()
-    factor_scores = (
-        load_factor_scores(
+    five_year_factor_scores = None
+    spread_factor_scores = None
+    if factor_mode == "market-data":
+        five_year_factor_scores = load_factor_scores(
             factor_dates,
+            FACTOR_TICKERS,
         )
-        if factor_mode == "market-data"
-        else None
-    )
+        spread_factor_scores = load_factor_scores(
+            factor_dates,
+            SPREAD_FACTOR_TICKERS,
+        )
     run_instrument(
         five_year_prices,
         STRATEGIES["5y_future"],
@@ -939,7 +944,7 @@ def main() -> None:
         args.signal_cutoff,
         signal_mode,
         factor_mode,
-        factor_scores,
+        five_year_factor_scores,
         args.volatility_lookback_days,
         args.start_date,
         five_year_benchmark_prices,
@@ -954,7 +959,7 @@ def main() -> None:
         args.signal_cutoff,
         signal_mode,
         factor_mode,
-        factor_scores,
+        spread_factor_scores,
         args.volatility_lookback_days,
         args.start_date,
         spread_benchmark_prices,

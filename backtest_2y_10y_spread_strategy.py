@@ -10,6 +10,7 @@ from backtest_5y_trend_strategy import (
     calculate_statistics,
     load_5y_yield,
     load_spx_index,
+    parse_excel_dates,
     run_backtest,
     summarize_spx_change,
     summarize_5y_yield_change,
@@ -44,7 +45,7 @@ def load_spread() -> pd.DataFrame:
 
     def load_leg(date_column: str, price_column: str) -> pd.Series:
         leg = frame.loc[:, [date_column, price_column]].copy()
-        leg[date_column] = pd.to_datetime(leg[date_column], errors="raise")
+        leg[date_column] = parse_excel_dates(leg[date_column])
         leg[price_column] = pd.to_numeric(leg[price_column], errors="raise")
         incomplete_rows = leg.isna().any(axis=1) & leg.notna().any(axis=1)
         if incomplete_rows.any():

@@ -21,6 +21,18 @@ VOLATILITY_LOOKBACK_DAYS = 63
 TARGET_ANNUALIZED_VOLATILITY = 0.10
 
 
+def parse_excel_dates(values: pd.Series) -> pd.Series:
+    """Parse Excel dates stored as serial numbers or native date values."""
+    if pd.api.types.is_numeric_dtype(values):
+        return pd.to_datetime(
+            values,
+            unit="D",
+            origin="1899-12-30",
+            errors="raise",
+        )
+    return pd.to_datetime(values, errors="raise")
+
+
 def load_prices() -> pd.DataFrame:
     """Load and validate the 5Y futures price series."""
     frame = pd.read_excel(INPUT_FILE, sheet_name=SHEET_NAME)
@@ -33,7 +45,7 @@ def load_prices() -> pd.DataFrame:
         )
 
     prices = frame.loc[:, ["Date", "5Y future"]].copy()
-    prices["Date"] = pd.to_datetime(prices["Date"], errors="raise")
+    prices["Date"] = parse_excel_dates(prices["Date"])
     prices["5Y future"] = pd.to_numeric(prices["5Y future"], errors="raise")
     incomplete_rows = prices.isna().any(axis=1) & prices.notna().any(axis=1)
     if incomplete_rows.any():
@@ -64,7 +76,7 @@ def load_5y_yield() -> pd.Series:
         )
 
     yields = frame.loc[:, ["Date .1", "5Y Yield"]].copy()
-    yields["Date .1"] = pd.to_datetime(yields["Date .1"], errors="raise")
+    yields["Date .1"] = parse_excel_dates(yields["Date .1"])
     yields["5Y Yield"] = pd.to_numeric(yields["5Y Yield"], errors="raise")
     incomplete_rows = yields.isna().any(axis=1) & yields.notna().any(axis=1)
     if incomplete_rows.any():
@@ -112,7 +124,7 @@ def load_spx_index() -> pd.Series:
         )
 
     spx = frame.loc[:, ["Date.2", "SPX"]].copy()
-    spx["Date.2"] = pd.to_datetime(spx["Date.2"], errors="raise")
+    spx["Date.2"] = parse_excel_dates(spx["Date.2"])
     spx["SPX"] = pd.to_numeric(spx["SPX"], errors="raise")
     incomplete_rows = spx.isna().any(axis=1) & spx.notna().any(axis=1)
     if incomplete_rows.any():

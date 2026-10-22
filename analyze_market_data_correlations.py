@@ -162,10 +162,7 @@ def save_rolling_correlation_plot(
     figure, axis = plt.subplots(figsize=(15, 8))
     plotted = 0
     for ticker, returns in ticker_returns.items():
-        if ticker in FUTURES_TICKERS and (
-            target_name == FIVE_YEAR_TARGET
-            or ticker == FIVE_YEAR_TARGET
-        ):
+        if ticker in FUTURES_TICKERS:
             continue
         paired_returns = pd.concat(
             [returns.rename(ticker), target_return.rename(target_name)],
