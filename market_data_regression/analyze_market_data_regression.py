@@ -30,6 +30,7 @@ EXCLUDED_PREDICTORS = {
     FIVE_YEAR_TARGET,
     TWO_YEAR_TICKER,
     TEN_YEAR_TICKER,
+    "CTA US Equity",
 }
 TRAIN_FRACTION = 0.8
 TIME_SERIES_CV_SPLITS = 5
@@ -389,7 +390,12 @@ def fit_target(
     target: pd.Series,
     target_name: str,
     scaling_name: str,
-) -> tuple[list[dict[str, object]], pd.DataFrame, list[dict[str, object]]]:
+) -> tuple[
+    list[dict[str, object]],
+    pd.DataFrame,
+    pd.DataFrame,
+    list[dict[str, object]],
+]:
     """Fit all models for one target and return predictions and top predictors."""
     aligned = pd.concat([features, target], axis=1, join="inner").dropna()
     X = aligned.loc[:, features.columns].to_numpy(dtype=float)
@@ -406,6 +412,10 @@ def fit_target(
     t_statistics = calculate_ols_t_statistics(X_train, y_train)
     ols_coefficients, ols_intercept, _ = fit_linear_model(X_train, y_train)
     top_predictor_stats: list[dict[str, object]] = []
+    train_prediction_frame = pd.DataFrame(
+        {"actual": y_train},
+        index=train_index,
+    )
     prediction_frame = pd.DataFrame(
         {"actual": y_test},
         index=test_index,
@@ -470,6 +480,7 @@ def fit_target(
         )
         train_prediction = predict(X_train, coefficients, intercept)
         test_prediction = predict(X_test, coefficients, intercept)
+        train_prediction_frame[f"{model_name.lower()}_fitted"] = train_prediction
         prediction_frame[f"{model_name.lower()}_fitted"] = test_prediction
 
         train_metrics = calculate_metrics(y_train, train_prediction)
@@ -503,16 +514,17 @@ def fit_target(
                 ),
             }
         )
-    return rows, prediction_frame, top_predictor_stats
+    return rows, train_prediction_frame, prediction_frame, top_predictor_stats
 
 
 def save_actual_fitted_plot(
     target_name: str,
     predictions: pd.DataFrame,
     output_path: Path,
+    sample_name: str = "Holdout",
     scaled: bool = False,
 ) -> None:
-    """Save test-set actual-versus-fitted scatter for OLS and Ridge."""
+    """Save actual-versus-fitted scatter for each fitted model."""
     scale = 1 if scaled else 100
     actual_values = predictions["actual"] * scale
     figure, axis = plt.subplots(figsize=(8, 7))
@@ -541,7 +553,7 @@ def save_actual_fitted_plot(
     )
     axis.plot([lower, upper], [lower, upper], "k--", linewidth=1, label="45° line")
     axis.set_title(
-        f"{target_name}: Holdout Actual vs. Fitted "
+        f"{target_name}: {sample_name} Actual vs. Fitted "
         f"{'Rolling Z-Scores' if scaled else 'Daily Returns'}"
     )
     axis.set_xlabel("Actual rolling z-score" if scaled else "Actual daily return (%)")
@@ -553,15 +565,16 @@ def save_actual_fitted_plot(
     plt.close(figure)
 
 
-def save_holdout_time_series_plot(
+def save_actual_fitted_time_series_plot(
     target_name: str,
     model_set: str,
     model_name: str,
     predictions: pd.DataFrame,
     output_path: Path,
+    sample_name: str = "Holdout",
     scaled: bool = False,
 ) -> None:
-    """Plot actual and fitted returns in date order for one holdout regression."""
+    """Plot actual and fitted values in date order for one regression."""
     fitted_column = f"{model_name.lower()}_fitted"
     scale = 1 if scaled else 100
     figure, axis = plt.subplots(figsize=(13, 6))
@@ -579,7 +592,7 @@ def save_holdout_time_series_plot(
     )
     axis.axhline(0, color="black", linewidth=0.8, alpha=0.6)
     axis.set_title(
-        f"{target_name}: Holdout Actual vs. {model_name} Fitted Returns "
+        f"{target_name}: {sample_name} Actual vs. {model_name} Fitted Returns "
         f"({model_set.replace('_', ' ')}, "
         f"{'rolling z-score' if scaled else 'unscaled'})"
     )
@@ -623,9 +636,12 @@ def main(use_rolling_zscore: bool = False) -> None:
             ),
         )
         for target_name, target in target_series.items():
-            stats, predictions, top_predictor_stats = fit_target(
-                features, target, target_name, scaling_name
-            )
+            (
+                stats,
+                train_predictions,
+                predictions,
+                top_predictor_stats,
+            ) = fit_target(features, target, target_name, scaling_name)
             for row in stats:
                 row["model_set"] = model_set
             for row in top_predictor_stats:
@@ -643,13 +659,34 @@ def main(use_rolling_zscore: bool = False) -> None:
             )
             save_actual_fitted_plot(
                 target_name,
+                train_predictions,
+                output_dir
+                / f"{safe_target}_{model_set}_in_sample_actual_vs_fitted.png",
+                sample_name="In-Sample",
+                scaled=use_rolling_zscore,
+            )
+            save_actual_fitted_plot(
+                target_name,
                 predictions,
                 output_dir
                 / f"{safe_target}_{model_set}_holdout_actual_vs_fitted.png",
                 scaled=use_rolling_zscore,
             )
             for model_name in ("OLS", "Ridge", "Lasso"):
-                save_holdout_time_series_plot(
+                save_actual_fitted_time_series_plot(
+                    target_name,
+                    model_set,
+                    model_name,
+                    train_predictions,
+                    output_dir
+                    / (
+                        f"{safe_target}_{model_set}_"
+                        f"{model_name.lower()}_in_sample_actual_vs_predicted.png"
+                    ),
+                    sample_name="In-Sample",
+                    scaled=use_rolling_zscore,
+                )
+                save_actual_fitted_time_series_plot(
                     target_name,
                     model_set,
                     model_name,
