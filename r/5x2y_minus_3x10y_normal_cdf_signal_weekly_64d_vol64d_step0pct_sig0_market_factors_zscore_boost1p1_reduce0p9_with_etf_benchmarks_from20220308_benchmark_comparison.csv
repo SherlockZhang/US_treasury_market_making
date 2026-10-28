@@ -1,0 +1,5 @@
+instrument,strategy,comparison_start_date,comparison_end_date,total_return_pct,annualized_return_pct,annualized_volatility_pct,sharpe_ratio,max_drawdown_pct
+5x2Y - 3x10Y futures basket,Normal-CDF signal,2022-03-08,2026-10-28,-7.260226,-1.274737,8.366532,-0.152361,-17.949447
+5x2Y - 3x10Y futures basket,1-year moving-average strategy,2022-03-08,2026-10-28,-11.323948,-2.087516,10.032162,-0.208082,-30.041891
+5x2Y - 3x10Y futures basket,DBMF buy-and-hold,2022-03-08,2026-10-28,45.201601,8.754687,11.937363,0.733385,-20.440615
+5x2Y - 3x10Y futures basket,CTA buy-and-hold,2022-03-08,2026-10-28,53.810800,10.854223,17.646636,0.615087,-20.786692

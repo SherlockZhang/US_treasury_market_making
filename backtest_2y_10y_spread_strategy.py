@@ -37,13 +37,28 @@ def load_spread(
 ) -> pd.DataFrame:
     """Load both futures and calculate the standard and weighted price series."""
     frame = pd.read_excel(INPUT_FILE, sheet_name=SHEET_NAME)
-    required_columns = {"Date.1", "2Y future", "Date ", "10Y future"}
+    required_columns = {"2Y future", "10Y future"}
     missing_columns = required_columns.difference(frame.columns)
     if missing_columns:
         raise ValueError(
             f"Missing required columns in {INPUT_FILE.name}: "
             f"{sorted(missing_columns)}"
         )
+
+    columns = list(frame.columns)
+
+    def adjacent_date_column(price_column: str) -> str:
+        price_column_index = columns.index(price_column)
+        if price_column_index == 0:
+            raise ValueError(f"No date column found for {price_column!r}.")
+        date_column = columns[price_column_index - 1]
+        if not isinstance(date_column, str) or not date_column.strip().startswith(
+            "Date"
+        ):
+            raise ValueError(
+                f"Expected a date column immediately before {price_column!r}."
+            )
+        return date_column
 
     def load_leg(date_column: str, price_column: str) -> pd.Series:
         leg = frame.loc[:, [date_column, price_column]].copy()
@@ -64,8 +79,12 @@ def load_spread(
             raise ValueError(f"{price_column} prices must be positive.")
         return leg.set_index(date_column)[price_column].sort_index()
 
-    two_year = load_leg("Date.1", "2Y future").rename("2y_future")
-    ten_year = load_leg("Date ", "10Y future").rename("10y_future")
+    two_year = load_leg(
+        adjacent_date_column("2Y future"), "2Y future"
+    ).rename("2y_future")
+    ten_year = load_leg(
+        adjacent_date_column("10Y future"), "10Y future"
+    ).rename("10y_future")
     prices = pd.concat([two_year, ten_year], axis=1, join="inner").dropna()
     if prices.empty:
         raise ValueError("No dates have both 2Y and 10Y futures prices.")

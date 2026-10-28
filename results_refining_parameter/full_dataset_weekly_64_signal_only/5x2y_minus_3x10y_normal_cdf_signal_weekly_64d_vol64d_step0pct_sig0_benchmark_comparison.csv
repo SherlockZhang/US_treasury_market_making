@@ -1,0 +1,3 @@
+instrument,strategy,comparison_start_date,comparison_end_date,total_return_pct,annualized_return_pct,annualized_volatility_pct,sharpe_ratio,max_drawdown_pct
+5x2Y - 3x10Y futures basket,Normal-CDF signal,2016-01-04,2026-10-15,21.719714,2.013076,6.171611,0.326183,-12.007781
+5x2Y - 3x10Y futures basket,1-year moving-average strategy,2016-01-04,2026-10-15,18.337638,2.046183,9.847660,0.207784,-30.041891

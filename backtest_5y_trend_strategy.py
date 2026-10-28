@@ -85,17 +85,16 @@ def load_prices() -> pd.DataFrame:
 def load_5y_yield() -> pd.Series:
     """Load the 5Y yield observations, indexed by their own observation dates."""
     frame = pd.read_excel(INPUT_FILE, sheet_name=SHEET_NAME)
-    required_columns = {"Date .1", "5Y Yield"}
-    missing_columns = required_columns.difference(frame.columns)
-    if missing_columns:
+    value_column = "5Y Yield"
+    if value_column not in frame.columns:
         raise ValueError(
-            f"Missing required columns in {INPUT_FILE.name}: "
-            f"{sorted(missing_columns)}"
+            f"Missing required column {value_column!r} in {INPUT_FILE.name}."
         )
+    date_column = _adjacent_date_column(frame, value_column)
 
-    yields = frame.loc[:, ["Date .1", "5Y Yield"]].copy()
-    yields["Date .1"] = parse_excel_dates(yields["Date .1"])
-    yields["5Y Yield"] = pd.to_numeric(yields["5Y Yield"], errors="raise")
+    yields = frame.loc[:, [date_column, value_column]].copy()
+    yields[date_column] = parse_excel_dates(yields[date_column])
+    yields[value_column] = pd.to_numeric(yields[value_column], errors="raise")
     incomplete_rows = yields.isna().any(axis=1) & yields.notna().any(axis=1)
     if incomplete_rows.any():
         raise ValueError(
@@ -104,14 +103,29 @@ def load_5y_yield() -> pd.Series:
     yields = yields.dropna(how="all")
     if yields.empty:
         raise ValueError("No 5Y yield observations were found.")
-    if yields["Date .1"].duplicated().any():
+    if yields[date_column].duplicated().any():
         raise ValueError("The 5Y yield data contains duplicate dates.")
 
     return (
-        yields.sort_values("Date .1")
-        .set_index("Date .1")["5Y Yield"]
+        yields.sort_values(date_column)
+        .set_index(date_column)[value_column]
         .rename("5y_yield_pct")
     )
+
+
+def _adjacent_date_column(frame: pd.DataFrame, value_column: str) -> str:
+    """Find the date column immediately before a value column in the workbook."""
+    value_column_index = list(frame.columns).index(value_column)
+    if value_column_index == 0:
+        raise ValueError(f"No date column found for {value_column!r}.")
+    date_column = frame.columns[value_column_index - 1]
+    if not isinstance(date_column, str) or not date_column.strip().startswith(
+        "Date"
+    ):
+        raise ValueError(
+            f"Expected a date column immediately before {value_column!r}."
+        )
+    return date_column
 
 
 def summarize_5y_yield_change(yields: pd.Series) -> dict[str, object]:
@@ -133,31 +147,30 @@ def summarize_5y_yield_change(yields: pd.Series) -> dict[str, object]:
 def load_spx_index() -> pd.Series:
     """Load SPX index observations, indexed by their observation dates."""
     frame = pd.read_excel(INPUT_FILE, sheet_name=SHEET_NAME)
-    required_columns = {"Date.2", "SPX"}
-    missing_columns = required_columns.difference(frame.columns)
-    if missing_columns:
+    value_column = "SPX"
+    if value_column not in frame.columns:
         raise ValueError(
-            f"Missing required columns in {INPUT_FILE.name}: "
-            f"{sorted(missing_columns)}"
+            f"Missing required column {value_column!r} in {INPUT_FILE.name}."
         )
+    date_column = _adjacent_date_column(frame, value_column)
 
-    spx = frame.loc[:, ["Date.2", "SPX"]].copy()
-    spx["Date.2"] = parse_excel_dates(spx["Date.2"])
-    spx["SPX"] = pd.to_numeric(spx["SPX"], errors="raise")
+    spx = frame.loc[:, [date_column, value_column]].copy()
+    spx[date_column] = parse_excel_dates(spx[date_column])
+    spx[value_column] = pd.to_numeric(spx[value_column], errors="raise")
     incomplete_rows = spx.isna().any(axis=1) & spx.notna().any(axis=1)
     if incomplete_rows.any():
         raise ValueError("The SPX date and index columns cannot be partially blank.")
     spx = spx.dropna(how="all")
     if spx.empty:
         raise ValueError("No SPX index observations were found.")
-    if spx["Date.2"].duplicated().any():
+    if spx[date_column].duplicated().any():
         raise ValueError("The SPX data contains duplicate dates.")
-    if (spx["SPX"] <= 0).any():
+    if (spx[value_column] <= 0).any():
         raise ValueError("SPX index levels must be positive.")
 
     return (
-        spx.sort_values("Date.2")
-        .set_index("Date.2")["SPX"]
+        spx.sort_values(date_column)
+        .set_index(date_column)[value_column]
         .rename("spx_index")
     )
 

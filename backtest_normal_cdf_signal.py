@@ -15,6 +15,7 @@ from backtest_5y_trend_strategy import (
     TRADING_DAYS_PER_YEAR,
     calculate_annual_statistics,
     calculate_statistics,
+    calculate_trading_volume,
     load_5y_yield,
     load_prices,
     load_spx_index,
@@ -588,19 +589,77 @@ def calculate_stats(
         )
         annual_stat["rebalance_frequency"] = rebalance_frequency
 
-    yields = load_5y_yield()
-    spx = load_spx_index()
-    yield_dates = pd.DatetimeIndex(yields.index)
-    spx_dates = pd.DatetimeIndex(spx.index)
-    full_stats.update(summarize_5y_yield_change(yields))
-    full_stats.update(summarize_spx_change(spx))
-    for annual_stat in annual_stats:
-        year = int(cast(str, annual_stat["period"]))
-        annual_yields = yields.loc[yield_dates.year == year]
-        annual_spx = spx.loc[spx_dates.year == year]
-        annual_stat.update(summarize_5y_yield_change(annual_yields))
-        annual_stat.update(summarize_spx_change(annual_spx))
+    sheet1_columns = set(
+        pd.read_excel(BACKTEST_DATA_FILE, sheet_name=BACKTEST_DATA_SHEET, nrows=0)
+        .columns
+    )
+    if "5Y Yield" in sheet1_columns:
+        yields = load_5y_yield()
+        yield_dates = pd.DatetimeIndex(yields.index)
+        full_stats.update(summarize_5y_yield_change(yields))
+        for annual_stat in annual_stats:
+            year = int(cast(str, annual_stat["period"]))
+            annual_yields = yields.loc[yield_dates.year == year]
+            annual_stat.update(summarize_5y_yield_change(annual_yields))
+    else:
+        print(
+            "5Y yield statistics unavailable: '5Y Yield' is not present "
+            "on Sheet1; related CSV fields will be blank."
+        )
+        for stats in [full_stats, *annual_stats]:
+            stats.update(
+                {
+                    "5y_yield_start_date": np.nan,
+                    "5y_yield_end_date": np.nan,
+                    "5y_yield_start_pct": np.nan,
+                    "5y_yield_end_pct": np.nan,
+                    "5y_yield_change_percentage_points": np.nan,
+                }
+            )
+
+    if "SPX" in sheet1_columns:
+        spx = load_spx_index()
+        spx_dates = pd.DatetimeIndex(spx.index)
+        full_stats.update(summarize_spx_change(spx))
+        for annual_stat in annual_stats:
+            year = int(cast(str, annual_stat["period"]))
+            annual_spx = spx.loc[spx_dates.year == year]
+            annual_stat.update(summarize_spx_change(annual_spx))
+    else:
+        print(
+            "SPX statistics unavailable: 'SPX' is not present on Sheet1; "
+            "related CSV fields will be blank."
+        )
+        for stats in [full_stats, *annual_stats]:
+            stats.update(
+                {
+                    "spx_start_date": np.nan,
+                    "spx_end_date": np.nan,
+                    "spx_start_index": np.nan,
+                    "spx_end_index": np.nan,
+                    "spx_change_index_points": np.nan,
+                }
+            )
     return pd.DataFrame([full_stats, *annual_stats])
+
+
+def calculate_comparison_metrics(returns: pd.Series) -> dict[str, float]:
+    """Calculate comparable return, volatility, Sharpe, and drawdown metrics."""
+    wealth = (1 + returns).cumprod()
+    daily_volatility = returns.std(ddof=1)
+    annualized_volatility = daily_volatility * np.sqrt(TRADING_DAYS_PER_YEAR)
+    sharpe_ratio = (
+        returns.mean() / daily_volatility * np.sqrt(TRADING_DAYS_PER_YEAR)
+        if np.isfinite(daily_volatility) and daily_volatility > 0
+        else np.nan
+    )
+    return {
+        "total_return_pct": (wealth.iloc[-1] - 1) * 100,
+        "annualized_return_pct": returns.mean() * TRADING_DAYS_PER_YEAR * 100,
+        "annualized_volatility_pct": annualized_volatility * 100,
+        "sharpe_ratio": sharpe_ratio,
+        "max_drawdown_pct": (wealth / wealth.cummax() - 1).min() * 100,
+    }
 
 
 def save_plots(
@@ -614,11 +673,65 @@ def save_plots(
     signal_cutoff: float,
     signal_label: str,
     plot_path: Path,
+    signal_plot_path: Path,
     comparison_path: Path,
+    comparison_table_path: Path,
     factor_mode: FactorMode,
     volatility_lookback_days: int,
 ) -> None:
-    """Save cumulative PnL and comparison against the original trend strategy."""
+    """Save signal, cumulative PnL, and comparison plots."""
+    figure, signal_axis = plt.subplots(figsize=(12, 6))
+    volume_axis = signal_axis.twinx()
+    price_axis = signal_axis.twinx()
+    price_axis.spines["right"].set_position(("outward", 60))
+
+    signal_points = signal_axis.scatter(
+        results.index,
+        results["signal"],
+        color="#87CEFA",
+        s=10,
+        label="Generated signal",
+    )
+    signal_axis.axhline(0, color="black", linewidth=0.8, alpha=0.5)
+    rebalance_volume = calculate_trading_volume(results["position"])
+    volume_bars = volume_axis.bar(
+        results.index,
+        rebalance_volume,
+        width=2.0,
+        color="#B8860B",
+        alpha=0.45,
+        label="Rebalance volume",
+    )
+    price_line, = price_axis.plot(
+        results.index,
+        results["price"],
+        color="#59636E",
+        linewidth=1.0,
+        alpha=0.8,
+        label="Underlying price",
+    )
+    signal_axis.set_title(
+        f"{instrument} Generated Signal, Rebalance Volume, and Price"
+    )
+    signal_axis.set_xlabel("Date")
+    signal_axis.set_ylabel("Generated signal", color=color)
+    volume_axis.set_ylabel(
+        "Rebalance volume (absolute position change)", color="#A87912"
+    )
+    price_axis.set_ylabel("Underlying price", color="#59636E")
+    signal_axis.tick_params(axis="y", labelcolor=color)
+    volume_axis.tick_params(axis="y", labelcolor="#A87912")
+    price_axis.tick_params(axis="y", labelcolor="#59636E")
+    signal_axis.grid(True, alpha=0.25)
+    signal_axis.legend(
+        [signal_points, volume_bars, price_line],
+        ["Generated signal", "Rebalance volume", "Underlying price"],
+        loc="upper left",
+    )
+    figure.tight_layout(rect=(0, 0, 0.82, 1))
+    figure.savefig(signal_plot_path, dpi=150)
+    plt.close(figure)
+
     figure, axis = plt.subplots(figsize=(12, 6))
     axis.plot(
         results.index,
@@ -646,10 +759,9 @@ def save_plots(
     original_results = run_trend_backtest(
         benchmark_prices.rename("price").to_frame()
     )
-    benchmark_returns = original_results.loc[
-        results.index, "strategy_return"
-    ]
+    benchmark_returns = original_results["strategy_return"].reindex(results.index)
     benchmark_cumulative_pnl = (1 + benchmark_returns).cumprod().sub(1).mul(100)
+    aligned_etf_prices: dict[str, pd.Series] = {}
     figure, axis = plt.subplots(figsize=(12, 6))
     axis.plot(
         benchmark_cumulative_pnl.index,
@@ -663,6 +775,7 @@ def save_plots(
             raise ValueError(
                 f"No {benchmark_name} benchmark prices overlap the backtest dates."
             )
+        aligned_etf_prices[benchmark_name] = aligned_prices
         benchmark_cumulative_return = (
             aligned_prices / aligned_prices.iloc[0] - 1
         ) * 100
@@ -692,6 +805,43 @@ def save_plots(
     figure.tight_layout()
     figure.savefig(comparison_path, dpi=150)
     plt.close(figure)
+
+    comparison_start = max(
+        [
+            results.index[0],
+            *(prices.index[0] for prices in aligned_etf_prices.values()),
+        ]
+    )
+    comparison_index = results.index[results.index >= comparison_start]
+    comparison_returns: dict[str, pd.Series] = {
+        "Normal-CDF signal": results["strategy_return"].reindex(comparison_index),
+        "1-year moving-average strategy": benchmark_returns.reindex(
+            comparison_index
+        ),
+    }
+    for benchmark_name, prices in aligned_etf_prices.items():
+        buy_and_hold_returns = prices.pct_change(fill_method=None).fillna(0.0)
+        buy_and_hold_returns.loc[comparison_start] = 0.0
+        comparison_returns[f"{benchmark_name} buy-and-hold"] = (
+            buy_and_hold_returns.reindex(comparison_index)
+        )
+
+    comparison_rows = []
+    for strategy_name, returns in comparison_returns.items():
+        comparison_rows.append(
+            {
+                "instrument": instrument,
+                "strategy": strategy_name,
+                "comparison_start_date": comparison_index[0].date(),
+                "comparison_end_date": comparison_index[-1].date(),
+                **calculate_comparison_metrics(returns),
+            }
+        )
+    pd.DataFrame(comparison_rows).to_csv(
+        comparison_table_path,
+        index=False,
+        float_format="%.6f",
+    )
 
 
 def run_instrument(
@@ -772,7 +922,9 @@ def run_instrument(
     stats_path = OUTPUT_DIR / f"{stem}_stats.csv"
     simple_stats_path = OUTPUT_DIR / f"{stem}_stats_simple.csv"
     plot_path = OUTPUT_DIR / f"{stem}_cumulative_pnl.png"
+    signal_plot_path = OUTPUT_DIR / f"{stem}_signal_rebalance_volume_price.png"
     comparison_path = OUTPUT_DIR / f"{stem}_vs_original_pnl.png"
+    comparison_table_path = OUTPUT_DIR / f"{stem}_benchmark_comparison.csv"
 
     results.to_csv(daily_path, index_label="Date", float_format="%.8f")
     stats_frame.to_csv(stats_path, index=False, float_format="%.6f")
@@ -810,7 +962,9 @@ def run_instrument(
         signal_cutoff,
         signal_label,
         plot_path,
+        signal_plot_path,
         comparison_path,
+        comparison_table_path,
         factor_mode,
         volatility_lookback_days,
     )
@@ -827,7 +981,9 @@ def run_instrument(
     print(f"Stats: {stats_path}")
     print(f"Simplified stats: {simple_stats_path}")
     print(f"PnL plot: {plot_path}")
+    print(f"Signal/volume/price plot: {signal_plot_path}")
     print(f"Comparison plot: {comparison_path}")
+    print(f"Benchmark comparison table: {comparison_table_path}")
 
 
 def main() -> None:
