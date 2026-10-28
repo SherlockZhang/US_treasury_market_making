@@ -17,7 +17,7 @@ from backtest_5y_trend_strategy import (
     calculate_statistics,
     calculate_trading_volume,
     load_5y_yield,
-    load_prices,
+    load_10y_prices,
     load_spx_index,
     parse_excel_dates,
     run_backtest as run_trend_backtest,
@@ -71,9 +71,9 @@ SPREAD_FACTOR_TICKERS = {
 }
 
 STRATEGIES = {
-    "5y_future": {
-        "instrument": "5Y future",
-        "stem": "5y_future_normal_cdf_signal",
+    "10y_future": {
+        "instrument": "10Y future",
+        "stem": "10y_future_normal_cdf_signal",
         "color": "#245a84",
     },
     "10y_2y_spread": {
@@ -766,7 +766,7 @@ def save_plots(
     axis.plot(
         benchmark_cumulative_pnl.index,
         benchmark_cumulative_pnl,
-        label="1-year moving-average strategy",
+        label="1-year moving-average strategy (10Y future)",
         linewidth=1.5,
     )
     for benchmark_name, prices in etf_benchmark_prices.items():
@@ -815,7 +815,7 @@ def save_plots(
     comparison_index = results.index[results.index >= comparison_start]
     comparison_returns: dict[str, pd.Series] = {
         "Normal-CDF signal": results["strategy_return"].reindex(comparison_index),
-        "1-year moving-average strategy": benchmark_returns.reindex(
+        "1-year moving-average strategy (10Y future)": benchmark_returns.reindex(
             comparison_index
         ),
     }
@@ -1073,15 +1073,14 @@ def main() -> None:
     rebalance_frequency: RebalanceFrequency = args.rebalance_frequency
     signal_mode: SignalMode = args.signal_mode
     factor_mode: FactorMode = args.factor_mode
-    five_year_prices = load_prices()["price"]
+    ten_year_prices = load_10y_prices()["price"]
     spread_prices = load_spread(require_positive_10y_minus_2y=False)[
         "weighted_spread"
     ]
     etf_benchmark_prices = (
         load_etf_benchmark_prices() if args.include_etf_benchmarks else {}
     )
-    five_year_benchmark_prices = five_year_prices
-    spread_benchmark_prices = spread_prices
+    comparison_benchmark_prices = ten_year_prices
     if args.start_date is not None:
         signal_warmup_observations = (
             max(AVERAGED_SIGNAL_LOOKBACK_DAYS)
@@ -1098,25 +1097,25 @@ def main() -> None:
             warmup_start = max(0, start_position - warmup_observations)
             return prices.iloc[warmup_start:]
 
-        five_year_prices = include_warmup(five_year_prices)
+        ten_year_prices = include_warmup(ten_year_prices)
         spread_prices = include_warmup(spread_prices)
         if (
-            five_year_prices.empty
+            ten_year_prices.empty
             or spread_prices.empty
-            or five_year_prices.index[-1] < args.start_date
+            or ten_year_prices.index[-1] < args.start_date
             or spread_prices.index[-1] < args.start_date
         ):
             parser.error(
                 f"No prices available on or after {args.start_date:%Y-%m-%d} "
                 "for both instruments."
             )
-    factor_dates = pd.DatetimeIndex(five_year_prices.index).union(
+    factor_dates = pd.DatetimeIndex(ten_year_prices.index).union(
         pd.DatetimeIndex(spread_prices.index)
     ).sort_values()
-    five_year_factor_scores = None
+    ten_year_factor_scores = None
     spread_factor_scores = None
     if factor_mode == "market-data":
-        five_year_factor_scores = load_factor_scores(
+        ten_year_factor_scores = load_factor_scores(
             factor_dates,
             FACTOR_TICKERS,
         )
@@ -1125,18 +1124,18 @@ def main() -> None:
             SPREAD_FACTOR_TICKERS,
         )
     run_instrument(
-        five_year_prices,
-        STRATEGIES["5y_future"],
+        ten_year_prices,
+        STRATEGIES["10y_future"],
         args.lookback_days,
         rebalance_frequency,
         args.rebalance_threshold_fraction,
         args.signal_cutoff,
         signal_mode,
         factor_mode,
-        five_year_factor_scores,
+        ten_year_factor_scores,
         args.volatility_lookback_days,
         args.start_date,
-        five_year_benchmark_prices,
+        comparison_benchmark_prices,
         etf_benchmark_prices,
     )
     run_instrument(
@@ -1151,7 +1150,7 @@ def main() -> None:
         spread_factor_scores,
         args.volatility_lookback_days,
         args.start_date,
-        spread_benchmark_prices,
+        comparison_benchmark_prices,
         etf_benchmark_prices,
     )
 

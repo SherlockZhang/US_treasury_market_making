@@ -10,10 +10,11 @@ import pandas as pd
 INPUT_FILE = Path(__file__).with_name("US_future_data.xlsx")
 SHEET_NAME = "Sheet1"
 OUTPUT_DIR = Path(__file__).with_name("results")
-DAILY_OUTPUT_FILE = OUTPUT_DIR / "5y_trend_backtest_daily.csv"
-STATS_OUTPUT_FILE = OUTPUT_DIR / "5y_trend_backtest_stats.csv"
-SIMPLIFIED_STATS_OUTPUT_FILE = OUTPUT_DIR / "5y_trend_backtest_stats_simple.csv"
-PLOT_OUTPUT_FILE = OUTPUT_DIR / "5y_trend_cumulative_pnl.png"
+DAILY_OUTPUT_FILE = OUTPUT_DIR / "10y_trend_backtest_daily.csv"
+STATS_OUTPUT_FILE = OUTPUT_DIR / "10y_trend_backtest_stats.csv"
+SIMPLIFIED_STATS_OUTPUT_FILE = OUTPUT_DIR / "10y_trend_backtest_stats_simple.csv"
+PLOT_OUTPUT_FILE = OUTPUT_DIR / "10y_trend_cumulative_pnl.png"
+TREND_INSTRUMENT = "10Y future"
 
 TRADING_DAYS_PER_YEAR = 252
 TREND_LOOKBACK_DAYS = 252
@@ -53,33 +54,58 @@ def parse_excel_dates(values: pd.Series) -> pd.Series:
 
 def load_prices() -> pd.DataFrame:
     """Load and validate the 5Y futures price series."""
-    frame = pd.read_excel(INPUT_FILE, sheet_name=SHEET_NAME)
-    required_columns = {"Date", "5Y future"}
-    missing_columns = required_columns.difference(frame.columns)
-    if missing_columns:
-        raise ValueError(
-            f"Missing required columns in {INPUT_FILE.name}: "
-            f"{sorted(missing_columns)}"
-        )
+    return _load_future_prices("5Y future")
 
-    prices = frame.loc[:, ["Date", "5Y future"]].copy()
-    prices["Date"] = parse_excel_dates(prices["Date"])
-    prices["5Y future"] = pd.to_numeric(prices["5Y future"], errors="raise")
+
+def load_10y_prices() -> pd.DataFrame:
+    """Load and validate the 10Y futures price series."""
+    return _load_future_prices("10Y future")
+
+
+def _load_future_prices(price_column: str) -> pd.DataFrame:
+    """Load and validate a futures price series and its adjacent date column."""
+    frame = pd.read_excel(INPUT_FILE, sheet_name=SHEET_NAME)
+    if price_column not in frame.columns:
+        raise ValueError(
+            f"Missing required column {price_column!r} in {INPUT_FILE.name}."
+        )
+    date_column = _adjacent_date_column(frame, price_column)
+
+    prices = frame.loc[:, [date_column, price_column]].copy()
+    prices[date_column] = parse_excel_dates(prices[date_column])
+    prices[price_column] = pd.to_numeric(prices[price_column], errors="raise")
     incomplete_rows = prices.isna().any(axis=1) & prices.notna().any(axis=1)
     if incomplete_rows.any():
-        raise ValueError("The 5Y futures date and price columns cannot contain blanks.")
+        raise ValueError(
+            f"The {price_column} date and price columns cannot contain blanks."
+        )
     prices = prices.dropna(how="all")
     if prices.empty:
-        raise ValueError("No 5Y futures price observations were found.")
-    if prices["Date"].duplicated().any():
-        raise ValueError("The 5Y futures data contains duplicate dates.")
-    if (prices["5Y future"] <= 0).any():
-        raise ValueError("5Y futures prices must be positive.")
+        raise ValueError(f"No {price_column} price observations were found.")
+    if prices[date_column].duplicated().any():
+        raise ValueError(f"The {price_column} data contains duplicate dates.")
+    if (prices[price_column] <= 0).any():
+        raise ValueError(f"{price_column} prices must be positive.")
 
-    prices = prices.sort_values("Date").set_index("Date")
+    prices = prices.sort_values(date_column).set_index(date_column)
     if not prices.index.is_monotonic_increasing:
-        raise ValueError("The 5Y futures dates must be in ascending order.")
-    return prices.rename(columns={"5Y future": "price"})
+        raise ValueError(f"The {price_column} dates must be in ascending order.")
+    return prices.rename(columns={price_column: "price"})
+
+
+def _adjacent_date_column(frame: pd.DataFrame, value_column: str) -> str:
+    """Find the date column immediately before a value column in the workbook."""
+    value_column_index = list(frame.columns).index(value_column)
+    if value_column_index == 0:
+        raise ValueError(f"No date column found for {value_column!r}.")
+    date_column = frame.columns[value_column_index - 1]
+    if not isinstance(date_column, str) or not date_column.strip().startswith(
+        "Date"
+    ):
+        raise ValueError(
+            f"Expected a date column immediately before {value_column!r}."
+        )
+    return date_column
 
 
 def load_5y_yield() -> pd.Series:
@@ -399,7 +425,9 @@ def save_cumulative_pnl_plot(results: pd.DataFrame) -> None:
         linewidth=1.5,
     )
     axis.axhline(0, color="black", linewidth=0.8, alpha=0.6)
-    axis.set_title("5Y Treasury Futures Trend Strategy — Full-Period Cumulative PnL")
+    axis.set_title(
+        f"{TREND_INSTRUMENT} Trend Strategy — Full-Period Cumulative PnL"
+    )
     axis.set_xlabel("Date")
     axis.set_ylabel("Cumulative PnL (%)")
     axis.grid(True, alpha=0.25)
@@ -409,12 +437,15 @@ def save_cumulative_pnl_plot(results: pd.DataFrame) -> None:
 
 
 def main() -> None:
-    prices = load_prices()
+    prices = load_10y_prices()
     yields = load_5y_yield()
     spx = load_spx_index()
     results = run_backtest(prices)
     stats = calculate_statistics(results)
     annual_stats = calculate_annual_statistics(results)
+    stats["instrument"] = TREND_INSTRUMENT
+    for annual_stat in annual_stats:
+        annual_stat["instrument"] = TREND_INSTRUMENT
     stats.update(summarize_5y_yield_change(yields))
     stats.update(summarize_spx_change(spx))
     for annual_stat in annual_stats:
