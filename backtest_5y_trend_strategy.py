@@ -8,7 +8,7 @@ import pandas as pd
 
 
 INPUT_FILE = Path(__file__).with_name("US_future_data.xlsx")
-SHEET_NAME = "Sheet1"
+SHEET_NAME = "Sheet2"
 OUTPUT_DIR = Path(__file__).with_name("results")
 DAILY_OUTPUT_FILE = OUTPUT_DIR / "5y_trend_backtest_daily.csv"
 STATS_OUTPUT_FILE = OUTPUT_DIR / "5y_trend_backtest_stats.csv"
@@ -30,7 +30,25 @@ def parse_excel_dates(values: pd.Series) -> pd.Series:
             origin="1899-12-30",
             errors="raise",
         )
-    return pd.to_datetime(values, errors="raise")
+
+    def parse_value(value: object) -> pd.Timestamp | None:
+        if pd.isna(value):
+            return None
+        if isinstance(value, (int, float, np.integer, np.floating)):
+            return pd.to_datetime(
+                value,
+                unit="D",
+                origin="1899-12-30",
+                errors="raise",
+            )
+        return pd.to_datetime(value, errors="raise")
+
+    return pd.Series(
+        values.map(parse_value),
+        index=values.index,
+        name=values.name,
+        dtype="datetime64[ns]",
+    )
 
 
 def load_prices() -> pd.DataFrame:

@@ -29,7 +29,7 @@ OUTPUT_DIR = Path(__file__).with_name("results_refining_parameter")
 FACTOR_DATA_FILE = Path(__file__).with_name("market_data.xlsx")
 FACTOR_DATA_SHEET = "Sheet1"
 BACKTEST_DATA_FILE = Path(__file__).with_name("US_future_data.xlsx")
-BACKTEST_DATA_SHEET = "Sheet1"
+BACKTEST_DATA_SHEET = "Sheet2"
 ETF_BENCHMARK_TICKERS = {
     "DBMF US Equity": "DBMF",
     "CTA US Equity": "CTA",
@@ -887,7 +887,9 @@ def main() -> None:
     signal_mode: SignalMode = args.signal_mode
     factor_mode: FactorMode = args.factor_mode
     five_year_prices = load_prices()["price"]
-    spread_prices = load_spread()["weighted_spread"]
+    spread_prices = load_spread(require_positive_10y_minus_2y=False)[
+        "weighted_spread"
+    ]
     etf_benchmark_prices = (
         load_etf_benchmark_prices() if args.include_etf_benchmarks else {}
     )

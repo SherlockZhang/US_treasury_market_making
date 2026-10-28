@@ -1,0 +1,4 @@
+target,model,model_set,predictor_count,train_observations,test_observations,train_start_date,train_end_date,test_start_date,test_end_date,train_r_squared,train_rmse,train_mae,test_r_squared,test_rmse,test_mae,hidden_layers,weight_decay,learning_rate,dropout,ensemble_size,mean_best_epoch
+5Y future,Neural network (tuned),daily_without_weekly_tff,14,1654,414,2018-04-03,2025-01-31,2025-02-03,2026-10-15,0.3509890681,0.002029798994,0.001451691213,0.07005288772,0.001973671212,0.001505008874,8,0.1,0.001,0,10,111.4
+5Y future,Neural network (untuned default),daily_without_weekly_tff,14,1654,414,2018-04-03,2025-01-31,2025-02-03,2026-10-15,0.4389148719,0.001887302024,0.001368647668,0.03150688896,0.002014159919,0.001510142521,32-16,0.001,0.001,0,10,34.5
+5Y future,OLS baseline,daily_without_weekly_tff,14,1654,414,2018-04-03,2025-01-31,2025-02-03,2026-10-15,0.337784717,0.002050343504,0.00146359286,0.05015777902,0.001994671657,0.00149943282,,,,,,

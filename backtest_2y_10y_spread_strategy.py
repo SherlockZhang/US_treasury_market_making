@@ -18,7 +18,7 @@ from backtest_5y_trend_strategy import (
 
 
 INPUT_FILE = Path(__file__).with_name("US_future_data.xlsx")
-SHEET_NAME = "Sheet1"
+SHEET_NAME = "Sheet2"
 OUTPUT_DIR = Path(__file__).with_name("results")
 DAILY_OUTPUT_FILE = OUTPUT_DIR / "2y_10y_spread_backtest_daily.csv"
 STATS_OUTPUT_FILE = OUTPUT_DIR / "2y_10y_spread_backtest_stats.csv"
@@ -32,7 +32,9 @@ TEN_YEAR_CONTRACTS = 3
 INSTRUMENT_NAME = "5x2Y - 3x10Y futures basket"
 
 
-def load_spread() -> pd.DataFrame:
+def load_spread(
+    require_positive_10y_minus_2y: bool = True,
+) -> pd.DataFrame:
     """Load both futures and calculate the standard and weighted price series."""
     frame = pd.read_excel(INPUT_FILE, sheet_name=SHEET_NAME)
     required_columns = {"Date.1", "2Y future", "Date ", "10Y future"}
@@ -69,7 +71,7 @@ def load_spread() -> pd.DataFrame:
         raise ValueError("No dates have both 2Y and 10Y futures prices.")
 
     prices["spread"] = prices["10y_future"] - prices["2y_future"]
-    if (prices["spread"] <= 0).any():
+    if require_positive_10y_minus_2y and (prices["spread"] <= 0).any():
         raise ValueError(
             "The 10Y-minus-2Y spread must remain positive to use "
             "percentage returns consistently."
