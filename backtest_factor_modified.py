@@ -347,6 +347,7 @@ def run_instrument(
             "period",
             "factor",
             "sharpe_ratio",
+            "trading_volume",
             "max_drawdown_pct",
             "5y_yield_change_percentage_points",
             "spx_change_index_points",

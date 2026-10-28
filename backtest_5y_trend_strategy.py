@@ -8,7 +8,7 @@ import pandas as pd
 
 
 INPUT_FILE = Path(__file__).with_name("US_future_data.xlsx")
-SHEET_NAME = "Sheet2"
+SHEET_NAME = "Sheet1"
 OUTPUT_DIR = Path(__file__).with_name("results")
 DAILY_OUTPUT_FILE = OUTPUT_DIR / "5y_trend_backtest_daily.csv"
 STATS_OUTPUT_FILE = OUTPUT_DIR / "5y_trend_backtest_stats.csv"
@@ -286,7 +286,15 @@ def calculate_statistics(
         "max_drawdown_recovery_date": recovery_date,
         "average_absolute_position": trading["position"].abs().mean(),
         "maximum_absolute_position": trading["position"].abs().max(),
+        "trading_volume": float(
+            calculate_trading_volume(results["position"]).sum()
+        ),
     }
+
+
+def calculate_trading_volume(position: pd.Series) -> pd.Series:
+    """Return gross turnover as absolute changes in normalized position."""
+    return position.diff().abs().fillna(0.0)
 
 
 def calculate_annual_statistics(
@@ -294,6 +302,7 @@ def calculate_annual_statistics(
 ) -> list[dict[str, object]]:
     """Calculate calendar-year metrics with return-based Sharpe ratios."""
     annual_stats = []
+    trading_volume = calculate_trading_volume(results["position"])
     for year, yearly in results.groupby(results.index.year, sort=True):
         returns = yearly["strategy_return"]
         daily_volatility = returns.std(ddof=1)
@@ -361,6 +370,7 @@ def calculate_annual_statistics(
                 "max_drawdown_recovery_date": recovery_date,
                 "average_absolute_position": yearly["position"].abs().mean(),
                 "maximum_absolute_position": yearly["position"].abs().max(),
+                "trading_volume": float(trading_volume.loc[yearly.index].sum()),
             }
         )
     return annual_stats
@@ -412,6 +422,7 @@ def main() -> None:
         [
             "period",
             "sharpe_ratio",
+            "trading_volume",
             "max_drawdown_pct",
             "5y_yield_change_percentage_points",
             "spx_change_index_points",

@@ -29,18 +29,19 @@ OUTPUT_DIR = Path(__file__).with_name("results_refining_parameter")
 FACTOR_DATA_FILE = Path(__file__).with_name("market_data.xlsx")
 FACTOR_DATA_SHEET = "Sheet1"
 BACKTEST_DATA_FILE = Path(__file__).with_name("US_future_data.xlsx")
-BACKTEST_DATA_SHEET = "Sheet2"
+BACKTEST_DATA_SHEET = "Sheet1"
 ETF_BENCHMARK_TICKERS = {
     "DBMF US Equity": "DBMF",
     "CTA US Equity": "CTA",
 }
 DEFAULT_LOOKBACK_DAYS = 252
 AVERAGED_SIGNAL_LOOKBACK_DAYS = (32, 64, 126, 252, 504)
-NORMAL_CDF_VOLATILITY_LOOKBACK_DAYS = 63
-FACTOR_SCORE_LOOKBACK_DAYS = 63
-FACTOR_SCORE_ZSCORE_LOOKBACK_DAYS = 63
+NORMAL_CDF_VOLATILITY_LOOKBACK_DAYS = 64
+FACTOR_SCORE_LOOKBACK_DAYS = 64
+FACTOR_SCORE_ZSCORE_LOOKBACK_DAYS = 64
 FACTOR_SIGNAL_BOOST_THRESHOLD = 1.0
 FACTOR_SIGNAL_BOOST_MULTIPLIER = 1.1
+FACTOR_SIGNAL_REDUCE_MULTIPLIER = 0.9
 NORMAL_CDF_SIGNAL_CUTOFF = 0.1
 REBALANCE_POSITION_CHANGE_THRESHOLD_FRACTION = 0.25
 RebalanceFrequency = Literal["daily", "weekly", "monthly"]
@@ -395,11 +396,23 @@ def run_backtest(
             (score_zscore < -FACTOR_SIGNAL_BOOST_THRESHOLD)
             & (results["signal"] < 0)
         )
+        signal_reduce = (
+            (score_zscore > FACTOR_SIGNAL_BOOST_THRESHOLD)
+            & (results["signal"] < 0)
+        ) | (
+            (score_zscore < -FACTOR_SIGNAL_BOOST_THRESHOLD)
+            & (results["signal"] > 0)
+        )
         results["base_signal"] = results["signal"]
         results["factor_score"] = score
         results["factor_score_zscore"] = score_zscore
-        results["factor_signal_multiplier"] = np.where(
-            signal_boost, FACTOR_SIGNAL_BOOST_MULTIPLIER, 1.0
+        results["factor_signal_multiplier"] = np.select(
+            [signal_boost, signal_reduce],
+            [
+                FACTOR_SIGNAL_BOOST_MULTIPLIER,
+                FACTOR_SIGNAL_REDUCE_MULTIPLIER,
+            ],
+            default=1.0,
         )
         results["signal"] *= results["factor_signal_multiplier"]
     results["realized_volatility"] = (
@@ -516,6 +529,11 @@ def calculate_stats(
         if factor_mode == "market-data"
         else np.nan
     )
+    full_stats["factor_signal_reduce_multiplier"] = (
+        FACTOR_SIGNAL_REDUCE_MULTIPLIER
+        if factor_mode == "market-data"
+        else np.nan
+    )
     full_stats["signal_lookback_days"] = (
         lookback_days if signal_mode == "single" else np.nan
     )
@@ -549,6 +567,11 @@ def calculate_stats(
         )
         annual_stat["factor_signal_boost_multiplier"] = (
             FACTOR_SIGNAL_BOOST_MULTIPLIER
+            if factor_mode == "market-data"
+            else np.nan
+        )
+        annual_stat["factor_signal_reduce_multiplier"] = (
+            FACTOR_SIGNAL_REDUCE_MULTIPLIER
             if factor_mode == "market-data"
             else np.nan
         )
@@ -712,7 +735,11 @@ def run_instrument(
         f"sig{int(signal_cutoff * 100)}"
     )
     if factor_mode == "market-data":
-        stem = f"{stem}_market_factors_zscore"
+        boost_tag = str(FACTOR_SIGNAL_BOOST_MULTIPLIER).replace(".", "p")
+        reduce_tag = str(FACTOR_SIGNAL_REDUCE_MULTIPLIER).replace(".", "p")
+        stem = (
+            f"{stem}_market_factors_zscore_boost{boost_tag}_reduce{reduce_tag}"
+        )
     if etf_benchmark_prices:
         stem = f"{stem}_with_etf_benchmarks"
     if start_date is not None:
@@ -758,6 +785,7 @@ def run_instrument(
             "factor_score_zscore_lookback_days",
             "factor_signal_boost_threshold",
             "factor_signal_boost_multiplier",
+            "factor_signal_reduce_multiplier",
             "signal_lookback_days",
             "signal_lookbacks_days",
             "volatility_lookback_days",
@@ -765,6 +793,7 @@ def run_instrument(
             "rebalance_position_change_threshold_fraction",
             "rebalance_frequency",
             "sharpe_ratio",
+            "trading_volume",
             "max_drawdown_pct",
             "5y_yield_change_percentage_points",
             "spx_change_index_points",
@@ -840,8 +869,10 @@ def main() -> None:
         choices=("none", "market-data"),
         default="none",
         help=(
-            "Optionally scale the normal-CDF signal with the signed average "
-            "63-observation market-data factor score."
+            "Scale with the signed average market-data factor score: boost "
+            f"aligned signals by {FACTOR_SIGNAL_BOOST_MULTIPLIER:g} and reduce "
+            f"opposing signals to {FACTOR_SIGNAL_REDUCE_MULTIPLIER:g} when the "
+            "factor z-score magnitude exceeds 1."
         ),
     )
     parser.add_argument(

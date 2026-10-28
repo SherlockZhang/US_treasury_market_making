@@ -18,7 +18,7 @@ from backtest_5y_trend_strategy import (
 
 
 INPUT_FILE = Path(__file__).with_name("US_future_data.xlsx")
-SHEET_NAME = "Sheet2"
+SHEET_NAME = "Sheet1"
 OUTPUT_DIR = Path(__file__).with_name("results")
 DAILY_OUTPUT_FILE = OUTPUT_DIR / "2y_10y_spread_backtest_daily.csv"
 STATS_OUTPUT_FILE = OUTPUT_DIR / "2y_10y_spread_backtest_stats.csv"
@@ -153,6 +153,7 @@ def main() -> None:
         [
             "period",
             "sharpe_ratio",
+            "trading_volume",
             "max_drawdown_pct",
             "5y_yield_change_percentage_points",
             "spx_change_index_points",
