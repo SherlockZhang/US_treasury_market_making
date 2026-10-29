@@ -1,0 +1,7 @@
+period,signal_mode,factor_mode,factor_score_zscore_lookback_days,factor_signal_boost_threshold,factor_signal_boost_multiplier,factor_signal_reduce_multiplier,signal_lookback_days,signal_lookbacks_days,volatility_lookback_days,signal_cutoff,rebalance_position_change_threshold_fraction,rebalance_frequency,sharpe_ratio,annualized_return_pct,annualized_volatility_pct,trading_volume,trading_volume_to_average_absolute_position,max_drawdown_pct,5y_yield_change_percentage_points,spx_change_index_points
+Full dataset,single,market-data,64,1.000000,1.100000,0.900000,64,64,64,0.000000,0.000000,weekly,0.304099,3.017939,9.924208,112.771406,84.337680,-13.886152,3.091600,5709.940000
+2022,single,market-data,64,1.000000,1.100000,0.900000,64,64,64,0.000000,0.000000,weekly,1.080270,13.684624,12.667784,11.828105,9.075096,-6.921134,2.649900,-957.060000
+2023,single,market-data,64,1.000000,1.100000,0.900000,64,64,64,0.000000,0.000000,weekly,-0.075459,-0.661045,8.760363,18.190058,18.962046,-9.212488,-0.156800,945.690000
+2024,single,market-data,64,1.000000,1.100000,0.900000,64,64,64,0.000000,0.000000,weekly,0.093398,0.962876,10.309352,23.086013,15.294871,-8.617476,0.534900,1138.800000
+2025,single,market-data,64,1.000000,1.100000,0.900000,64,64,64,0.000000,0.000000,weekly,-0.494941,-3.870572,7.820268,29.424733,24.709305,-8.468285,-0.656800,976.950000
+2026,single,market-data,64,1.000000,1.100000,0.900000,64,64,64,0.000000,0.000000,weekly,0.767284,7.571897,9.868436,30.242497,17.159398,-6.409634,1.126200,864.130000

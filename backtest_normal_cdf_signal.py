@@ -45,7 +45,7 @@ FACTOR_SIGNAL_BOOST_MULTIPLIER = 1.1
 FACTOR_SIGNAL_REDUCE_MULTIPLIER = 0.9
 NORMAL_CDF_SIGNAL_CUTOFF = 0.1
 REBALANCE_POSITION_CHANGE_THRESHOLD_FRACTION = 0.25
-RebalanceFrequency = Literal["daily", "weekly", "monthly"]
+RebalanceFrequency = Literal["daily", "weekly", "monthly", "yearly"]
 SignalMode = Literal["single", "average"]
 FactorMode = Literal["none", "market-data"]
 DEFAULT_REBALANCE_FREQUENCY: RebalanceFrequency = "weekly"
@@ -331,12 +331,12 @@ def run_backtest(
     volatility_lookback_days: int = NORMAL_CDF_VOLATILITY_LOOKBACK_DAYS,
     output_start_date: pd.Timestamp | None = None,
 ) -> pd.DataFrame:
-    """Apply the signal with daily, Monday-weekly, or month-end volatility sizing."""
+    """Apply the signal with daily, Monday-weekly, month-end, or year-end sizing."""
     if lookback_days <= 0:
         raise ValueError("Lookback days must be a positive integer.")
     if volatility_lookback_days <= 0:
         raise ValueError("Volatility lookback days must be a positive integer.")
-    if rebalance_frequency not in ("daily", "weekly", "monthly"):
+    if rebalance_frequency not in ("daily", "weekly", "monthly", "yearly"):
         raise ValueError(
             f"Unsupported rebalance frequency: {rebalance_frequency}"
         )
@@ -445,12 +445,15 @@ def run_backtest(
         rebalance_dates = np.ones(len(dates), dtype=bool)
     elif rebalance_frequency == "weekly":
         rebalance_dates = dates.dayofweek == 0
-    else:
+    elif rebalance_frequency == "monthly":
         months = dates.to_period("M")
         rebalance_dates = np.r_[
             months[:-1] != months[1:],
             True,
         ]
+    else:
+        years = dates.year
+        rebalance_dates = np.r_[years[:-1] != years[1:], True]
     position_change_threshold = (
         position_change_threshold_fraction
         * TARGET_ANNUALIZED_VOLATILITY
@@ -662,6 +665,19 @@ def calculate_comparison_metrics(returns: pd.Series) -> dict[str, float]:
     }
 
 
+def calculate_relative_rebalance_volume(position: pd.Series) -> pd.Series:
+    """Scale gross position changes by the trailing mean absolute position."""
+    average_absolute_position = (
+        position.abs().shift(1).rolling(window=21, min_periods=1).mean()
+    )
+    return (
+        calculate_trading_volume(position)
+        .div(average_absolute_position.where(average_absolute_position.ne(0)))
+        .fillna(0.0)
+        .mul(100)
+    )
+
+
 def save_plots(
     results: pd.DataFrame,
     benchmark_prices: pd.Series,
@@ -693,7 +709,7 @@ def save_plots(
         label="Generated signal",
     )
     signal_axis.axhline(0, color="black", linewidth=0.8, alpha=0.5)
-    rebalance_volume = calculate_trading_volume(results["position"])
+    rebalance_volume = calculate_relative_rebalance_volume(results["position"])
     volume_bars = volume_axis.bar(
         results.index,
         rebalance_volume,
@@ -716,7 +732,8 @@ def save_plots(
     signal_axis.set_xlabel("Date")
     signal_axis.set_ylabel("Generated signal", color=color)
     volume_axis.set_ylabel(
-        "Rebalance volume (absolute position change)", color="#A87912"
+        "Rebalance volume (% of prior 21-day average absolute position)",
+        color="#A87912",
     )
     price_axis.set_ylabel("Underlying price", color="#59636E")
     signal_axis.tick_params(axis="y", labelcolor=color)
@@ -945,7 +962,10 @@ def run_instrument(
             "rebalance_position_change_threshold_fraction",
             "rebalance_frequency",
             "sharpe_ratio",
+            "annualized_return_pct",
+            "annualized_volatility_pct",
             "trading_volume",
+            "trading_volume_to_average_absolute_position",
             "max_drawdown_pct",
             "5y_yield_change_percentage_points",
             "spx_change_index_points",
@@ -1041,11 +1061,12 @@ def main() -> None:
     )
     parser.add_argument(
         "--rebalance-frequency",
-        choices=("daily", "weekly", "monthly"),
+        choices=("daily", "weekly", "monthly", "yearly"),
         default=DEFAULT_REBALANCE_FREQUENCY,
         help=(
-            "Position rebalance frequency; monthly rebalances on each month's "
-            f"last available date (default: {DEFAULT_REBALANCE_FREQUENCY})."
+            "Position rebalance frequency; monthly/yearly rebalance on the "
+            "last available date of each period "
+            f"(default: {DEFAULT_REBALANCE_FREQUENCY})."
         ),
     )
     parser.add_argument(

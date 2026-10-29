@@ -302,6 +302,8 @@ def calculate_statistics(
     recovery_date = recovery_dates[0].date() if len(recovery_dates) else None
     annualized_return = returns.mean() * TRADING_DAYS_PER_YEAR
     annualized_volatility = daily_volatility * np.sqrt(TRADING_DAYS_PER_YEAR)
+    trading_volume = calculate_trading_volume(results["position"]).sum()
+    average_absolute_position = trading["position"].abs().mean()
 
     return {
         "period": "Full dataset",
@@ -323,10 +325,11 @@ def calculate_statistics(
         "max_drawdown_peak_date": peak_date.date(),
         "max_drawdown_trough_date": trough_date.date(),
         "max_drawdown_recovery_date": recovery_date,
-        "average_absolute_position": trading["position"].abs().mean(),
+        "average_absolute_position": average_absolute_position,
         "maximum_absolute_position": trading["position"].abs().max(),
-        "trading_volume": float(
-            calculate_trading_volume(results["position"]).sum()
+        "trading_volume": float(trading_volume),
+        "trading_volume_to_average_absolute_position": float(
+            trading_volume / average_absolute_position
         ),
     }
 
@@ -344,6 +347,8 @@ def calculate_annual_statistics(
     trading_volume = calculate_trading_volume(results["position"])
     for year, yearly in results.groupby(results.index.year, sort=True):
         returns = yearly["strategy_return"]
+        annual_turnover = trading_volume.loc[yearly.index].sum()
+        average_absolute_position = yearly["position"].abs().mean()
         daily_volatility = returns.std(ddof=1)
         sharpe_ratio = (
             returns.mean()
@@ -407,9 +412,14 @@ def calculate_annual_statistics(
                 "max_drawdown_peak_date": peak_date_value,
                 "max_drawdown_trough_date": trough_date_value,
                 "max_drawdown_recovery_date": recovery_date,
-                "average_absolute_position": yearly["position"].abs().mean(),
+                "average_absolute_position": average_absolute_position,
                 "maximum_absolute_position": yearly["position"].abs().max(),
-                "trading_volume": float(trading_volume.loc[yearly.index].sum()),
+                "trading_volume": float(annual_turnover),
+                "trading_volume_to_average_absolute_position": (
+                    float(annual_turnover / average_absolute_position)
+                    if average_absolute_position > 0
+                    else np.nan
+                ),
             }
         )
     return annual_stats
@@ -467,6 +477,7 @@ def main() -> None:
             "period",
             "sharpe_ratio",
             "trading_volume",
+            "trading_volume_to_average_absolute_position",
             "max_drawdown_pct",
             "5y_yield_change_percentage_points",
             "spx_change_index_points",
