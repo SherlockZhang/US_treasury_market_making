@@ -1,5 +1,7 @@
 {
     "workbench.editorAssociations": {
-        "file:/c:/Users/xinzhang/US_treasury_market_making/results/5y_trend_backtest_daily.csv": "default"
+        "file:/c:/Users/xinzhang/US_treasury_market_making/results/5y_trend_backtest_daily.csv": "default",
+        "*.copilotmd": "vscode.markdown.preview.editor",
+        "*.xlsx": "docxxlsx.xlsxEditor"
     }
 }
