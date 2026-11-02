@@ -34,7 +34,7 @@ data, unless a script explicitly reads them.
 | [`backtest_factor_modified.py`](./backtest_factor_modified.py) | `US_future_data.xlsx` |
 | [`backtest_12_month_average_signal.py`](./backtest_12_month_average_signal.py) | `US_future_data.xlsx`, indirectly through the 5Y trend and 2Y/10Y spread loaders |
 | [`analyze_5y_future_yield_correlation.py`](./analyze_5y_future_yield_correlation.py) | `US_future_data.xlsx`, indirectly through the 5Y trend loaders |
-| [`backtest_normal_cdf_signal.py`](./backtest_normal_cdf_signal.py) | `US_future_data.xlsx`; `market_data.xlsx` when market-data factor signals are used |
+| [`backtest_normal_cdf_signal.py`](./backtest_normal_cdf_signal.py) | `US_future_data.xlsx` for the existing 10Y/basket backtests; `future_price.csv` for the optional single 5Y, 2Y, or 10Y futures backtests and DBMF price comparison; `market_data.xlsx` when market-data factor signals are used |
 | [`backtest_normal_cdf_sharpe_grid.py`](./backtest_normal_cdf_sharpe_grid.py) | `US_future_data.xlsx`, indirectly through the 10Y futures and spread loaders |
 | [`cta_replication_backtest.py`](./cta_replication_backtest.py) | Yahoo Finance downloads by default; optional user-provided target CSV; generated synthetic data with `--synthetic` |
 | [`generate_treasury_pdf.py`](./generate_treasury_pdf.py) | No repository data file is loaded; generates a PDF from content defined by the script |
@@ -44,8 +44,11 @@ data, unless a script explicitly reads them.
 - These scripts resolve their bundled input files relative to the script or
   repository location, so run them with the listed files available in the
   repository.
+- To generate the single-futures presentation reports, run
+  `python backtest_normal_cdf_signal.py --instrument "5Y future" "2Y future" "10Y future" --start-date 2026-01-01 --lookback-days 64 --volatility-lookback-days 64 --rebalance-frequency weekly --rebalance-threshold-fraction 0 --signal-cutoff 0`.
+  The daily results, statistics, and plots are written to `presentation report/`.
 - CSVs, spreadsheets, plots, and PDFs created in `results/`,
-  `results_refining_parameter/`, `component_analysis/results/`,
+  `results_refining_parameter/`, `presentation report/`, `component_analysis/results/`,
   `market_data_regression/`, or other output folders are analysis artifacts.
   Their presence does not necessarily mean another script consumes them.
 - `US_Treasury_Futures_and_Options_Exchanges.pdf` is a reference document in

@@ -31,6 +31,8 @@ FACTOR_DATA_FILE = Path(__file__).with_name("market_data.xlsx")
 FACTOR_DATA_SHEET = "Sheet1"
 BACKTEST_DATA_FILE = Path(__file__).with_name("US_future_data.xlsx")
 BACKTEST_DATA_SHEET = "Sheet1"
+FUTURE_PRICE_CSV = Path(__file__).with_name("future_price.csv")
+PRESENTATION_OUTPUT_DIR = Path(__file__).with_name("presentation report")
 ETF_BENCHMARK_TICKERS = {
     "DBMF US Equity": "DBMF",
     "CTA US Equity": "CTA",
@@ -81,6 +83,11 @@ STRATEGIES = {
         "stem": "5x2y_minus_3x10y_normal_cdf_signal",
         "color": "#8c4a2f",
     },
+}
+SINGLE_FUTURE_STRATEGIES = {
+    "5Y future": {"stem": "5y_future", "color": "#245a84"},
+    "2Y future": {"stem": "2y_future", "color": "#8c4a2f"},
+    "10Y future": {"stem": "10y_future", "color": "#4f772d"},
 }
 
 
@@ -276,6 +283,93 @@ def load_factor_scores(
     return signed_scores
 
 
+def load_single_future_prices() -> dict[str, pd.Series]:
+    """Load individual futures and DBMF prices from the repeated-pair CSV."""
+    frame = pd.read_csv(FUTURE_PRICE_CSV)
+    price_columns = [*SINGLE_FUTURE_STRATEGIES, "DBMF Price"]
+    prices_by_name: dict[str, pd.Series] = {}
+
+    for price_column in price_columns:
+        if price_column not in frame.columns:
+            raise ValueError(
+                f"Required price column {price_column!r} was not found in "
+                f"{FUTURE_PRICE_CSV.name}."
+            )
+        price_column_index = list(frame.columns).index(price_column)
+        if price_column_index == 0:
+            raise ValueError(f"No date column found for {price_column!r}.")
+        date_column_index = price_column_index - (
+            2 if price_column == "DBMF Price" else 1
+        )
+        if date_column_index < 0:
+            raise ValueError(f"No date column found for {price_column!r}.")
+        date_column = frame.columns[date_column_index]
+        if not isinstance(date_column, str) or not date_column.strip().startswith(
+            "Date"
+        ):
+            raise ValueError(
+                f"Expected the date column at position {date_column_index} "
+                f"before {price_column!r}."
+            )
+
+        observations = frame.loc[:, [date_column, price_column]].copy()
+        observations[date_column] = parse_csv_dates(observations[date_column])
+        observations[price_column] = pd.to_numeric(
+            observations[price_column], errors="raise"
+        )
+        partially_blank = observations.isna().any(axis=1) & observations.notna().any(
+            axis=1
+        )
+        if partially_blank.any():
+            raise ValueError(
+                f"The {price_column!r} date and price columns contain "
+                "partially blank rows."
+            )
+        observations = observations.dropna(how="all")
+        if observations.empty:
+            raise ValueError(f"No observations found for {price_column!r}.")
+        if observations[date_column].duplicated().any():
+            raise ValueError(f"{price_column!r} contains duplicate dates.")
+        values = observations[price_column]
+        if not np.isfinite(values).all() or (values <= 0).any():
+            raise ValueError(
+                f"{price_column!r} prices must be finite and positive."
+            )
+        prices_by_name[price_column] = (
+            observations.sort_values(date_column)
+            .set_index(date_column)[price_column]
+            .rename(price_column)
+        )
+
+    return prices_by_name
+
+
+def parse_csv_dates(values: pd.Series) -> pd.Series:
+    """Parse CSV dates stored as strings or Excel serial numbers."""
+    numeric_values = pd.to_numeric(values, errors="coerce")
+    numeric_mask = values.notna() & numeric_values.notna()
+    parsed_dates = pd.Series(
+        pd.NaT,
+        index=values.index,
+        name=values.name,
+        dtype="datetime64[ns]",
+    )
+    if numeric_mask.any():
+        parsed_dates.loc[numeric_mask] = pd.to_datetime(
+            numeric_values.loc[numeric_mask],
+            unit="D",
+            origin="1899-12-30",
+            errors="raise",
+        )
+    text_mask = values.notna() & ~numeric_mask
+    if text_mask.any():
+        parsed_dates.loc[text_mask] = pd.to_datetime(
+            values.loc[text_mask],
+            errors="raise",
+        )
+    return parsed_dates
+
+
 def calculate_normal_cdf_signal(
     daily_returns: pd.Series,
     lookback_days: int,
@@ -444,7 +538,7 @@ def run_backtest(
     if rebalance_frequency == "daily":
         rebalance_dates = np.ones(len(dates), dtype=bool)
     elif rebalance_frequency == "weekly":
-        rebalance_dates = dates.dayofweek == 0
+        rebalance_dates = dates.day_of_week == 0
     elif rebalance_frequency == "monthly":
         months = dates.to_period("M")
         rebalance_dates = np.r_[
@@ -1006,8 +1100,214 @@ def run_instrument(
     print(f"Benchmark comparison table: {comparison_table_path}")
 
 
+def save_single_future_presentation_plot(
+    results: pd.DataFrame,
+    dbmf_prices: pd.Series,
+    instrument: str,
+    output_path: Path,
+) -> None:
+    """Plot the futures signal above DBMF performance and strategy PnL."""
+    aligned_dbmf = dbmf_prices.reindex(results.index, method="ffill")
+    aligned_dbmf.loc[aligned_dbmf.index > dbmf_prices.index[-1]] = np.nan
+    aligned_dbmf = aligned_dbmf.dropna()
+    if aligned_dbmf.empty:
+        raise ValueError(
+            f"No DBMF Price observations overlap the {instrument} backtest."
+        )
+
+    figure, (future_axis, dbmf_axis) = plt.subplots(
+        2,
+        1,
+        figsize=(13, 8),
+        sharex=True,
+    )
+    signal_axis = future_axis.twinx()
+    pnl_axis = dbmf_axis.twinx()
+    underlying_change_pct = (
+        results["price"] / results["price"].iloc[0] - 1
+    ) * 100
+    dbmf_change_pct = (aligned_dbmf / aligned_dbmf.iloc[0] - 1) * 100
+    underlying_line, = future_axis.plot(
+        underlying_change_pct.index,
+        underlying_change_pct,
+        label=f"{instrument} price change",
+        color="#59636E",
+        linewidth=1.3,
+    )
+    signal_line, = signal_axis.plot(
+        results.index,
+        results["signal"],
+        label="Generated normal-CDF signal",
+        color="#245a84",
+        linewidth=1.1,
+    )
+    future_axis.axhline(0, color="black", linewidth=0.8, alpha=0.6)
+    signal_axis.axhline(0, color="#245a84", linewidth=0.7, alpha=0.35)
+    future_axis.set_title(f"{instrument} Price Change and Generated Signal")
+    future_axis.set_ylabel("Future price change (%)")
+    signal_axis.set_ylabel("Generated signal")
+    future_axis.grid(True, alpha=0.25)
+    future_lines = [underlying_line, signal_line]
+    future_axis.legend(
+        future_lines,
+        [line.get_label() for line in future_lines],
+        loc="best",
+    )
+
+    dbmf_line, = dbmf_axis.plot(
+        dbmf_change_pct.index,
+        dbmf_change_pct,
+        label="DBMF Price change",
+        color="#B8860B",
+        linewidth=1.3,
+    )
+    pnl_line, = pnl_axis.plot(
+        results.index,
+        results["cumulative_pnl_pct"],
+        label="Strategy cumulative PnL",
+        color="#4f772d",
+        linewidth=1.3,
+    )
+    dbmf_axis.axhline(0, color="black", linewidth=0.8, alpha=0.6)
+    pnl_axis.axhline(0, color="#4f772d", linewidth=0.7, alpha=0.35)
+    dbmf_axis.set_title("DBMF Price Change and Strategy PnL")
+    dbmf_axis.set_ylabel("DBMF price change (%)")
+    pnl_axis.set_ylabel("Strategy cumulative PnL (%)")
+    dbmf_axis.set_xlabel("Date")
+    dbmf_axis.grid(True, alpha=0.25)
+    dbmf_lines = [dbmf_line, pnl_line]
+    dbmf_axis.legend(
+        dbmf_lines,
+        [line.get_label() for line in dbmf_lines],
+        loc="best",
+    )
+
+    figure.suptitle(f"{instrument} Normal-CDF Trend Backtest")
+    figure.tight_layout()
+    figure.savefig(output_path, dpi=160)
+    plt.close(figure)
+
+
+def run_single_future_presentation_backtest(
+    instrument: str,
+    prices: pd.Series,
+    dbmf_prices: pd.Series,
+    lookback_days: int,
+    signal_mode: SignalMode,
+    rebalance_frequency: RebalanceFrequency,
+    position_change_threshold_fraction: float,
+    signal_cutoff: float,
+    volatility_lookback_days: int,
+    start_date: pd.Timestamp | None,
+    factor_mode: FactorMode,
+) -> dict[str, object]:
+    """Run one futures backtest and save its presentation outputs."""
+    strategy = SINGLE_FUTURE_STRATEGIES[instrument]
+    factor_scores = (
+        load_factor_scores(pd.DatetimeIndex(prices.index))
+        if factor_mode == "market-data"
+        else None
+    )
+    results = run_backtest(
+        prices,
+        lookback_days=lookback_days,
+        rebalance_frequency=rebalance_frequency,
+        position_change_threshold_fraction=position_change_threshold_fraction,
+        signal_cutoff=signal_cutoff,
+        signal_mode=signal_mode,
+        factor_scores=factor_scores,
+        volatility_lookback_days=volatility_lookback_days,
+        output_start_date=start_date,
+    )
+
+    signal_lookbacks = (
+        (lookback_days,)
+        if signal_mode == "single"
+        else AVERAGED_SIGNAL_LOOKBACK_DAYS
+    )
+    parameter_values: dict[str, object] = {
+        "instrument": instrument,
+        "signal_mode": signal_mode,
+        "factor_mode": factor_mode,
+        "signal_lookback_days": (
+            lookback_days if signal_mode == "single" else np.nan
+        ),
+        "signal_lookbacks_days": ",".join(
+            str(days) for days in signal_lookbacks
+        ),
+        "volatility_lookback_days": volatility_lookback_days,
+        "signal_cutoff": signal_cutoff,
+        "rebalance_position_change_threshold_fraction": (
+            position_change_threshold_fraction
+        ),
+        "rebalance_frequency": rebalance_frequency,
+    }
+    stats_rows = []
+    for stats in [
+        calculate_statistics(results),
+        *calculate_annual_statistics(results),
+    ]:
+        stats.update(parameter_values)
+        stats_rows.append(stats)
+    stats_frame = pd.DataFrame(stats_rows)
+
+    lookback_tag = (
+        f"{lookback_days}d"
+        if signal_mode == "single"
+        else f"avg{'-'.join(str(days) for days in signal_lookbacks)}d"
+    )
+    stem = (
+        f"{strategy['stem']}_normal_cdf_signal_{rebalance_frequency}_"
+        f"{lookback_tag}_vol{volatility_lookback_days}d_"
+        f"step{int(position_change_threshold_fraction * 100)}pct_"
+        f"sig{int(signal_cutoff * 100)}"
+    )
+    if start_date is not None:
+        stem = f"{stem}_from{start_date:%Y%m%d}"
+    PRESENTATION_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    daily_path = PRESENTATION_OUTPUT_DIR / f"{stem}_daily.csv"
+    stats_path = PRESENTATION_OUTPUT_DIR / f"{stem}_stats.csv"
+    plot_path = PRESENTATION_OUTPUT_DIR / f"{stem}_presentation.png"
+    results.to_csv(daily_path, index_label="Date", float_format="%.8f")
+    stats_frame.to_csv(stats_path, index=False, float_format="%.6f")
+    save_single_future_presentation_plot(
+        results,
+        dbmf_prices,
+        instrument,
+        plot_path,
+    )
+
+    full_stats = stats_frame.iloc[0].to_dict()
+    signal_label = (
+        f"T={lookback_days}"
+        if signal_mode == "single"
+        else f"average T={','.join(str(days) for days in signal_lookbacks)}"
+    )
+    print(
+        f"{instrument} ({signal_label}, {rebalance_frequency} rebalance): "
+        f"{results.index[0]:%Y-%m-%d} to {results.index[-1]:%Y-%m-%d}, "
+        f"Sharpe {full_stats['sharpe_ratio']:.4f}, total return "
+        f"{full_stats['total_return_pct']:.2f}%"
+    )
+    print(f"Daily results: {daily_path}")
+    print(f"Stats: {stats_path}")
+    print(f"Presentation plot: {plot_path}")
+    return full_stats
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--instrument",
+        choices=tuple(SINGLE_FUTURE_STRATEGIES),
+        nargs="+",
+        help=(
+            "Run the single-instrument futures backtest using future_price.csv "
+            "and write presentation outputs. Supply one or more of: "
+            + ", ".join(SINGLE_FUTURE_STRATEGIES)
+            + ". Omit to run the existing 10Y/basket backtests."
+        ),
+    )
     parser.add_argument(
         "--lookback-days",
         type=positive_int,
@@ -1094,6 +1394,44 @@ def main() -> None:
     rebalance_frequency: RebalanceFrequency = args.rebalance_frequency
     signal_mode: SignalMode = args.signal_mode
     factor_mode: FactorMode = args.factor_mode
+    if args.instrument:
+        if args.include_etf_benchmarks:
+            parser.error(
+                "--include-etf-benchmarks is not available in single-futures mode; "
+                "the presentation plot always compares against DBMF Price."
+            )
+        presentation_prices = load_single_future_prices()
+        comparison_rows = []
+        for instrument in args.instrument:
+            comparison_rows.append(
+                run_single_future_presentation_backtest(
+                    instrument,
+                    presentation_prices[instrument],
+                    presentation_prices["DBMF Price"],
+                    args.lookback_days,
+                    signal_mode,
+                    rebalance_frequency,
+                    args.rebalance_threshold_fraction,
+                    args.signal_cutoff,
+                    args.volatility_lookback_days,
+                    args.start_date,
+                    factor_mode,
+                )
+            )
+        comparison_path = (
+            PRESENTATION_OUTPUT_DIR
+            / f"normal_cdf_single_future_comparison_{args.start_date:%Y%m%d}.csv"
+            if args.start_date is not None
+            else PRESENTATION_OUTPUT_DIR / "normal_cdf_single_future_comparison.csv"
+        )
+        pd.DataFrame(comparison_rows).to_csv(
+            comparison_path,
+            index=False,
+            float_format="%.6f",
+        )
+        print(f"Instrument comparison: {comparison_path}")
+        return
+
     ten_year_prices = load_10y_prices()["price"]
     spread_prices = load_spread(require_positive_10y_minus_2y=False)[
         "weighted_spread"
