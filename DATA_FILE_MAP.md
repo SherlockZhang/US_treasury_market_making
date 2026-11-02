@@ -23,6 +23,7 @@ data, unless a script explicitly reads them.
 | [`analyze_dbmf_correlation.py`](./analyze_dbmf_correlation.py) | `DBMF_COMP.csv` |
 | [`analyze_dbmf_garch_volatility.py`](./analyze_dbmf_garch_volatility.py) | `DBMF_COMP.csv` |
 | [`analyze_dbmf_sharpe.py`](./analyze_dbmf_sharpe.py) | `bbg_data.xlsx` |
+| [`analyze_dbmf_monthly_returns.py`](./analyze_dbmf_monthly_returns.py) | `future_price.csv` (`DBMF Price` and the date column two positions before it) |
 | [`analyze_future_data.py`](./analyze_future_data.py) | `future_price.csv` |
 | [`analyze_rolling_future_regression.py`](./analyze_rolling_future_regression.py) | `future_price.csv`, indirectly through `analyze_future_data.py` |
 | [`component_analysis/analyze_component_portfolio.py`](./component_analysis/analyze_component_portfolio.py) | `future_price.csv`, indirectly through `analyze_future_data.py` |
@@ -47,6 +48,11 @@ data, unless a script explicitly reads them.
 - To generate the single-futures presentation reports, run
   `python backtest_normal_cdf_signal.py --instrument "5Y future" "2Y future" "10Y future" --start-date 2026-01-01 --lookback-days 64 --volatility-lookback-days 64 --rebalance-frequency weekly --rebalance-threshold-fraction 0 --signal-cutoff 0`.
   The daily results, statistics, and plots are written to `presentation report/`.
+- To calculate monthly DBMF Price returns and the positive-month win rate from
+  2016-01-01, run `python analyze_dbmf_monthly_returns.py`. The monthly returns
+  and win-rate summary, monthly return plot, and daily-return-based annual
+  statistics from 2020 are written to `component_analysis/results/`. The source
+  series starts in 2019, so no observations are available for 2016–2019.
 - CSVs, spreadsheets, plots, and PDFs created in `results/`,
   `results_refining_parameter/`, `presentation report/`, `component_analysis/results/`,
   `market_data_regression/`, or other output folders are analysis artifacts.
