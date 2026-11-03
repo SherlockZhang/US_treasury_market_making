@@ -1,0 +1,19 @@
+market_variable,target,week_definition,correlation_method,paired_week_count,sample_start_week,sample_end_week,weekly_return_correlation
+JPYUSD BGN Curncy,2Y future,W-FRI last available close; same-week return,Pearson,564,2016-01-15,2026-10-30,0.47928309
+XAU BGN Curncy,2Y future,W-FRI last available close; same-week return,Pearson,564,2016-01-15,2026-10-30,0.28631323
+EURUSD BGN Curncy,2Y future,W-FRI last available close; same-week return,Pearson,564,2016-01-15,2026-10-30,0.24198013
+TFF2HLFN Index,2Y future,W-FRI last available close; same-week return,Pearson,563,2016-01-15,2026-10-23,0.05225152
+TFF2ILFN Index,2Y future,W-FRI last available close; same-week return,Pearson,563,2016-01-15,2026-10-23,0.00610362
+XBTUSD BGN Curncy,2Y future,W-FRI last available close; same-week return,Pearson,564,2016-01-15,2026-10-30,0.00046229
+NDX,2Y future,W-FRI last available close; same-week return,Pearson,564,2016-01-15,2026-10-30,-0.01489683
+S5INFT Index,2Y future,W-FRI last available close; same-week return,Pearson,564,2016-01-15,2026-10-30,-0.03597508
+SPX,2Y future,W-FRI last available close; same-week return,Pearson,564,2016-01-15,2026-10-30,-0.04388176
+GSTMTAIP Index,2Y future,W-FRI last available close; same-week return,Pearson,564,2016-01-15,2026-10-30,-0.04451968
+DJI,2Y future,W-FRI last available close; same-week return,Pearson,564,2016-01-15,2026-10-30,-0.05764551
+SOFRRATE Index,2Y future,W-FRI last available close; same-week return,Pearson,447,2018-04-13,2026-10-30,-0.07871192
+UKX,2Y future,W-FRI last available close; same-week return,Pearson,564,2016-01-15,2026-10-30,-0.12689034
+DAX,2Y future,W-FRI last available close; same-week return,Pearson,564,2016-01-15,2026-10-30,-0.13218294
+TFF2GLFN Index,2Y future,W-FRI last available close; same-week return,Pearson,563,2016-01-15,2026-10-23,-0.13892313
+CL1 COMB Comdty,2Y future,W-FRI last available close; same-week return,Pearson,564,2016-01-15,2026-10-30,-0.16910283
+BBDXY Index,2Y future,W-FRI last available close; same-week return,Pearson,564,2016-01-15,2026-10-30,-0.28277676
+CTA US Equity,2Y future,W-FRI last available close; same-week return,Pearson,242,2022-03-18,2026-10-30,-0.39981950
