@@ -47,8 +47,10 @@ FACTOR_SIGNAL_BOOST_MULTIPLIER = 1.1
 FACTOR_SIGNAL_REDUCE_MULTIPLIER = 0.9
 NORMAL_CDF_SIGNAL_CUTOFF = 0.1
 REBALANCE_POSITION_CHANGE_THRESHOLD_FRACTION = 0.25
+POSITION_ROUNDING_INCREMENTS = (0.1, 0.2, 0.5)
+DEFAULT_POSITION_ROUNDING_INCREMENT = 0.1
 RebalanceFrequency = Literal["daily", "weekly", "monthly", "yearly"]
-SignalMode = Literal["single", "average"]
+SignalMode = Literal["single", "average", "rounded"]
 FactorMode = Literal["none", "market-data"]
 DEFAULT_REBALANCE_FREQUENCY: RebalanceFrequency = "weekly"
 FACTOR_TICKERS = {
@@ -89,6 +91,15 @@ SINGLE_FUTURE_STRATEGIES = {
     "2Y future": {"stem": "2y_future", "color": "#8c4a2f"},
     "10Y future": {"stem": "10y_future", "color": "#4f772d"},
 }
+
+
+def signal_lookbacks_for_mode(
+    signal_mode: SignalMode, lookback_days: int
+) -> tuple[int, ...]:
+    """Return the lookback windows used by a signal mode."""
+    if signal_mode == "average":
+        return AVERAGED_SIGNAL_LOOKBACK_DAYS
+    return (lookback_days,)
 
 
 def positive_int(value: str) -> int:
@@ -424,6 +435,7 @@ def run_backtest(
     factor_scores: pd.DataFrame | None = None,
     volatility_lookback_days: int = NORMAL_CDF_VOLATILITY_LOOKBACK_DAYS,
     output_start_date: pd.Timestamp | None = None,
+    position_rounding_increment: float = DEFAULT_POSITION_ROUNDING_INCREMENT,
 ) -> pd.DataFrame:
     """Apply the signal with daily, Monday-weekly, month-end, or year-end sizing."""
     if lookback_days <= 0:
@@ -443,8 +455,13 @@ def run_backtest(
         )
     if not np.isfinite(signal_cutoff) or signal_cutoff < 0:
         raise ValueError("Signal cutoff must be finite and non-negative.")
-    if signal_mode not in ("single", "average"):
+    if signal_mode not in ("single", "average", "rounded"):
         raise ValueError(f"Unsupported signal mode: {signal_mode}")
+    if position_rounding_increment not in POSITION_ROUNDING_INCREMENTS:
+        raise ValueError(
+            "Position-rounding increment must be one of "
+            f"{POSITION_ROUNDING_INCREMENTS}."
+        )
     if prices.empty:
         raise ValueError("No prices are available for this backtest.")
     if prices.isna().any() or not np.isfinite(prices).all() or (prices <= 0).any():
@@ -535,6 +552,13 @@ def run_backtest(
         * TARGET_ANNUALIZED_VOLATILITY
         / results.loc[eligible, "realized_volatility"]
     )
+    if signal_mode == "rounded":
+        desired_position = (
+            (desired_position / position_rounding_increment)
+            .round()
+            .mul(position_rounding_increment)
+            .round(1)
+        )
     if rebalance_frequency == "daily":
         rebalance_dates = np.ones(len(dates), dtype=bool)
     elif rebalance_frequency == "weekly":
@@ -607,12 +631,16 @@ def calculate_stats(
     signal_mode: SignalMode,
     factor_mode: str,
     volatility_lookback_days: int,
+    position_rounding_increment: float = DEFAULT_POSITION_ROUNDING_INCREMENT,
 ) -> pd.DataFrame:
     """Calculate full-period and annual statistics."""
     full_stats = calculate_statistics(results)
     annual_stats = calculate_annual_statistics(results)
     full_stats["instrument"] = instrument
     full_stats["signal_mode"] = signal_mode
+    full_stats["position_rounding_increment"] = (
+        position_rounding_increment if signal_mode == "rounded" else np.nan
+    )
     full_stats["factor_mode"] = factor_mode
     full_stats["factor_score_zscore_lookback_days"] = (
         FACTOR_SCORE_ZSCORE_LOOKBACK_DAYS
@@ -632,16 +660,12 @@ def calculate_stats(
         if factor_mode == "market-data"
         else np.nan
     )
+    signal_lookbacks = signal_lookbacks_for_mode(signal_mode, lookback_days)
     full_stats["signal_lookback_days"] = (
-        lookback_days if signal_mode == "single" else np.nan
+        np.nan if signal_mode == "average" else lookback_days
     )
     full_stats["signal_lookbacks_days"] = ",".join(
-        str(days)
-        for days in (
-            (lookback_days,)
-            if signal_mode == "single"
-            else AVERAGED_SIGNAL_LOOKBACK_DAYS
-        )
+        str(days) for days in signal_lookbacks
     )
     full_stats["volatility_lookback_days"] = volatility_lookback_days
     full_stats["signal_cutoff"] = signal_cutoff
@@ -652,6 +676,9 @@ def calculate_stats(
     for annual_stat in annual_stats:
         annual_stat["instrument"] = instrument
         annual_stat["signal_mode"] = signal_mode
+        annual_stat["position_rounding_increment"] = (
+            position_rounding_increment if signal_mode == "rounded" else np.nan
+        )
         annual_stat["factor_mode"] = factor_mode
         annual_stat["factor_score_zscore_lookback_days"] = (
             FACTOR_SCORE_ZSCORE_LOOKBACK_DAYS
@@ -674,7 +701,7 @@ def calculate_stats(
             else np.nan
         )
         annual_stat["signal_lookback_days"] = (
-            lookback_days if signal_mode == "single" else np.nan
+            np.nan if signal_mode == "average" else lookback_days
         )
         annual_stat["signal_lookbacks_days"] = full_stats[
             "signal_lookbacks_days"
@@ -968,26 +995,31 @@ def run_instrument(
     start_date: pd.Timestamp | None = None,
     benchmark_prices: pd.Series | None = None,
     etf_benchmark_prices: dict[str, pd.Series] | None = None,
+    position_rounding_increment: float = DEFAULT_POSITION_ROUNDING_INCREMENT,
 ) -> None:
     """Run one instrument and save daily, summary, and plot outputs."""
     instrument = strategy["instrument"]
-    signal_lookbacks = (
-        (lookback_days,)
-        if signal_mode == "single"
-        else AVERAGED_SIGNAL_LOOKBACK_DAYS
-    )
-    signal_label = (
-        f"T={lookback_days}"
-        if signal_mode == "single"
-        else f"average T={','.join(str(days) for days in signal_lookbacks)}"
-    )
+    signal_lookbacks = signal_lookbacks_for_mode(signal_mode, lookback_days)
+    if signal_mode == "average":
+        signal_label = (
+            f"average T={','.join(str(days) for days in signal_lookbacks)}"
+        )
+    elif signal_mode == "rounded":
+        signal_label = (
+            f"rounded T={lookback_days}, "
+            f"position step={position_rounding_increment:g}"
+        )
+    else:
+        signal_label = f"T={lookback_days}"
     if factor_mode == "market-data":
         signal_label = f"{signal_label}, market-data factors (no CTA)"
-    lookback_tag = (
-        f"{lookback_days}d"
-        if signal_mode == "single"
-        else f"avg{'-'.join(str(days) for days in signal_lookbacks)}d"
-    )
+    if signal_mode == "average":
+        lookback_tag = f"avg{'-'.join(str(days) for days in signal_lookbacks)}d"
+    elif signal_mode == "rounded":
+        rounding_tag = str(position_rounding_increment).replace(".", "p")
+        lookback_tag = f"rounded{lookback_days}d_pos{rounding_tag}"
+    else:
+        lookback_tag = f"{lookback_days}d"
     stem = (
         f"{strategy['stem']}_{rebalance_frequency}_{lookback_tag}_"
         f"vol{volatility_lookback_days}d_"
@@ -1014,6 +1046,7 @@ def run_instrument(
         factor_scores,
         volatility_lookback_days,
         start_date,
+        position_rounding_increment,
     )
     stats_frame = calculate_stats(
         results,
@@ -1025,6 +1058,7 @@ def run_instrument(
         signal_mode,
         factor_mode,
         volatility_lookback_days,
+        position_rounding_increment,
     )
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -1043,6 +1077,7 @@ def run_instrument(
         [
             "period",
             "signal_mode",
+            "position_rounding_increment",
             "factor_mode",
             "factor_score_zscore_lookback_days",
             "factor_signal_boost_threshold",
@@ -1199,6 +1234,7 @@ def run_single_future_presentation_backtest(
     volatility_lookback_days: int,
     start_date: pd.Timestamp | None,
     factor_mode: FactorMode,
+    position_rounding_increment: float = DEFAULT_POSITION_ROUNDING_INCREMENT,
 ) -> dict[str, object]:
     """Run one futures backtest and save its presentation outputs."""
     strategy = SINGLE_FUTURE_STRATEGIES[instrument]
@@ -1217,19 +1253,19 @@ def run_single_future_presentation_backtest(
         factor_scores=factor_scores,
         volatility_lookback_days=volatility_lookback_days,
         output_start_date=start_date,
+        position_rounding_increment=position_rounding_increment,
     )
 
-    signal_lookbacks = (
-        (lookback_days,)
-        if signal_mode == "single"
-        else AVERAGED_SIGNAL_LOOKBACK_DAYS
-    )
+    signal_lookbacks = signal_lookbacks_for_mode(signal_mode, lookback_days)
     parameter_values: dict[str, object] = {
         "instrument": instrument,
         "signal_mode": signal_mode,
+        "position_rounding_increment": (
+            position_rounding_increment if signal_mode == "rounded" else np.nan
+        ),
         "factor_mode": factor_mode,
         "signal_lookback_days": (
-            lookback_days if signal_mode == "single" else np.nan
+            np.nan if signal_mode == "average" else lookback_days
         ),
         "signal_lookbacks_days": ",".join(
             str(days) for days in signal_lookbacks
@@ -1250,11 +1286,13 @@ def run_single_future_presentation_backtest(
         stats_rows.append(stats)
     stats_frame = pd.DataFrame(stats_rows)
 
-    lookback_tag = (
-        f"{lookback_days}d"
-        if signal_mode == "single"
-        else f"avg{'-'.join(str(days) for days in signal_lookbacks)}d"
-    )
+    if signal_mode == "average":
+        lookback_tag = f"avg{'-'.join(str(days) for days in signal_lookbacks)}d"
+    elif signal_mode == "rounded":
+        rounding_tag = str(position_rounding_increment).replace(".", "p")
+        lookback_tag = f"rounded{lookback_days}d_pos{rounding_tag}"
+    else:
+        lookback_tag = f"{lookback_days}d"
     stem = (
         f"{strategy['stem']}_normal_cdf_signal_{rebalance_frequency}_"
         f"{lookback_tag}_vol{volatility_lookback_days}d_"
@@ -1277,11 +1315,17 @@ def run_single_future_presentation_backtest(
     )
 
     full_stats = stats_frame.iloc[0].to_dict()
-    signal_label = (
-        f"T={lookback_days}"
-        if signal_mode == "single"
-        else f"average T={','.join(str(days) for days in signal_lookbacks)}"
-    )
+    if signal_mode == "average":
+        signal_label = (
+            f"average T={','.join(str(days) for days in signal_lookbacks)}"
+        )
+    elif signal_mode == "rounded":
+        signal_label = (
+            f"rounded T={lookback_days}, "
+            f"position step={position_rounding_increment:g}"
+        )
+    else:
+        signal_label = f"T={lookback_days}"
     print(
         f"{instrument} ({signal_label}, {rebalance_frequency} rebalance): "
         f"{results.index[0]:%Y-%m-%d} to {results.index[-1]:%Y-%m-%d}, "
@@ -1331,12 +1375,25 @@ def main() -> None:
     )
     parser.add_argument(
         "--signal-mode",
-        choices=("single", "average"),
+        choices=("single", "average", "rounded"),
         default="single",
         help=(
-            "Use one lookback signal or average signals for T="
+            "Use one lookback signal, average signals for T="
             f"{','.join(str(days) for days in AVERAGED_SIGNAL_LOOKBACK_DAYS)} "
+            "or round volatility-scaled positions to a selected increment "
             "(default: single)."
+        ),
+    )
+    parser.add_argument(
+        "--position-rounding-increment",
+        type=float,
+        choices=POSITION_ROUNDING_INCREMENTS,
+        default=DEFAULT_POSITION_ROUNDING_INCREMENT,
+        metavar="INCREMENT",
+        help=(
+            "Position increment for rounded signal mode "
+            f"(choices: {', '.join(str(value) for value in POSITION_ROUNDING_INCREMENTS)}; "
+            f"default: {DEFAULT_POSITION_ROUNDING_INCREMENT})."
         ),
     )
     parser.add_argument(
@@ -1415,6 +1472,7 @@ def main() -> None:
                     args.volatility_lookback_days,
                     args.start_date,
                     factor_mode,
+                    args.position_rounding_increment,
                 )
             )
         comparison_path = (
@@ -1441,9 +1499,7 @@ def main() -> None:
     comparison_benchmark_prices = ten_year_prices
     if args.start_date is not None:
         signal_warmup_observations = (
-            max(AVERAGED_SIGNAL_LOOKBACK_DAYS)
-            if signal_mode == "average"
-            else args.lookback_days
+            max(signal_lookbacks_for_mode(signal_mode, args.lookback_days))
         )
         warmup_observations = max(
             signal_warmup_observations,
@@ -1495,6 +1551,7 @@ def main() -> None:
         args.start_date,
         comparison_benchmark_prices,
         etf_benchmark_prices,
+        args.position_rounding_increment,
     )
     run_instrument(
         spread_prices,
@@ -1510,6 +1567,7 @@ def main() -> None:
         args.start_date,
         comparison_benchmark_prices,
         etf_benchmark_prices,
+        args.position_rounding_increment,
     )
 
 

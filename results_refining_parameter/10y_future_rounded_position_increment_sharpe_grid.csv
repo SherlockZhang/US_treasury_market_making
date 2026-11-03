@@ -1,0 +1,4 @@
+instrument,period_start,period_end,lookback_days,rebalance_frequency,position_rounding_increment,signal_cutoff,rebalance_threshold_fraction,rounded_sharpe_ratio,rounded_total_return_pct,rounded_max_drawdown_pct,trend_strategy_sharpe_ratio,trend_strategy_total_return_pct
+10Y future,2016-01-04,2026-10-28,64,weekly,0.100000,0.000000,0.000000,0.706366,102.838275,-13.769685,0.455363,54.820030
+10Y future,2016-01-04,2026-10-28,64,weekly,0.200000,0.000000,0.000000,0.706484,102.944194,-13.588248,0.455363,54.820030
+10Y future,2016-01-04,2026-10-28,64,weekly,0.500000,0.000000,0.000000,0.662829,94.833845,-15.203692,0.455363,54.820030
