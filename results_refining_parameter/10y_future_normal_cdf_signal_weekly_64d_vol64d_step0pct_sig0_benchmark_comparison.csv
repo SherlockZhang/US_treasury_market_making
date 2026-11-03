@@ -1,3 +1,0 @@
-instrument,strategy,comparison_start_date,comparison_end_date,total_return_pct,annualized_return_pct,annualized_volatility_pct,sharpe_ratio,max_drawdown_pct
-10Y future,Normal-CDF signal,2016-01-04,2026-10-28,102.364238,7.025169,10.090078,0.696245,-13.611495
-10Y future,1-year moving-average strategy (10Y future),2016-01-04,2026-10-28,54.820030,4.536972,9.963428,0.455363,-31.625305

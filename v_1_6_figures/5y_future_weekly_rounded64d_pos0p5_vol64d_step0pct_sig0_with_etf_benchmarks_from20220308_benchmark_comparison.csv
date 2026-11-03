@@ -1,0 +1,5 @@
+instrument,strategy,comparison_start_date,comparison_end_date,total_return_pct,annualized_return_pct,annualized_volatility_pct,sharpe_ratio,max_drawdown_pct
+5Y future,Normal-CDF signal,2022-03-08,2026-11-02,14.645473,3.400011,9.605428,0.353968,-15.156629
+5Y future,1-year moving-average strategy (5Y future),2022-03-08,2026-11-02,12.217778,3.003540,10.249273,0.293049,-21.853748
+5Y future,DBMF buy-and-hold,2022-03-08,2026-11-02,45.201601,8.732278,11.922095,0.732445,-20.440615
+5Y future,CTA buy-and-hold,2022-03-08,2026-11-02,53.810800,10.826439,17.624051,0.614299,-20.786692

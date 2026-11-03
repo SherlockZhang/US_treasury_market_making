@@ -1,0 +1,4 @@
+instrument,period_start,period_end,observations,signal_mode,position_rounding_increment,signal_lookback_days,rebalance_frequency,rebalance_threshold_fraction,signal_cutoff,rounded_total_return_pct,rounded_sharpe_ratio,rounded_max_drawdown_pct,rounded_trading_volume_in_increment_units,simple_trend_total_return_pct,simple_trend_sharpe_ratio,simple_trend_max_drawdown_pct
+2Y future,2016-01-04,2026-11-02,2729,rounded,0.500000,64,weekly,0.000000,0.000000,264.610980,1.149728,-16.278439,2583.000000,232.873230,1.118595,-18.053038
+5Y future,2016-01-04,2026-11-02,2729,rounded,0.500000,64,weekly,0.000000,0.000000,115.837663,0.757849,-15.156629,854.000000,113.462846,0.745063,-21.853748
+10Y future,2016-01-04,2026-11-02,2729,rounded,0.500000,64,weekly,0.000000,0.000000,92.364518,0.650405,-15.203692,548.000000,52.876643,0.443162,-31.625305
