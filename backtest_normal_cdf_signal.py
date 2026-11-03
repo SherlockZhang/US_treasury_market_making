@@ -872,12 +872,13 @@ def save_plots(
     )
     benchmark_returns = original_results["strategy_return"].reindex(results.index)
     benchmark_cumulative_pnl = (1 + benchmark_returns).cumprod().sub(1).mul(100)
+    trend_strategy_name = f"1-year moving-average strategy ({instrument})"
     aligned_etf_prices: dict[str, pd.Series] = {}
     figure, axis = plt.subplots(figsize=(12, 6))
     axis.plot(
         benchmark_cumulative_pnl.index,
         benchmark_cumulative_pnl,
-        label="1-year moving-average strategy (10Y future)",
+        label=trend_strategy_name,
         linewidth=1.5,
     )
     for benchmark_name, prices in etf_benchmark_prices.items():
@@ -926,9 +927,7 @@ def save_plots(
     comparison_index = results.index[results.index >= comparison_start]
     comparison_returns: dict[str, pd.Series] = {
         "Normal-CDF signal": results["strategy_return"].reindex(comparison_index),
-        "1-year moving-average strategy (10Y future)": benchmark_returns.reindex(
-            comparison_index
-        ),
+        trend_strategy_name: benchmark_returns.reindex(comparison_index),
     }
     for benchmark_name, prices in aligned_etf_prices.items():
         buy_and_hold_returns = prices.pct_change(fill_method=None).fillna(0.0)
