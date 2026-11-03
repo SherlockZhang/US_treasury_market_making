@@ -636,6 +636,15 @@ def calculate_stats(
     """Calculate full-period and annual statistics."""
     full_stats = calculate_statistics(results)
     annual_stats = calculate_annual_statistics(results)
+    if signal_mode == "rounded":
+        full_stats["trading_volume"] = (
+            float(full_stats["trading_volume"]) / position_rounding_increment
+        )
+        for annual_stat in annual_stats:
+            annual_stat["trading_volume"] = (
+                float(annual_stat["trading_volume"])
+                / position_rounding_increment
+            )
     full_stats["instrument"] = instrument
     full_stats["signal_mode"] = signal_mode
     full_stats["position_rounding_increment"] = (
