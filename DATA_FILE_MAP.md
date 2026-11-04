@@ -10,7 +10,7 @@ data, unless a script explicitly reads them.
 | Data file | What the code uses it for |
 |---|---|
 | `US_future_data.xlsx` | Futures prices and related series used by Treasury backtests and analyses. The code reads `Sheet1`, including the 2Y, 5Y, and 10Y futures, 5Y yield, SPX, and CPI series where needed. |
-| `market_data.xlsx` | Market/factor time series used for market-data correlations, regression, and neural-network modeling. The code reads `Sheet1`. |
+| `market_data.xlsx` | Market/factor time series used for correlations, regression, neural-network modeling, and instrument-specific normal-CDF factors. The code reads `Sheet1`. |
 | `DBMF_COMP.csv` | Date-indexed DBMF, SPX, and IEF price data for DBMF correlation/performance and volatility analyses. |
 | `bbg_data.xlsx` | Bloomberg workbook data for DBMF, risk-free yield, and SPX Sharpe-ratio analysis. The code reads `Sheet1`. |
 | `future_price.csv` | Repeated date/price column pairs for futures and other components (including DBMF), used to calculate aligned returns and fit component regressions. |
@@ -35,7 +35,7 @@ data, unless a script explicitly reads them.
 | [`backtest_factor_modified.py`](./backtest_factor_modified.py) | `US_future_data.xlsx` |
 | [`backtest_12_month_average_signal.py`](./backtest_12_month_average_signal.py) | `US_future_data.xlsx`, indirectly through the 5Y trend and 2Y/10Y spread loaders |
 | [`analyze_5y_future_yield_correlation.py`](./analyze_5y_future_yield_correlation.py) | `US_future_data.xlsx`, indirectly through the 5Y trend loaders |
-| [`backtest_normal_cdf_signal.py`](./backtest_normal_cdf_signal.py) | `US_future_data.xlsx` for the existing 10Y/basket backtests and optional SPX signal factor; `market_data.xlsx` for the optional TFF2GLFN, CL1, and XAU factors; `future_price.csv` for the optional single 5Y, 2Y, or 10Y futures backtests and DBMF price comparison |
+| [`backtest_normal_cdf_signal.py`](./backtest_normal_cdf_signal.py) | `US_future_data.xlsx` for the existing 10Y/basket backtests and optional SPX signal factor; `market_data.xlsx` for optional TFF2GLFN, CL1, XAU, and instrument-specific 2Y/5Y/10Y market-factor profiles; `future_price.csv` for the optional single 5Y, 2Y, or 10Y futures backtests and DBMF price comparison |
 | [`backtest_normal_cdf_sharpe_grid.py`](./backtest_normal_cdf_sharpe_grid.py) | `US_future_data.xlsx`, indirectly through the 10Y futures and spread loaders |
 | [`cta_replication_backtest.py`](./cta_replication_backtest.py) | Yahoo Finance downloads by default; optional user-provided target CSV; generated synthetic data with `--synthetic` |
 | [`generate_treasury_pdf.py`](./generate_treasury_pdf.py) | No repository data file is loaded; generates a PDF from content defined by the script |
@@ -48,6 +48,11 @@ data, unless a script explicitly reads them.
 - To generate the single-futures presentation reports, run
   `python backtest_normal_cdf_signal.py --instrument "5Y future" "2Y future" "10Y future" --start-date 2026-01-01 --lookback-days 64 --volatility-lookback-days 64 --rebalance-frequency weekly --rebalance-threshold-fraction 0 --signal-cutoff 0`.
   The daily results, statistics, and plots are written to `presentation report/`.
+- To apply the configured 2Y, 5Y, and 10Y instrument-specific market-factor
+  profiles, run
+  `python backtest_normal_cdf_signal.py --instrument "2Y future" "5Y future" "10Y future" --signal-factor-mode instrument`.
+  The factors trigger when their weekly return or point change deviates by more
+  than one standard deviation from the preceding 52 weekly observations.
 - To calculate monthly DBMF Price returns and the positive-month win rate from
   2016-01-01, run `python analyze_dbmf_monthly_returns.py`. The monthly returns
   and win-rate summary, monthly return plot, and daily-return-based annual

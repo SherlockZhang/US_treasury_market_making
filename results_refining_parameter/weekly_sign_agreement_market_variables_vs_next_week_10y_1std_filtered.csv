@@ -1,0 +1,19 @@
+market_variable,target,full_sample_weekly_return_mean,full_sample_weekly_return_std_ddof1,filter_rule,total_paired_weeks,filtered_weeks,both_positive_count,both_negative_count,same_nonzero_sign_count,different_sign_or_zero_count_filtered,same_sign_pct_of_filtered_weeks,sample_start_week,sample_end_week
+TFF2GLFN Index,10Y future,0.02493674,4.91616505,abs(market weekly return - full-sample mean) > full-sample standard deviation,563,7,1,4,5,2,71.42857143,2016-01-15,2022-08-05
+XAU BGN Curncy,10Y future,0.00253260,0.02129232,abs(market weekly return - full-sample mean) > full-sample standard deviation,563,141,37,36,73,68,51.77304965,2016-02-05,2026-10-23
+EURUSD BGN Curncy,10Y future,0.00009273,0.00996081,abs(market weekly return - full-sample mean) > full-sample standard deviation,564,151,39,40,79,72,52.31788079,2016-01-22,2026-10-02
+GSTMTAIP Index,10Y future,0.00529327,0.03648926,abs(market weekly return - full-sample mean) > full-sample standard deviation,564,155,36,45,81,74,52.25806452,2016-01-08,2026-10-23
+CTA US Equity,10Y future,0.00102878,0.02426040,abs(market weekly return - full-sample mean) > full-sample standard deviation,241,62,12,21,33,29,53.22580645,2022-03-18,2026-10-16
+TFF2HLFN Index,10Y future,0.00175768,1.81076844,abs(market weekly return - full-sample mean) > full-sample standard deviation,563,18,4,3,7,11,38.88888889,2016-04-01,2022-07-22
+UKX,10Y future,0.00125119,0.02017361,abs(market weekly return - full-sample mean) > full-sample standard deviation,563,119,39,35,74,45,62.18487395,2016-01-29,2026-10-16
+JPYUSD BGN Curncy,10Y future,-0.00039714,0.01283637,abs(market weekly return - full-sample mean) > full-sample standard deviation,564,148,37,41,78,70,52.70270270,2016-01-08,2026-09-18
+S5INFT Index,10Y future,0.00466262,0.03066360,abs(market weekly return - full-sample mean) > full-sample standard deviation,563,148,35,40,75,73,50.67567568,2016-02-05,2026-10-16
+XBTUSD BGN Curncy,10Y future,0.01346025,0.09184809,abs(market weekly return - full-sample mean) > full-sample standard deviation,564,145,41,29,70,75,48.27586207,2016-01-15,2026-08-21
+DAX,10Y future,0.00202358,0.02554102,abs(market weekly return - full-sample mean) > full-sample standard deviation,563,133,30,37,67,66,50.37593985,2016-01-15,2026-07-10
+NDX,10Y future,0.00383111,0.02790304,abs(market weekly return - full-sample mean) > full-sample standard deviation,563,155,38,41,79,76,50.96774194,2016-01-15,2026-10-16
+BBDXY Index,10Y future,0.00002431,0.00826094,abs(market weekly return - full-sample mean) > full-sample standard deviation,564,147,28,36,64,83,43.53741497,2016-02-05,2026-09-18
+TFF2ILFN Index,10Y future,0.00662164,0.09091009,abs(market weekly return - full-sample mean) > full-sample standard deviation,563,124,26,28,54,70,43.54838710,2016-01-29,2026-05-29
+DJI,10Y future,0.00233888,0.02320091,abs(market weekly return - full-sample mean) > full-sample standard deviation,563,120,27,34,61,59,50.83333333,2016-01-15,2026-08-07
+SPX,10Y future,0.00273853,0.02313491,abs(market weekly return - full-sample mean) > full-sample standard deviation,563,126,28,34,62,64,49.20634921,2016-01-15,2026-08-07
+CL1 COMB Comdty,10Y future,0.00373402,0.05948383,abs(market weekly return - full-sample mean) > full-sample standard deviation,563,133,28,37,65,68,48.87218045,2016-01-15,2026-10-16
+SOFRRATE Index,10Y future,0.03331808,0.36123208,abs(market weekly return - full-sample mean) > full-sample standard deviation,446,19,4,4,8,11,42.10526316,2020-03-20,2022-07-29

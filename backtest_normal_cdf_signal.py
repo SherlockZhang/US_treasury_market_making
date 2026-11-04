@@ -1,6 +1,7 @@
 """Backtest a normal-CDF momentum signal on 5Y and 10Y-2Y prices."""
 
 import argparse
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal, cast
 
@@ -59,6 +60,7 @@ RebalanceFrequency = Literal["daily", "weekly", "monthly", "yearly"]
 SignalMode = Literal["single", "average", "rounded"]
 SignalFactorMode = Literal[
     "none",
+    "instrument",
     "spx",
     "tff2glfn",
     "cl1",
@@ -74,7 +76,42 @@ SignalFactorMode = Literal[
     "tff2glfn_cl1_xau",
     "all",
 ]
+MarketFactorMeasure = Literal["return", "change"]
 DEFAULT_REBALANCE_FREQUENCY: RebalanceFrequency = "weekly"
+
+
+@dataclass(frozen=True)
+class MarketFactorSpec:
+    name: str
+    ticker: str
+    probability: float
+    same_sign_increases: bool
+    measure: MarketFactorMeasure
+
+
+INSTRUMENT_MARKET_FACTOR_PROFILES: dict[str, tuple[MarketFactorSpec, ...]] = {
+    "2Y future": (
+        MarketFactorSpec("spx", "SPX", 0.6, False, "return"),
+        MarketFactorSpec("tff2glfn", "TFF2GLFN Index", 0.7, True, "change"),
+        MarketFactorSpec("cl1", "CL1 COMB Comdty", 0.564, False, "return"),
+        MarketFactorSpec("xau", "XAU BGN Curncy", 0.54, True, "change"),
+    ),
+    "5Y future": (
+        MarketFactorSpec("sofrate", "SOFRRATE Index", 0.68, False, "change"),
+        MarketFactorSpec("tff2ilfn", "TFF2ILFN Index", 0.56, False, "change"),
+        MarketFactorSpec("cl1", "CL1 COMB Comdty", 0.56, False, "return"),
+        MarketFactorSpec("spx", "SPX", 0.54, False, "return"),
+        MarketFactorSpec("ukx", "UKX", 0.59, True, "return"),
+        MarketFactorSpec("tff2glfn", "TFF2GLFN Index", 0.71, True, "change"),
+    ),
+    "10Y future": (
+        MarketFactorSpec("tff2hlfn", "TFF2HLFN Index", 0.61, False, "change"),
+        MarketFactorSpec("sofrate", "SOFRRATE Index", 0.58, False, "change"),
+        MarketFactorSpec("bbdxy", "BBDXY Index", 0.56, False, "return"),
+        MarketFactorSpec("ukx", "UKX", 0.62, True, "return"),
+        MarketFactorSpec("tff2glfn", "TFF2GLFN Index", 0.714, True, "change"),
+    ),
+}
 
 STRATEGIES = {
     "10y_future": {
@@ -111,6 +148,7 @@ def signal_factor_mode_uses(
     """Return whether a selected mode enables a specific market factor."""
     enabled_factors = {
         "none": (),
+        "instrument": (),
         "spx": ("spx",),
         "tff2glfn": ("tff2glfn",),
         "cl1": ("cl1",),
@@ -259,6 +297,39 @@ def load_market_data_series(ticker: str) -> pd.Series:
         .set_index(date_column)[ticker]
         .rename(ticker)
     )
+
+
+def calculate_instrument_market_factor(
+    factor_spec: MarketFactorSpec,
+    target_dates: pd.DatetimeIndex,
+) -> pd.DataFrame:
+    """Align a market factor's weekly change/return and prior-year deviation."""
+    weekly_values = load_market_data_series(factor_spec.ticker).resample(
+        "W-FRI"
+    ).last()
+    if factor_spec.measure == "change":
+        weekly_factor_values = weekly_values.diff()
+    else:
+        weekly_factor_values = weekly_values.pct_change(fill_method=None)
+    prior_values = weekly_factor_values.shift(1)
+    rolling_mean = prior_values.rolling(
+        SPX_FACTOR_LOOKBACK_WEEKS,
+        min_periods=SPX_FACTOR_LOOKBACK_WEEKS,
+    ).mean()
+    rolling_std = prior_values.rolling(
+        SPX_FACTOR_LOOKBACK_WEEKS,
+        min_periods=SPX_FACTOR_LOOKBACK_WEEKS,
+    ).std(ddof=1)
+    outside_one_std = (weekly_factor_values - rolling_mean).abs() > rolling_std
+    weekly_factor = pd.DataFrame(
+        {
+            "value": weekly_factor_values,
+            "mean": rolling_mean,
+            "std": rolling_std,
+            "outside_one_std": outside_one_std,
+        }
+    )
+    return weekly_factor.reindex(target_dates, method="ffill")
 
 
 def load_tff2glfn_series() -> pd.Series:
@@ -583,6 +654,9 @@ def run_backtest(
     cl1_factor_probability: float = DEFAULT_CL1_FACTOR_PROBABILITY,
     xau_factor_data: pd.DataFrame | None = None,
     xau_factor_probability: float = DEFAULT_XAU_FACTOR_PROBABILITY,
+    instrument_factor_data: tuple[
+        tuple[MarketFactorSpec, pd.DataFrame], ...
+    ] = (),
 ) -> pd.DataFrame:
     """Apply the signal with daily, Monday-weekly, month-end, or year-end sizing."""
     if lookback_days <= 0:
@@ -655,6 +729,7 @@ def run_backtest(
         or tff2glfn_factor_data is not None
         or cl1_factor_data is not None
         or xau_factor_data is not None
+        or instrument_factor_data
     ):
         raw_signal = results["signal"]
         results["raw_signal"] = raw_signal
@@ -753,6 +828,51 @@ def run_backtest(
             results[std_column] = aligned_factor[std_column]
             results[active_column] = factor_active
             results[multiplier_column] = multiplier
+            combined_multiplier *= multiplier
+        for factor_spec, factor_data in instrument_factor_data:
+            if (
+                not np.isfinite(factor_spec.probability)
+                or not 0 <= factor_spec.probability <= 1
+            ):
+                raise ValueError(
+                    f"{factor_spec.ticker} factor probability must be between 0 and 1."
+                )
+            required_columns = {"value", "mean", "std", "outside_one_std"}
+            missing_columns = required_columns.difference(factor_data.columns)
+            if missing_columns:
+                raise ValueError(
+                    f"{factor_spec.ticker} factor data is missing columns: "
+                    f"{sorted(missing_columns)}"
+                )
+            aligned_factor = factor_data.reindex(results.index)
+            factor_value = aligned_factor["value"]
+            factor_active = (
+                aligned_factor["outside_one_std"].fillna(False).astype(bool)
+            )
+            same_sign = raw_signal.mul(factor_value).gt(0)
+            adjustment = 2 * factor_spec.probability - 1
+            same_sign_multiplier = (
+                1 + adjustment
+                if factor_spec.same_sign_increases
+                else 1 - adjustment
+            )
+            different_sign_multiplier = (
+                1 - adjustment
+                if factor_spec.same_sign_increases
+                else 1 + adjustment
+            )
+            multiplier = np.select(
+                [factor_active & same_sign, factor_active & ~same_sign],
+                [same_sign_multiplier, different_sign_multiplier],
+                default=1.0,
+            )
+            results[f"{factor_spec.name}_weekly_{factor_spec.measure}"] = (
+                factor_value
+            )
+            results[f"{factor_spec.name}_rolling_mean"] = aligned_factor["mean"]
+            results[f"{factor_spec.name}_rolling_std"] = aligned_factor["std"]
+            results[f"{factor_spec.name}_outside_1y_1std"] = factor_active
+            results[f"{factor_spec.name}_signal_multiplier"] = multiplier
             combined_multiplier *= multiplier
         results["market_factor_signal_multiplier"] = combined_multiplier
         results["signal"] = raw_signal * combined_multiplier
@@ -1400,6 +1520,11 @@ def run_instrument(
 ) -> None:
     """Run one instrument and save daily, summary, and plot outputs."""
     instrument = strategy["instrument"]
+    if signal_factor_mode == "instrument":
+        raise ValueError(
+            "Instrument-specific market-factor profiles are available only "
+            "for single-futures backtests."
+        )
     signal_lookbacks = signal_lookbacks_for_mode(signal_mode, lookback_days)
     if signal_mode == "average":
         signal_label = (
@@ -1762,6 +1887,23 @@ def run_single_future_presentation_backtest(
         if uses_xau_factor
         else None
     )
+    instrument_factor_specs = (
+        INSTRUMENT_MARKET_FACTOR_PROFILES.get(instrument, ())
+        if signal_factor_mode == "instrument"
+        else ()
+    )
+    if signal_factor_mode == "instrument" and not instrument_factor_specs:
+        raise ValueError(
+            f"No instrument-specific market-factor profile is configured for "
+            f"{instrument!r}."
+        )
+    instrument_factor_data = tuple(
+        (
+            factor_spec,
+            calculate_instrument_market_factor(factor_spec, target_dates),
+        )
+        for factor_spec in instrument_factor_specs
+    )
     results = run_backtest(
         prices,
         lookback_days=lookback_days,
@@ -1780,6 +1922,7 @@ def run_single_future_presentation_backtest(
         cl1_factor_probability=cl1_factor_probability,
         xau_factor_data=xau_factor_data,
         xau_factor_probability=xau_factor_probability,
+        instrument_factor_data=instrument_factor_data,
     )
 
     signal_lookbacks = signal_lookbacks_for_mode(signal_mode, lookback_days)
@@ -1787,6 +1930,11 @@ def run_single_future_presentation_backtest(
         "instrument": instrument,
         "signal_mode": signal_mode,
         "signal_factor_mode": signal_factor_mode,
+        "instrument_market_factor_profile": ";".join(
+            f"{factor_spec.ticker}:p={factor_spec.probability:g}:"
+            f"same_sign_{'increase' if factor_spec.same_sign_increases else 'decrease'}"
+            for factor_spec in instrument_factor_specs
+        ),
         "spx_factor_probability": (
             spx_factor_probability if uses_spx_factor else np.nan
         ),
@@ -1879,6 +2027,8 @@ def run_single_future_presentation_backtest(
     if uses_xau_factor:
         probability_tag = str(xau_factor_probability).replace(".", "p")
         stem = f"{stem}_xau_factor_p{probability_tag}"
+    if instrument_factor_specs:
+        stem = f"{stem}_instrument_factors"
     if dbmf_prices is None:
         stem = f"{stem}_no_benchmark"
     if start_date is not None:
@@ -1909,6 +2059,10 @@ def run_single_future_presentation_backtest(
         active_factor_labels.append(f"CL1 p={cl1_factor_probability:g}")
     if uses_xau_factor:
         active_factor_labels.append(f"XAU p={xau_factor_probability:g}")
+    active_factor_labels.extend(
+        f"{factor_spec.ticker} p={factor_spec.probability:g}"
+        for factor_spec in instrument_factor_specs
+    )
     signal_label = (
         f"market factor ({', '.join(active_factor_labels)})"
         if active_factor_labels
@@ -2098,6 +2252,7 @@ def main() -> None:
         "--signal-factor-mode",
         choices=(
             "none",
+            "instrument",
             "spx",
             "tff2glfn",
             "cl1",
@@ -2115,9 +2270,9 @@ def main() -> None:
         ),
         default="none",
         help=(
-            "Select market factors: SPX, TFF2GLFN, CL1, XAU, supported "
-            "combinations, all four, or none. Active multipliers combine "
-            "multiplicatively."
+            "Select market factors: instrument-specific 5Y/10Y profiles, SPX, "
+            "TFF2GLFN, CL1, XAU, supported combinations, all four, or none. "
+            "Active multipliers combine multiplicatively."
         ),
     )
     parser.add_argument(
@@ -2170,6 +2325,20 @@ def main() -> None:
     rebalance_frequency: RebalanceFrequency = args.rebalance_frequency
     signal_mode: SignalMode = args.signal_mode
     signal_factor_mode: SignalFactorMode = args.signal_factor_mode
+    if signal_factor_mode == "instrument" and not args.instrument:
+        parser.error(
+            "--signal-factor-mode instrument requires --instrument with "
+            "2Y, 5Y, and/or 10Y future."
+        )
+    if signal_factor_mode == "instrument":
+        unsupported_instruments = set(args.instrument).difference(
+            INSTRUMENT_MARKET_FACTOR_PROFILES
+        )
+        if unsupported_instruments:
+            parser.error(
+                "--signal-factor-mode instrument is not configured for "
+                f"{sorted(unsupported_instruments)}."
+            )
     if args.instrument:
         if args.no_benchmark and args.include_etf_benchmarks:
             parser.error("--no-benchmark cannot be combined with --include-etf-benchmarks.")
