@@ -10,7 +10,7 @@ data, unless a script explicitly reads them.
 | Data file | What the code uses it for |
 |---|---|
 | `US_future_data.xlsx` | Futures prices and related series used by Treasury backtests and analyses. The code reads `Sheet1`, including the 2Y, 5Y, and 10Y futures, 5Y yield, SPX, and CPI series where needed. |
-| `market_data.xlsx` | Market/factor time series used for market-data correlations, regression, neural-network modeling, and optional factor signals. The code reads `Sheet1`. |
+| `market_data.xlsx` | Market/factor time series used for market-data correlations, regression, and neural-network modeling. The code reads `Sheet1`. |
 | `DBMF_COMP.csv` | Date-indexed DBMF, SPX, and IEF price data for DBMF correlation/performance and volatility analyses. |
 | `bbg_data.xlsx` | Bloomberg workbook data for DBMF, risk-free yield, and SPX Sharpe-ratio analysis. The code reads `Sheet1`. |
 | `future_price.csv` | Repeated date/price column pairs for futures and other components (including DBMF), used to calculate aligned returns and fit component regressions. |
@@ -35,7 +35,7 @@ data, unless a script explicitly reads them.
 | [`backtest_factor_modified.py`](./backtest_factor_modified.py) | `US_future_data.xlsx` |
 | [`backtest_12_month_average_signal.py`](./backtest_12_month_average_signal.py) | `US_future_data.xlsx`, indirectly through the 5Y trend and 2Y/10Y spread loaders |
 | [`analyze_5y_future_yield_correlation.py`](./analyze_5y_future_yield_correlation.py) | `US_future_data.xlsx`, indirectly through the 5Y trend loaders |
-| [`backtest_normal_cdf_signal.py`](./backtest_normal_cdf_signal.py) | `US_future_data.xlsx` for the existing 10Y/basket backtests; `future_price.csv` for the optional single 5Y, 2Y, or 10Y futures backtests and DBMF price comparison; `market_data.xlsx` when market-data factor signals are used |
+| [`backtest_normal_cdf_signal.py`](./backtest_normal_cdf_signal.py) | `US_future_data.xlsx` for the existing 10Y/basket backtests; `future_price.csv` for the optional single 5Y, 2Y, or 10Y futures backtests and DBMF price comparison |
 | [`backtest_normal_cdf_sharpe_grid.py`](./backtest_normal_cdf_sharpe_grid.py) | `US_future_data.xlsx`, indirectly through the 10Y futures and spread loaders |
 | [`cta_replication_backtest.py`](./cta_replication_backtest.py) | Yahoo Finance downloads by default; optional user-provided target CSV; generated synthetic data with `--synthetic` |
 | [`generate_treasury_pdf.py`](./generate_treasury_pdf.py) | No repository data file is loaded; generates a PDF from content defined by the script |
