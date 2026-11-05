@@ -1,0 +1,2 @@
+instrument,start_date,end_date,observations,kama_fast_n,kama_slow_n,er_lookback_days,extreme_lookback_m,total_return_pct,annualized_return_pct,annualized_volatility_pct,sharpe_ratio,max_drawdown_pct,daily_results,pnl_plot
+2Y future,2026-01-02,2026-11-02,211,5,25,25,3,1.435942,1.711601,1.327991,1.288865,-0.534648,C:\Users\xinzhang\US_treasury_market_making\presentation report\2y_future_kama_extreme_fast5_slow25_er25_m3_from20260101_daily.csv,C:\Users\xinzhang\US_treasury_market_making\presentation report\2y_future_kama_extreme_fast5_slow25_er25_m3_from20260101_pnl.png

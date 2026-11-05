@@ -657,8 +657,9 @@ def run_backtest(
     instrument_factor_data: tuple[
         tuple[MarketFactorSpec, pd.DataFrame], ...
     ] = (),
+    use_volatility_scaling: bool = True,
 ) -> pd.DataFrame:
-    """Apply the signal with daily, Monday-weekly, month-end, or year-end sizing."""
+    """Apply the signal with optional volatility scaling and scheduled sizing."""
     if lookback_days <= 0:
         raise ValueError("Lookback days must be a positive integer.")
     if volatility_lookback_days <= 0:
@@ -894,13 +895,18 @@ def run_backtest(
             )
         dates = pd.DatetimeIndex(results.index)
 
-    eligible = results["signal"].notna() & results["realized_volatility"].gt(0)
+    eligible = results["signal"].notna()
+    if use_volatility_scaling:
+        eligible &= results["realized_volatility"].gt(0)
     desired_position = pd.Series(np.nan, index=results.index, dtype=float)
-    desired_position.loc[eligible] = (
-        results.loc[eligible, "signal"]
-        * TARGET_ANNUALIZED_VOLATILITY
-        / results.loc[eligible, "realized_volatility"]
-    )
+    if use_volatility_scaling:
+        desired_position.loc[eligible] = (
+            results.loc[eligible, "signal"]
+            * TARGET_ANNUALIZED_VOLATILITY
+            / results.loc[eligible, "realized_volatility"]
+        )
+    else:
+        desired_position.loc[eligible] = results.loc[eligible, "signal"]
     if signal_mode == "rounded":
         desired_position = (
             (desired_position / position_rounding_increment)
@@ -921,11 +927,16 @@ def run_backtest(
     else:
         years = dates.year
         rebalance_dates = np.r_[years[:-1] != years[1:], True]
-    position_change_threshold = (
-        position_change_threshold_fraction
-        * TARGET_ANNUALIZED_VOLATILITY
-        / results["realized_volatility"]
-    )
+    if use_volatility_scaling:
+        position_change_threshold = (
+            position_change_threshold_fraction
+            * TARGET_ANNUALIZED_VOLATILITY
+            / results["realized_volatility"]
+        )
+    else:
+        position_change_threshold = (
+            position_change_threshold_fraction * desired_position.abs()
+        )
     position_change_threshold = position_change_threshold.where(rebalance_dates)
     target_position = np.zeros(len(results), dtype=float)
     current_target_position = 0.0
@@ -987,6 +998,7 @@ def calculate_stats(
     ),
     cl1_factor_probability: float = DEFAULT_CL1_FACTOR_PROBABILITY,
     xau_factor_probability: float = DEFAULT_XAU_FACTOR_PROBABILITY,
+    use_volatility_scaling: bool = True,
 ) -> pd.DataFrame:
     """Calculate full-period and annual statistics."""
     full_stats = calculate_statistics(results)
@@ -1003,6 +1015,7 @@ def calculate_stats(
     full_stats["instrument"] = instrument
     full_stats["signal_mode"] = signal_mode
     full_stats["signal_factor_mode"] = signal_factor_mode
+    full_stats["volatility_scaling"] = use_volatility_scaling
     uses_spx_factor = signal_factor_mode_uses(signal_factor_mode, "spx")
     uses_tff2glfn_factor = signal_factor_mode_uses(
         signal_factor_mode,
@@ -1072,6 +1085,7 @@ def calculate_stats(
         annual_stat["instrument"] = instrument
         annual_stat["signal_mode"] = signal_mode
         annual_stat["signal_factor_mode"] = signal_factor_mode
+        annual_stat["volatility_scaling"] = use_volatility_scaling
         annual_stat["spx_factor_probability"] = (
             spx_factor_probability if uses_spx_factor else np.nan
         )
@@ -1517,6 +1531,7 @@ def run_instrument(
     ),
     cl1_factor_probability: float = DEFAULT_CL1_FACTOR_PROBABILITY,
     xau_factor_probability: float = DEFAULT_XAU_FACTOR_PROBABILITY,
+    use_volatility_scaling: bool = True,
 ) -> None:
     """Run one instrument and save daily, summary, and plot outputs."""
     instrument = strategy["instrument"]
@@ -1557,6 +1572,8 @@ def run_instrument(
         factor_labels.append(f"XAU p={xau_factor_probability:g}")
     if factor_labels:
         signal_label = f"{signal_label}, market factor ({', '.join(factor_labels)})"
+    if not use_volatility_scaling:
+        signal_label = f"{signal_label}, no volatility scaling"
     if signal_mode == "average":
         lookback_tag = f"avg{'-'.join(str(days) for days in signal_lookbacks)}d"
     elif signal_mode == "rounded":
@@ -1572,6 +1589,8 @@ def run_instrument(
     )
     if etf_benchmark_prices:
         stem = f"{stem}_with_etf_benchmarks"
+    if not use_volatility_scaling:
+        stem = f"{stem}_no_volatility_scaling"
     if uses_spx_factor:
         probability_tag = str(spx_factor_probability).replace(".", "p")
         stem = f"{stem}_spx_factor_p{probability_tag}"
@@ -1634,6 +1653,8 @@ def run_instrument(
         cl1_factor_probability,
         xau_factor_data,
         xau_factor_probability,
+        (),
+        use_volatility_scaling,
     )
     stats_frame = calculate_stats(
         results,
@@ -1650,6 +1671,7 @@ def run_instrument(
         tff2glfn_factor_probability,
         cl1_factor_probability,
         xau_factor_probability,
+        use_volatility_scaling,
     )
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -1669,6 +1691,7 @@ def run_instrument(
             "period",
             "signal_mode",
             "signal_factor_mode",
+            "volatility_scaling",
             "position_rounding_increment",
             "spx_factor_probability",
             "spx_factor_multiplier_adjustment",
@@ -1850,6 +1873,7 @@ def run_single_future_presentation_backtest(
     ),
     cl1_factor_probability: float = DEFAULT_CL1_FACTOR_PROBABILITY,
     xau_factor_probability: float = DEFAULT_XAU_FACTOR_PROBABILITY,
+    use_volatility_scaling: bool = True,
 ) -> dict[str, object]:
     """Run one futures backtest and save its presentation outputs."""
     strategy = SINGLE_FUTURE_STRATEGIES[instrument]
@@ -1923,6 +1947,7 @@ def run_single_future_presentation_backtest(
         xau_factor_data=xau_factor_data,
         xau_factor_probability=xau_factor_probability,
         instrument_factor_data=instrument_factor_data,
+        use_volatility_scaling=use_volatility_scaling,
     )
 
     signal_lookbacks = signal_lookbacks_for_mode(signal_mode, lookback_days)
@@ -1930,6 +1955,7 @@ def run_single_future_presentation_backtest(
         "instrument": instrument,
         "signal_mode": signal_mode,
         "signal_factor_mode": signal_factor_mode,
+        "volatility_scaling": use_volatility_scaling,
         "instrument_market_factor_profile": ";".join(
             f"{factor_spec.ticker}:p={factor_spec.probability:g}:"
             f"same_sign_{'increase' if factor_spec.same_sign_increases else 'decrease'}"
@@ -2029,6 +2055,8 @@ def run_single_future_presentation_backtest(
         stem = f"{stem}_xau_factor_p{probability_tag}"
     if instrument_factor_specs:
         stem = f"{stem}_instrument_factors"
+    if not use_volatility_scaling:
+        stem = f"{stem}_no_volatility_scaling"
     if dbmf_prices is None:
         stem = f"{stem}_no_benchmark"
     if start_date is not None:
@@ -2068,6 +2096,8 @@ def run_single_future_presentation_backtest(
         if active_factor_labels
         else "normal-CDF signal"
     )
+    if not use_volatility_scaling:
+        signal_label = f"{signal_label}, no volatility scaling"
     if active_factor_labels:
         results_without_factors = run_backtest(
             prices,
@@ -2081,6 +2111,7 @@ def run_single_future_presentation_backtest(
             volatility_lookback_days=volatility_lookback_days,
             output_start_date=start_date,
             position_rounding_increment=position_rounding_increment,
+            use_volatility_scaling=use_volatility_scaling,
         )
         save_market_factor_return_comparison(
             results,
@@ -2172,6 +2203,16 @@ def main() -> None:
         help=(
             "Rolling realized-volatility window in trading days "
             f"(default: {NORMAL_CDF_VOLATILITY_LOOKBACK_DAYS})."
+        ),
+    )
+    parser.add_argument(
+        "--no-volatility-scaling",
+        action="store_false",
+        dest="use_volatility_scaling",
+        default=True,
+        help=(
+            "Use the normal-CDF signal directly as position size instead of "
+            "scaling it to the target annualized volatility."
         ),
     )
     parser.add_argument(
@@ -2370,6 +2411,7 @@ def main() -> None:
                     args.tff2glfn_factor_probability,
                     args.cl1_factor_probability,
                     args.xau_factor_probability,
+                    args.use_volatility_scaling,
                 )
             )
         if not args.no_benchmark:
@@ -2441,6 +2483,7 @@ def main() -> None:
         args.tff2glfn_factor_probability,
         args.cl1_factor_probability,
         args.xau_factor_probability,
+        args.use_volatility_scaling,
     )
     run_instrument(
         spread_prices,
@@ -2460,6 +2503,7 @@ def main() -> None:
         args.tff2glfn_factor_probability,
         args.cl1_factor_probability,
         args.xau_factor_probability,
+        args.use_volatility_scaling,
     )
 
 
