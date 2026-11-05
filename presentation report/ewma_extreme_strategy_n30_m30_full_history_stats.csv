@@ -1,0 +1,2 @@
+instrument,start_date,end_date,observations,ewma_span_n,ewma_alpha,extreme_lookback_m,total_return_pct,annualized_return_pct,annualized_volatility_pct,sharpe_ratio,max_drawdown_pct,daily_results,pnl_plot
+2Y future,2016-01-04,2026-11-02,2729,30,0.064516,30,13.691068,1.196524,1.524685,0.784768,-3.463042,C:\Users\xinzhang\US_treasury_market_making\presentation report\2y_future_ewma_extreme_n30_m30_full_history_daily.csv,C:\Users\xinzhang\US_treasury_market_making\presentation report\2y_future_ewma_extreme_n30_m30_full_history_pnl.png
