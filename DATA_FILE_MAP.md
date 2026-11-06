@@ -37,6 +37,8 @@ data, unless a script explicitly reads them.
 | [`analyze_5y_future_yield_correlation.py`](./analyze_5y_future_yield_correlation.py) | `US_future_data.xlsx`, indirectly through the 5Y trend loaders |
 | [`backtest_normal_cdf_signal.py`](./backtest_normal_cdf_signal.py) | `US_future_data.xlsx` for the existing 10Y/basket backtests and optional SPX signal factor; `market_data.xlsx` for optional TFF2GLFN, CL1, XAU, and instrument-specific 2Y/5Y/10Y market-factor profiles; `future_price.csv` for the optional single 5Y, 2Y, or 10Y futures backtests and DBMF price comparison |
 | [`backtest_normal_cdf_sharpe_grid.py`](./backtest_normal_cdf_sharpe_grid.py) | `US_future_data.xlsx`, indirectly through the 10Y futures and spread loaders |
+| [`analyze_best_four_futures_strategies.py`](./analyze_best_four_futures_strategies.py) | `future_price.csv` and the existing 2016–2025 best-parameter tables in `results/` |
+| [`analyze_best_cdf_market_factor_comparison.py`](./analyze_best_cdf_market_factor_comparison.py) | `future_price.csv` and `market_data.xlsx` |
 | [`cta_replication_backtest.py`](./cta_replication_backtest.py) | Yahoo Finance downloads by default; optional user-provided target CSV; generated synthetic data with `--synthetic` |
 | [`generate_treasury_pdf.py`](./generate_treasury_pdf.py) | No repository data file is loaded; generates a PDF from content defined by the script |
 
@@ -45,6 +47,33 @@ data, unless a script explicitly reads them.
 - These scripts resolve their bundled input files relative to the script or
   repository location, so run them with the listed files available in the
   repository.
+- Run `python analyze_best_four_futures_strategies.py` to generate separate 5Y
+  and 10Y four-strategy reports under `results/`, including daily results,
+  period and annual statistics, plots, and the scaled CDF selection grid. As in
+  the 2Y report, both CDF models use weekly rebalancing and 0.5 position
+  increments; the scaled model targets 1% annualized volatility before
+  rounding. The scaled CDF uses the user-specified T=64 for 5Y; for 10Y, its
+  weekly lookback is selected by Sharpe ratio **after rounding** over 32, 64,
+  126, 252, and 504 trading days. The grid records both the training ranking
+  and the lookback selected for the report. The existing unscaled rounded CDF,
+  EWMA, and KAMA best-parameter tables supply the other models. The 2026 results use prior prices
+  for indicator warmup but restart positions according to each backtest's
+  period-start convention. The 2016–2025 results are in-sample, 2026 is
+  out-of-sample, and returns do not account for transaction costs. Returns are
+  based on percentage price changes and normalized positions, not contract
+  dollar P&L. Annualized return and volatility use 252 trading days.
+- Run `python analyze_best_cdf_market_factor_comparison.py` to compare the
+  rounded weekly scaled CDF models with and without their configured
+  instrument-specific market factors in 2026. The lookbacks match the
+  four-strategy reports (currently 64 days for all three futures); 2Y and 5Y
+  use the user-specified overrides and 10Y uses the rounded 2016–2025 training grid.
+  The comparison does not select on 2026 performance or separately optimize
+  the factor-adjusted model. The summary records model parameters and their
+  selection source. Both variants restart their positions in 2026. Outputs
+  are written to `results/cdf_four_strategy_model_2026_market_factor_comparison/`.
+  The original 64-day comparison remains unchanged. Factor values are aligned
+  using the existing weekly forward-fill logic, so the dates and freshness of
+  the underlying market data should be checked when interpreting results.
 - To generate the single-futures presentation reports, run
   `python backtest_normal_cdf_signal.py --instrument "5Y future" "2Y future" "10Y future" --start-date 2026-01-01 --lookback-days 64 --volatility-lookback-days 64 --rebalance-frequency weekly --rebalance-threshold-fraction 0 --signal-cutoff 0`.
   The daily results, statistics, and plots are written to `presentation report/`.

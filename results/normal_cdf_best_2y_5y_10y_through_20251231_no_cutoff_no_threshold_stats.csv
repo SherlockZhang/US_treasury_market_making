@@ -1,4 +1,12 @@
 instrument,sharpe_rank_within_instrument,data_start_date,data_end_date,observations,first_active_date,rebalance_frequency,signal_mode,signal_lookback_days,volatility_scaling,target_annualized_volatility_pct,volatility_lookback_days,signal_factor_mode,signal_cutoff,rebalance_threshold_fraction,total_return_pct,annualized_return_pct,annualized_volatility_pct,sharpe_ratio,max_drawdown_pct,calmar_ratio,max_drawdown_duration_calendar_days,win_ratio_pct,risk_reward_ratio,average_abs_position,maximum_abs_position,long_days,flat_days,short_days
-2Y future,1,2016-01-04,2025-12-31,2518,2016-04-12,weekly,single,64,True,1.00000000,64,none,0.00000000,0.00000000,13.67953391,1.28939605,1.11524251,1.15615754,-1.72104837,0.74919222,1150,52.93613373,1.15356759,0.81146389,4.91736422,1079,68,1371
-5Y future,1,2016-01-04,2025-12-31,2518,2016-04-12,weekly,single,64,True,1.00000000,64,none,0.00000000,0.00000000,7.68254596,0.74594392,1.01730069,0.73325805,-1.58585107,0.47037451,1168,51.66112957,1.08802116,0.25560830,0.85460735,1118,68,1332
-10Y future,1,2016-01-04,2025-12-31,2518,2016-04-12,weekly,single,64,True,1.00000000,64,none,0.00000000,0.00000000,7.13560798,0.69492516,1.01186171,0.68677878,-1.43220046,0.48521501,1168,51.33222315,1.08658913,0.16604860,0.48255117,1151,68,1299
+2Y future,1,1/4/2016,12/31/2025,2518,4/12/2016,weekly,single,64,TRUE,1,64,none,0,0,13.67953391,1.28939605,1.11524251,1.15615754,-1.72104837,0.74919222,1150,52.93613373,1.15356759,0.81146389,4.91736422,1079,68,1371
+5Y future,1,1/4/2016,12/31/2025,2518,4/12/2016,weekly,single,64,TRUE,1,64,none,0,0,7.68254596,0.74594392,1.01730069,0.73325805,-1.58585107,0.47037451,1168,51.66112957,1.08802116,0.2556083,0.85460735,1118,68,1332
+10Y future,1,1/4/2016,12/31/2025,2518,4/12/2016,weekly,single,64,TRUE,1,64,none,0,0,7.13560798,0.69492516,1.01186171,0.68677878,-1.43220046,0.48521501,1168,51.33222315,1.08658913,0.1660486,0.48255117,1151,68,1299
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+instrument,rebalance_frequency,signal_lookback_days,total_return_pct,annualized_return_pct,annualized_volatility_pct,sharpe_ratio,max_drawdown_pct,calmar_ratio,max_drawdown_duration_calendar_days,win_ratio_pct,risk_reward_ratio,average_abs_position,maximum_abs_position,,,,,,,,,,,,,,,
+2Y future,weekly,64,13.67953391,1.28939605,1.11524251,1.15615754,-1.72104837,0.74919222,1150,52.93613373,1.15356759,0.81146389,4.91736422,,,,,,,,,,,,,,,
+5Y future,weekly,64,7.68254596,0.74594392,1.01730069,0.73325805,-1.58585107,0.47037451,1168,51.66112957,1.08802116,0.2556083,0.85460735,,,,,,,,,,,,,,,
+10Y future,weekly,64,7.13560798,0.69492516,1.01186171,0.68677878,-1.43220046,0.48521501,1168,51.33222315,1.08658913,0.1660486,0.48255117,,,,,,,,,,,,,,,
