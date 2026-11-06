@@ -1,0 +1,19 @@
+market_variable,target,full_sample_weekly_return_mean,full_sample_weekly_return_std_ddof1,filter_rule,total_paired_weeks,filtered_weeks,both_positive_count,both_negative_count,same_nonzero_sign_count,different_sign_or_zero_count_filtered,same_sign_pct_of_filtered_weeks,sample_start_week,sample_end_week
+TFF2GLFN Index,2Y future,0.02792051,5.11573642,abs(market weekly return - full-sample mean) > full-sample standard deviation,519,7,2,3,5,2,71.42857143,2016-01-15,2022-08-05
+CTA US Equity,2Y future,0.00075947,0.02152210,abs(market weekly return - full-sample mean) > full-sample standard deviation,197,49,11,18,29,20,59.18367347,2022-03-18,2025-12-05
+JPYUSD BGN Curncy,2Y future,-0.00042218,0.01293067,abs(market weekly return - full-sample mean) > full-sample standard deviation,520,137,36,34,70,67,51.09489051,2016-01-08,2025-10-24
+EURUSD BGN Curncy,2Y future,0.00020614,0.01008615,abs(market weekly return - full-sample mean) > full-sample standard deviation,520,140,35,36,71,69,50.71428571,2016-01-22,2025-10-10
+TFF2HLFN Index,2Y future,0.00201490,1.88425927,abs(market weekly return - full-sample mean) > full-sample standard deviation,519,18,5,4,9,9,50.00000000,2016-04-01,2022-07-22
+GSTMTAIP Index,2Y future,0.00531044,0.03624628,abs(market weekly return - full-sample mean) > full-sample standard deviation,520,143,33,38,71,72,49.65034965,2016-01-08,2025-11-28
+XAU BGN Curncy,2Y future,0.00291696,0.01991351,abs(market weekly return - full-sample mean) > full-sample standard deviation,519,139,40,29,69,70,49.64028777,2016-02-05,2025-12-12
+XBTUSD BGN Curncy,2Y future,0.01457673,0.09394076,abs(market weekly return - full-sample mean) > full-sample standard deviation,520,130,34,29,63,67,48.46153846,2016-01-15,2025-11-21
+S5INFT Index,2Y future,0.00461668,0.03059122,abs(market weekly return - full-sample mean) > full-sample standard deviation,519,136,29,36,65,71,47.79411765,2016-02-05,2025-11-28
+UKX,2Y future,0.00119703,0.02035618,abs(market weekly return - full-sample mean) > full-sample standard deviation,519,107,27,24,51,56,47.66355140,2016-01-29,2025-12-19
+DAX,2Y future,0.00208076,0.02581323,abs(market weekly return - full-sample mean) > full-sample standard deviation,519,124,27,32,59,65,47.58064516,2016-01-15,2025-11-28
+BBDXY Index,2Y future,-0.00001539,0.00836837,abs(market weekly return - full-sample mean) > full-sample standard deviation,520,136,31,33,64,72,47.05882353,2016-02-05,2025-11-21
+NDX,2Y future,0.00384637,0.02803206,abs(market weekly return - full-sample mean) > full-sample standard deviation,519,142,33,33,66,76,46.47887324,2016-01-15,2025-11-28
+CL1 COMB Comdty,2Y future,0.00261722,0.05619957,abs(market weekly return - full-sample mean) > full-sample standard deviation,519,121,24,29,53,68,43.80165289,2016-01-15,2025-10-24
+TFF2ILFN Index,2Y future,0.00800568,0.09379159,abs(market weekly return - full-sample mean) > full-sample standard deviation,519,111,19,28,47,64,42.34234234,2016-01-29,2025-02-07
+SOFRRATE Index,2Y future,0.03683606,0.38029545,abs(market weekly return - full-sample mean) > full-sample standard deviation,402,19,6,2,8,11,42.10526316,2020-03-20,2022-07-29
+DJI,2Y future,0.00238818,0.02378889,abs(market weekly return - full-sample mean) > full-sample standard deviation,519,108,21,24,45,63,41.66666667,2016-01-15,2025-11-28
+SPX,2Y future,0.00275050,0.02362092,abs(market weekly return - full-sample mean) > full-sample standard deviation,519,114,22,25,47,67,41.22807018,2016-01-15,2025-11-28

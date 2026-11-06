@@ -53,6 +53,17 @@ data, unless a script explicitly reads them.
   `python backtest_normal_cdf_signal.py --instrument "2Y future" "5Y future" "10Y future" --signal-factor-mode instrument`.
   The factors trigger when their weekly return or point change deviates by more
   than one standard deviation from the preceding 52 weekly observations.
+  The configured profiles are:
+
+  | Future | Same-sign increases position (probability) | Different-sign increases position (probability) |
+  |---|---|---|
+  | 2Y | TFF2GLFN (0.70), CTA US (0.60) | SPX (0.59), TFF2ILFN (0.58), CL1 (0.56) |
+  | 5Y | TFF2GLFN (0.71), CTA US (0.57), UKX (0.57) | CL1 (0.54), SPX (0.56), TFF2ILFN (0.58), SOFRRATE (0.68) |
+  | 10Y | TFF2GLFN (0.71), UKX (0.60), CTA US (0.57) | SOFRRATE (0.58), TFF2HLFN (0.61) |
+
+  TFF2GLFN, TFF2ILFN, SOFRRATE, and TFF2HLFN use weekly point changes;
+  CTA US, SPX, CL1, and UKX use weekly percentage returns. Active multipliers
+  combine multiplicatively.
 - To calculate monthly DBMF Price returns and the positive-month win rate from
   2016-01-01, run `python analyze_dbmf_monthly_returns.py`. The monthly returns
   and win-rate summary, monthly return plot, and daily-return-based annual

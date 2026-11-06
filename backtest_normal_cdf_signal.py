@@ -91,25 +91,27 @@ class MarketFactorSpec:
 
 INSTRUMENT_MARKET_FACTOR_PROFILES: dict[str, tuple[MarketFactorSpec, ...]] = {
     "2Y future": (
-        MarketFactorSpec("spx", "SPX", 0.6, False, "return"),
         MarketFactorSpec("tff2glfn", "TFF2GLFN Index", 0.7, True, "change"),
-        MarketFactorSpec("cl1", "CL1 COMB Comdty", 0.564, False, "return"),
-        MarketFactorSpec("xau", "XAU BGN Curncy", 0.54, True, "change"),
+        MarketFactorSpec("cta", "CTA US Equity", 0.6, True, "return"),
+        MarketFactorSpec("spx", "SPX", 0.59, False, "return"),
+        MarketFactorSpec("tff2ilfn", "TFF2ILFN Index", 0.58, False, "change"),
+        MarketFactorSpec("cl1", "CL1 COMB Comdty", 0.56, False, "return"),
     ),
     "5Y future": (
-        MarketFactorSpec("sofrate", "SOFRRATE Index", 0.68, False, "change"),
-        MarketFactorSpec("tff2ilfn", "TFF2ILFN Index", 0.56, False, "change"),
-        MarketFactorSpec("cl1", "CL1 COMB Comdty", 0.56, False, "return"),
-        MarketFactorSpec("spx", "SPX", 0.54, False, "return"),
-        MarketFactorSpec("ukx", "UKX", 0.59, True, "return"),
         MarketFactorSpec("tff2glfn", "TFF2GLFN Index", 0.71, True, "change"),
+        MarketFactorSpec("cta", "CTA US Equity", 0.57, True, "return"),
+        MarketFactorSpec("ukx", "UKX", 0.57, True, "return"),
+        MarketFactorSpec("cl1", "CL1 COMB Comdty", 0.54, False, "return"),
+        MarketFactorSpec("spx", "SPX", 0.56, False, "return"),
+        MarketFactorSpec("tff2ilfn", "TFF2ILFN Index", 0.58, False, "change"),
+        MarketFactorSpec("sofrate", "SOFRRATE Index", 0.68, False, "change"),
     ),
     "10Y future": (
-        MarketFactorSpec("tff2hlfn", "TFF2HLFN Index", 0.61, False, "change"),
+        MarketFactorSpec("tff2glfn", "TFF2GLFN Index", 0.71, True, "change"),
+        MarketFactorSpec("ukx", "UKX", 0.6, True, "return"),
+        MarketFactorSpec("cta", "CTA US Equity", 0.57, True, "return"),
         MarketFactorSpec("sofrate", "SOFRRATE Index", 0.58, False, "change"),
-        MarketFactorSpec("bbdxy", "BBDXY Index", 0.56, False, "return"),
-        MarketFactorSpec("ukx", "UKX", 0.62, True, "return"),
-        MarketFactorSpec("tff2glfn", "TFF2GLFN Index", 0.714, True, "change"),
+        MarketFactorSpec("tff2hlfn", "TFF2HLFN Index", 0.61, False, "change"),
     ),
 }
 
@@ -2311,7 +2313,7 @@ def main() -> None:
         ),
         default="none",
         help=(
-            "Select market factors: instrument-specific 5Y/10Y profiles, SPX, "
+            "Select market factors: instrument-specific 2Y/5Y/10Y profiles, SPX, "
             "TFF2GLFN, CL1, XAU, supported combinations, all four, or none. "
             "Active multipliers combine multiplicatively."
         ),
