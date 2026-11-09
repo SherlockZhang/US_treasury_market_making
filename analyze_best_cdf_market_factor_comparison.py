@@ -6,6 +6,7 @@ matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
 import pandas as pd
+from pathlib import Path
 
 import analyze_best_four_futures_strategies as analysis
 import backtest_normal_cdf_signal as cdf
@@ -16,7 +17,9 @@ INSTRUMENTS = ("2Y future", "5Y future", "10Y future")
 
 
 def backtest_pair(
-    instrument: str, prices: pd.Series, lookback: int
+    instrument: str, prices: pd.Series, lookback: int,
+    target_annualized_volatility: float = cdf.TARGET_ANNUALIZED_VOLATILITY,
+    position_rounding_increment: float = analysis.CDF_POSITION_ROUNDING,
 ) -> dict[str, pd.DataFrame]:
     prices = prices.loc[analysis.START:analysis.TEST_END]
     specs = cdf.INSTRUMENT_MARKET_FACTOR_PROFILES[instrument]
@@ -35,8 +38,9 @@ def backtest_pair(
             signal_mode="rounded",
             volatility_lookback_days=analysis.CDF_VOLATILITY_LOOKBACK,
             output_start_date=analysis.TEST_START,
-            position_rounding_increment=analysis.CDF_POSITION_ROUNDING,
+            position_rounding_increment=position_rounding_increment,
             instrument_factor_data=factor_data,
+            target_annualized_volatility=target_annualized_volatility,
         )
     return results
 
@@ -51,7 +55,10 @@ def profile_description(instrument: str) -> str:
 
 
 def summarize(
-    instrument: str, mode: str, lookback: int, frame: pd.DataFrame
+    instrument: str, mode: str, lookback: int, frame: pd.DataFrame,
+    target_annualized_volatility: float = cdf.TARGET_ANNUALIZED_VOLATILITY,
+    position_rounding_increment: float = analysis.CDF_POSITION_ROUNDING,
+    lookback_selection: str | None = None,
 ) -> dict[str, object]:
     stats = analysis.statistics(frame)
     stats["position_change_count"] = int(frame["position"].diff().fillna(0).ne(0).sum())
@@ -63,8 +70,11 @@ def summarize(
         "signal_mode": "rounded",
         "volatility_scaling": True,
         "lookback_selection": (
-            "user-specified" if instrument in analysis.SCALED_CDF_LOOKBACK_OVERRIDES
-            else "2016-2025 rounded training Sharpe"
+            lookback_selection if lookback_selection is not None
+            else (
+                "user-specified" if instrument in analysis.SCALED_CDF_LOOKBACK_OVERRIDES
+                else "2016-2025 rounded training Sharpe"
+            )
         ),
         "start_date": stats.pop("start_date"),
         "end_date": stats.pop("end_date"),
@@ -73,15 +83,18 @@ def summarize(
         "rebalance_frequency": "weekly",
         "signal_lookback_days": lookback,
         "volatility_lookback_days": analysis.CDF_VOLATILITY_LOOKBACK,
-        "target_annualized_volatility_pct": cdf.TARGET_ANNUALIZED_VOLATILITY * 100,
-        "position_rounding_increment": analysis.CDF_POSITION_ROUNDING,
+        "target_annualized_volatility_pct": target_annualized_volatility * 100,
+        "position_rounding_increment": position_rounding_increment,
         "signal_cutoff": analysis.CDF_SIGNAL_CUTOFF,
         "rebalance_threshold_fraction": analysis.CDF_REBALANCE_THRESHOLD,
         **stats,
     }
 
 
-def save_plots(instrument: str, frames: dict[str, pd.DataFrame], lookback: int) -> None:
+def save_plots(
+    instrument: str, frames: dict[str, pd.DataFrame], lookback: int,
+    output_dir: Path = OUTPUT_DIR,
+) -> None:
     stem = instrument.split()[0].lower()
     for column, scale, label, slug in (
         ("cumulative_pnl_pct", 1, "Cumulative return (%)", "cumulative_pnl"),
@@ -97,7 +110,7 @@ def save_plots(instrument: str, frames: dict[str, pd.DataFrame], lookback: int) 
         ax.grid(alpha=0.25)
         ax.legend()
         fig.tight_layout()
-        fig.savefig(OUTPUT_DIR / f"{stem}_{slug}.png", dpi=150)
+        fig.savefig(output_dir / f"{stem}_{slug}.png", dpi=150)
         plt.close(fig)
 
 

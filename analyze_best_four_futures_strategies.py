@@ -83,11 +83,22 @@ def selected_parameters(instrument: str) -> dict[str, dict[str, int]]:
     }
 
 
-def parameter_labels(parameters: dict[str, dict[str, int]]) -> dict[str, str]:
+def parameter_labels(
+    parameters: dict[str, dict[str, int]],
+    scaled_position_rounding: float = CDF_POSITION_ROUNDING,
+    unscaled_position_rounding: float = CDF_POSITION_ROUNDING,
+    target_annualized_volatility: float = cdf.TARGET_ANNUALIZED_VOLATILITY,
+) -> dict[str, str]:
     s, u, e, k = (parameters[name] for name in STRATEGIES)
     return {
-        STRATEGIES[0]: f"weekly T={s['lookback']}; vol target 1%; position rounded 0.5",
-        STRATEGIES[1]: f"weekly T={u['lookback']}; unscaled; position rounded 0.5",
+        STRATEGIES[0]: (
+            f"weekly T={s['lookback']}; vol target {target_annualized_volatility * 100:g}%; "
+            f"position rounded {scaled_position_rounding:g}"
+        ),
+        STRATEGIES[1]: (
+            f"weekly T={u['lookback']}; unscaled; "
+            f"position rounded {unscaled_position_rounding:g}"
+        ),
         STRATEGIES[2]: f"N={e['n']}, M={e['m']}",
         STRATEGIES[3]: f"fast={k['fast']}, slow={k['slow']}, ER={k['er']}, M={k['m']}",
     }
@@ -121,7 +132,10 @@ def report_scaled_lookback(instrument: str, grid: pd.DataFrame) -> int:
 
 
 def run_period(
-    prices: pd.Series, parameters: dict[str, dict[str, int]], start: pd.Timestamp
+    prices: pd.Series, parameters: dict[str, dict[str, int]], start: pd.Timestamp,
+    scaled_position_rounding: float = CDF_POSITION_ROUNDING,
+    unscaled_position_rounding: float = CDF_POSITION_ROUNDING,
+    target_annualized_volatility: float = cdf.TARGET_ANNUALIZED_VOLATILITY,
 ) -> dict[str, pd.DataFrame]:
     prices = prices.loc[START:]
     output = {}
@@ -135,8 +149,12 @@ def run_period(
             signal_mode="rounded",
             volatility_lookback_days=CDF_VOLATILITY_LOOKBACK,
             output_start_date=start,
-            position_rounding_increment=CDF_POSITION_ROUNDING,
+            position_rounding_increment=(
+                scaled_position_rounding if name == STRATEGIES[0]
+                else unscaled_position_rounding
+            ),
             use_volatility_scaling=name == STRATEGIES[0],
+            target_annualized_volatility=target_annualized_volatility,
         )
     e, k = parameters["EWMA"], parameters["KAMA"]
     output["EWMA"] = ewma.run_backtest(
@@ -252,33 +270,64 @@ def generate(instrument: str, prices: pd.Series) -> None:
     grid["selected_for_report"] = grid["signal_lookback_days"].eq(lookback)
     grid.to_csv(directory / "rounded_scaled_cdf_training_grid.csv", index=False, float_format="%.8f")
     parameters["Normal CDF scaled"]["lookback"] = lookback
-    labels = parameter_labels(parameters)
+    save_report(instrument, prices, parameters, directory)
+
+
+def save_report(
+    instrument: str,
+    prices: pd.Series,
+    parameters: dict[str, dict[str, int]],
+    directory: Path,
+    scaled_position_rounding: float = CDF_POSITION_ROUNDING,
+    unscaled_position_rounding: float = CDF_POSITION_ROUNDING,
+    target_annualized_volatility: float = cdf.TARGET_ANNUALIZED_VOLATILITY,
+) -> None:
+    """Write reports; trading volume counts changes in the daily position.
+
+    The first position is measured against flat at the period start. Annual
+    counts use the previous trading day's position across year boundaries.
+    """
+    directory.mkdir(parents=True, exist_ok=True)
+    labels = parameter_labels(
+        parameters, scaled_position_rounding, unscaled_position_rounding,
+        target_annualized_volatility,
+    )
     summary = []
     for period, start, end in (
         ("2016_2025", START, TRAIN_END),
         ("2026", TEST_START, TEST_END),
     ):
-        frames = run_period(prices.loc[:end], parameters, start)
+        frames = run_period(
+            prices.loc[:end], parameters, start,
+            scaled_position_rounding, unscaled_position_rounding,
+            target_annualized_volatility,
+        )
         annual = []
         for name, slug in zip(STRATEGIES, SLUGS):
             frame = frames[name]
+            position_change = frame["position"].diff()
+            position_change.iloc[0] = frame["position"].iloc[0]
+            frame["position_changed"] = position_change.ne(0)
             frame.to_csv(directory / f"{period}_{slug}_daily.csv", index_label="date", float_format="%.10f")
             summary.append({"period": period, "instrument": instrument, "strategy": name,
-                            "parameters": labels[name], **statistics(frame)})
+                            "parameters": labels[name], **statistics(frame),
+                            "trading_volume": int(frame["position_changed"].sum())})
             if period == "2016_2025":
                 for year, yearly in frame.groupby(frame.index.year):
                     annual.append({"instrument": instrument, "strategy": name,
                                    "parameters": labels[name], "year": year,
-                                   **statistics(yearly)})
+                                   **statistics(yearly),
+                                   "trading_volume": int(yearly["position_changed"].sum())})
         if annual:
             table = pd.DataFrame(annual)
             table.to_csv(directory / f"{period}_annual_stats.csv", index=False, float_format="%.8f")
-            pivot = table.pivot(index="year", columns="strategy", values=list(METRICS))
-            pivot = pivot.reindex(columns=pd.MultiIndex.from_product([METRICS, STRATEGIES]))
+            metrics = (*METRICS, "trading_volume")
+            pivot = table.pivot(index="year", columns="strategy", values=list(metrics))
+            pivot = pivot.reindex(columns=pd.MultiIndex.from_product([metrics, STRATEGIES]))
             pivot.columns.names = ["metric", "strategy"]
             pivot.to_csv(directory / f"{period}_annual_stats_by_year_and_metric.csv", float_format="%.8f")
             pivot = pivot.swaplevel(axis=1).reindex(
-                columns=pd.MultiIndex.from_product([STRATEGIES, METRICS])
+                columns=pd.MultiIndex.from_product([STRATEGIES, metrics])
             )
             pivot.columns.names = ["strategy", "metric"]
             pivot.to_csv(directory / f"{period}_annual_stats_by_year_and_strategy.csv", float_format="%.8f")

@@ -54,7 +54,7 @@ XAU_TICKER = "XAU BGN Curncy"
 XAU_FACTOR_LOOKBACK_WEEKS = 52
 DEFAULT_XAU_FACTOR_PROBABILITY = 0.54
 REBALANCE_POSITION_CHANGE_THRESHOLD_FRACTION = 0.25
-POSITION_ROUNDING_INCREMENTS = (0.1, 0.2, 0.5)
+POSITION_ROUNDING_INCREMENTS = (0.1, 0.2, 0.3, 0.4, 0.5, 1.0)
 DEFAULT_POSITION_ROUNDING_INCREMENT = 0.1
 RebalanceFrequency = Literal["daily", "weekly", "monthly", "yearly"]
 SignalMode = Literal["single", "average", "rounded"]
@@ -660,12 +660,15 @@ def run_backtest(
         tuple[MarketFactorSpec, pd.DataFrame], ...
     ] = (),
     use_volatility_scaling: bool = True,
+    target_annualized_volatility: float = TARGET_ANNUALIZED_VOLATILITY,
 ) -> pd.DataFrame:
     """Apply the signal with optional volatility scaling and scheduled sizing."""
     if lookback_days <= 0:
         raise ValueError("Lookback days must be a positive integer.")
     if volatility_lookback_days <= 0:
         raise ValueError("Volatility lookback days must be a positive integer.")
+    if not np.isfinite(target_annualized_volatility) or target_annualized_volatility <= 0:
+        raise ValueError("Target annualized volatility must be finite and positive.")
     if rebalance_frequency not in ("daily", "weekly", "monthly", "yearly"):
         raise ValueError(
             f"Unsupported rebalance frequency: {rebalance_frequency}"
@@ -904,7 +907,7 @@ def run_backtest(
     if use_volatility_scaling:
         desired_position.loc[eligible] = (
             results.loc[eligible, "signal"]
-            * TARGET_ANNUALIZED_VOLATILITY
+            * target_annualized_volatility
             / results.loc[eligible, "realized_volatility"]
         )
     else:
@@ -932,7 +935,7 @@ def run_backtest(
     if use_volatility_scaling:
         position_change_threshold = (
             position_change_threshold_fraction
-            * TARGET_ANNUALIZED_VOLATILITY
+            * target_annualized_volatility
             / results["realized_volatility"]
         )
     else:
