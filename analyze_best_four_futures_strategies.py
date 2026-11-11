@@ -88,15 +88,16 @@ def parameter_labels(
     scaled_position_rounding: float = CDF_POSITION_ROUNDING,
     unscaled_position_rounding: float = CDF_POSITION_ROUNDING,
     target_annualized_volatility: float = cdf.TARGET_ANNUALIZED_VOLATILITY,
+    cdf_rebalance_frequencies: tuple[cdf.RebalanceFrequency, cdf.RebalanceFrequency] = ("weekly", "weekly"),
 ) -> dict[str, str]:
     s, u, e, k = (parameters[name] for name in STRATEGIES)
     return {
         STRATEGIES[0]: (
-            f"weekly T={s['lookback']}; vol target {target_annualized_volatility * 100:g}%; "
+            f"{cdf_rebalance_frequencies[0]} T={s['lookback']}; vol target {target_annualized_volatility * 100:g}%; "
             f"position rounded {scaled_position_rounding:g}"
         ),
         STRATEGIES[1]: (
-            f"weekly T={u['lookback']}; unscaled; "
+            f"{cdf_rebalance_frequencies[1]} T={u['lookback']}; unscaled; "
             f"position rounded {unscaled_position_rounding:g}"
         ),
         STRATEGIES[2]: f"N={e['n']}, M={e['m']}",
@@ -136,14 +137,15 @@ def run_period(
     scaled_position_rounding: float = CDF_POSITION_ROUNDING,
     unscaled_position_rounding: float = CDF_POSITION_ROUNDING,
     target_annualized_volatility: float = cdf.TARGET_ANNUALIZED_VOLATILITY,
+    cdf_rebalance_frequencies: tuple[cdf.RebalanceFrequency, cdf.RebalanceFrequency] = ("weekly", "weekly"),
 ) -> dict[str, pd.DataFrame]:
     prices = prices.loc[START:]
     output = {}
-    for name in STRATEGIES[:2]:
+    for name, frequency in zip(STRATEGIES[:2], cdf_rebalance_frequencies):
         output[name] = cdf.run_backtest(
             prices,
             lookback_days=parameters[name]["lookback"],
-            rebalance_frequency="weekly",
+            rebalance_frequency=frequency,
             position_change_threshold_fraction=CDF_REBALANCE_THRESHOLD,
             signal_cutoff=CDF_SIGNAL_CUTOFF,
             signal_mode="rounded",
@@ -171,12 +173,15 @@ def run_period(
 
 def statistics(frame: pd.DataFrame) -> dict[str, object]:
     returns = frame["strategy_return"]
+    gross_returns = frame["gross_strategy_return"]
     position = frame["position"]
     wealth = (1 + returns).cumprod()
     drawdown = wealth / wealth.cummax() - 1
     vol = returns.std(ddof=1) * np.sqrt(252)
     annual_return = returns.mean() * 252
     wins, losses = returns[returns > 0], returns[returns < 0]
+    gross_wins = gross_returns.gt(0).sum()
+    gross_losses = gross_returns.lt(0).sum()
     active = position.ne(0)
     longest = 0
     peak_date = frame.index[0]
@@ -205,8 +210,8 @@ def statistics(frame: pd.DataFrame) -> dict[str, object]:
         "max_drawdown_pct": max_drawdown * 100,
         "calmar_ratio": annual_return / -max_drawdown if max_drawdown < 0 else np.nan,
         "max_drawdown_duration_calendar_days": longest,
-        "win_ratio_pct": len(wins) / (len(wins) + len(losses)) * 100
-        if len(wins) + len(losses) else np.nan,
+        "win_ratio_pct": gross_wins / (gross_wins + gross_losses) * 100
+        if gross_wins + gross_losses else np.nan,
         "risk_reward_ratio": wins.mean() / -losses.mean()
         if len(wins) and len(losses) else np.nan,
         "average_abs_position": position.abs().mean(),
@@ -291,6 +296,7 @@ def save_report(
     scaled_position_rounding: float = CDF_POSITION_ROUNDING,
     unscaled_position_rounding: float = CDF_POSITION_ROUNDING,
     target_annualized_volatility: float = cdf.TARGET_ANNUALIZED_VOLATILITY,
+    cdf_rebalance_frequencies: tuple[cdf.RebalanceFrequency, cdf.RebalanceFrequency] | None = None,
 ) -> None:
     """Write reports; trading volume counts changes in the daily position.
 
@@ -301,20 +307,24 @@ def save_report(
     """
     prices = prices.rename(instrument)
     directory.mkdir(parents=True, exist_ok=True)
+    frequencies = cdf_rebalance_frequencies or ("weekly", "weekly")
     labels = parameter_labels(
         parameters, scaled_position_rounding, unscaled_position_rounding,
-        target_annualized_volatility,
+        target_annualized_volatility, frequencies,
     )
     summary = []
     for period, start, end in (
         ("2016_2025", START, TRAIN_END),
         ("2026", TEST_START, TEST_END),
     ):
-        frames = run_period(
-            prices.loc[:end], parameters, start,
-            scaled_position_rounding, unscaled_position_rounding,
-            target_annualized_volatility,
+        args = (
+            prices.loc[:end], parameters, start, scaled_position_rounding,
+            unscaled_position_rounding, target_annualized_volatility,
         )
+        if cdf_rebalance_frequencies is None:
+            frames = run_period(*args)
+        else:
+            frames = run_period(*args, cdf_rebalance_frequencies)
         annual = []
         for name, slug in zip(STRATEGIES, SLUGS):
             frame = frames[name]

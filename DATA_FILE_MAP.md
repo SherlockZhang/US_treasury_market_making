@@ -88,6 +88,82 @@ data, unless a script explicitly reads them.
   use `python analyze_2y_four_strategies_target_volatility.py --rounding 1
   --skip-reference-validation --output-dir <directory>`. The flag explicitly
   skips reference-parameter validation and uses the script's fixed parameters.
+- Run `python search_ewma_kama_trading_cost_grid.py` for cost-adjusted EWMA
+  and KAMA searches for all three futures. The script reuses the original
+  grids (121 and 60 parameter combinations per future), starts indicators
+  with prices from 2016, stops on 2025-12-31, and ranks by annualized Sharpe
+  using net daily returns. It writes full ranked grids, best-parameter files,
+  and a parameter-space CSV under
+  `results/ewma_kama_cost_adjusted_grid_2016_2025/`. Existing gross grids
+  and model-selection tables remain unchanged.
+- Run `python search_cdf_custom_vol_daily_weekly.py` to rank scaled and
+  unscaled normal-CDF models for each future over 2016-2025. It tests daily
+  and weekly rebalancing and signal lookbacks 32, 64, 126, 252, and 504,
+  using a 64-day volatility lookback, zero signal and rebalance thresholds,
+  and the currently configured trading-cost ratios. Scaled volatility targets
+  are 1.5%, 3%, and 5% for 2Y, 5Y, and 10Y; final positions for both models
+  are rounded to 1, 0.5, and 0.5 respectively. The unscaled model does not
+  use a volatility target. Outputs are full and best-per-model grids under
+  `results/cdf_custom_vol_daily_weekly_grid_2016_2025/`.
+- Run `python search_cdf_rounding_grid.py` for the same CDF search with final
+  position rounding increments 0.5, 1, 1.5, 2.5, and 3. Results are saved
+  separately under `results/cdf_custom_vol_rounding_daily_weekly_grid_2016_2025/`.
+  Candidates with zero return volatility have undefined Sharpe and are retained
+  unranked with `sharpe_status=undefined_zero_volatility`; they cannot win.
+- Run `python search_best_four_win_ratio_grid.py` to rerun the expanded CDF
+  and EWMA/KAMA grids and select, for each instrument and model, the highest
+  net Sharpe among candidates with a strictly greater than 50% win ratio.
+  Win ratio is winning gross-return days divided by winning plus losing
+  gross-return days; zero gross-return days are excluded. Four-strategy
+  statistics use this gross win ratio; P&L, Sharpe and risk/reward remain net
+  of trading costs. All candidates remain in
+  the output with eligibility and exclusion status, and unfiltered rank is
+  retained separately. Results are saved under
+  `results/best_four_gross_win_ratio_above_50_grid_2016_2025/`; previously
+  saved net-win-ratio reports are unchanged.
+ - Run `python analyze_2y_best_gross_win_filtered_model.py` for the overall
+  highest-net-Sharpe 2Y winner from those grids. It verifies the current model
+  settings and training metrics, then writes daily, annual, summary, and plot
+  outputs under `results/2y_best_gross_win_filtered_model_2016_2025_and_2026/`.
+  The 2026 run resets the position and uses earlier prices for indicator warmup.
+- Run `python analyze_2y_best_four_gross_win_filtered.py` for the four 2Y
+  winners from the gross-win-ratio-filtered grids, with training Sharpe and
+  gross win ratio checked against the selected rows. The comparison and daily
+  results are saved under
+  `results/2y_best_four_gross_win_filtered_2016_2025_and_2026/`; 2026 resets
+  positions and retains earlier prices for indicator warmup.
+- Run `python analyze_5y_10y_best_four_gross_win_filtered.py` for the
+  equivalent 5Y and 10Y comparisons, with each instrument's target volatility,
+  trading cost, and filtered grid winners. Results are saved in the corresponding
+  `5y_best_four_gross_win_filtered_2016_2025_and_2026` and
+  `10y_best_four_gross_win_filtered_2016_2025_and_2026` directories.
+- Run `python analyze_10y_four_weekly_t64_rounding_0p5.py` to replace only the
+  10Y scaled CDF model with the eligible rank-3 weekly T=64, rounding=0.5
+  candidate. The selected grid row and the four-strategy report are saved under
+  `results/10y_four_gross_filtered_weekly_t64_rounding_0p5_2016_2025_and_2026/`.
+- Run `python analyze_selected_cdf_market_factor_comparison.py` for the
+  2026 factor versus no-factor comparison of the filtered 2Y and 5Y scaled
+  winners and the selected rank-3 10Y scaled model. Outputs include factor
+  source-date coverage under `results/cdf_2026_gross_filtered_winners_market_factor_comparison/`.
+  Factor signals use the existing weekly forward-fill logic, and the enhanced
+  variants are not separately optimized.
+- Run `python analyze_10y_filtered_four_strategies_market_factors.py` for the
+  2026 comparison of the four selected 10Y strategies with market factors
+  applied only to the rank-3 scaled CDF model. Results are saved under
+  `results/10y_four_gross_filtered_scaled_market_factors_2026/`.
+- Run `python analyze_2y_cost_adjusted_best_strategies.py` to reproduce the
+  2Y four-strategy report using the cost-adjusted CDF, EWMA, and KAMA grid
+  winners. The script checks training Sharpe and the current cost ratio against
+  the saved winners before generating 2016-2025 and 2026 reports; CDF
+  frequencies follow the selected models independently.
+- Run `python analyze_2y_expanded_cdf_grid_winners.py` for the same report
+  using the expanded CDF rounding-grid winners and cost-adjusted EWMA/KAMA
+  winners. Scaled and unscaled CDF models use their independently selected
+  rounding increments and rebalance frequencies.
+- Run `python analyze_5y_10y_expanded_cdf_grid_winners.py` for equivalent
+  5Y and 10Y reports using the expanded CDF and cost-adjusted EWMA/KAMA
+  winners. Each instrument retains its own target, costs, selected rounding,
+  and rebalance frequencies; saved training Sharpe ratios are verified.
 - Run `python analyze_best_cdf_market_factor_comparison.py` to compare the
   rounded weekly scaled CDF models with and without their configured
   instrument-specific market factors in 2026. The lookbacks match the

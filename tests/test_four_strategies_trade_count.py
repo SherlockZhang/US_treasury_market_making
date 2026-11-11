@@ -18,6 +18,7 @@ class TradingVolumeReportTests(unittest.TestCase):
         frame = pd.DataFrame({
             "position": position,
             "strategy_return": [0.01, 0.0, 0.01, -0.01, 0.0],
+            "gross_strategy_return": [0.01, 0.0, 0.01, -0.01, 0.0],
             "position_change": [1.0, 0.0, 0.0, 3.0, 2.0],
             "trading_cost": np.array([1.0, 0.0, 0.0, 3.0, 2.0]) * 0.000042,
         }, index=dates)

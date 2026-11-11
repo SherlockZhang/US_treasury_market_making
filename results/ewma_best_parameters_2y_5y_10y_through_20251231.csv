@@ -1,4 +1,0 @@
-instrument,training_start_date,training_end_date,training_observations,parameter_combinations,n,alpha_2_over_n_plus_1,m,total_return_pct,annualized_return_pct,annualized_volatility_pct,sharpe_ratio,max_drawdown_pct,long_days,flat_days,short_days
-10Y future,2016-01-04,2025-12-31,2518,121,35,0.05555556,15,49.77718293,4.18908186,5.40092633,0.77562285,-6.17039173,1200,75,1243
-2Y future,2016-01-04,2025-12-31,2518,121,5,0.33333333,40,14.74587609,1.38847421,1.53954400,0.90187368,-3.10337329,1038,92,1388
-5Y future,2016-01-04,2025-12-31,2518,121,55,0.03571429,20,27.55810967,2.50197441,3.63128627,0.68900500,-8.17024680,1143,62,1313

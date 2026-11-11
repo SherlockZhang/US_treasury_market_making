@@ -54,7 +54,7 @@ XAU_TICKER = "XAU BGN Curncy"
 XAU_FACTOR_LOOKBACK_WEEKS = 52
 DEFAULT_XAU_FACTOR_PROBABILITY = 0.54
 REBALANCE_POSITION_CHANGE_THRESHOLD_FRACTION = 0.25
-POSITION_ROUNDING_INCREMENTS = (0.1, 0.2, 0.3, 0.4, 0.5, 1.0)
+POSITION_ROUNDING_INCREMENTS = (0.1, 0.2, 0.3, 0.4, 0.5, 1.0, 1.5, 2.5, 3.0)
 DEFAULT_POSITION_ROUNDING_INCREMENT = 0.1
 RebalanceFrequency = Literal["daily", "weekly", "monthly", "yearly"]
 SignalMode = Literal["single", "average", "rounded"]
@@ -138,7 +138,11 @@ TRADING_COST_RATIOS = {
     "5Y future": 0.00813 / 100,
     "10Y future": 0.0155 / 100,
 }
-
+# TRADING_COST_RATIOS = {
+#     "2Y future": 0.00 / 100,
+#     "5Y future": 0.00 / 100,
+#     "10Y future": 0.0 / 100,
+#  }
 
 def apply_trading_cost(
     results: pd.DataFrame,
@@ -150,7 +154,7 @@ def apply_trading_cost(
         trading_cost_ratio = TRADING_COST_RATIOS.get(instrument, 0.0)
     if not np.isfinite(trading_cost_ratio) or trading_cost_ratio < 0:
         raise ValueError("Trading cost ratio must be finite and non-negative.")
-    position = results["position"]
+    position = results["position"].astype(float)
     results["position_change"] = position.diff().fillna(position).abs()
     results["trading_cost"] = results["position_change"] * trading_cost_ratio
     results["gross_strategy_return"] = (
