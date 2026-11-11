@@ -231,6 +231,42 @@ def trading_statistics(frame: pd.DataFrame) -> dict[str, float | int]:
     }
 
 
+def plot_price_and_position(ax, frame: pd.DataFrame) -> None:
+    position = frame["position"]
+    if not np.isfinite(position).all():
+        raise ValueError("Position chart requires finite position values.")
+    maximum = float(position.abs().max())
+    position_limit = maximum if maximum > 0 else 1.0
+    colors = np.where(position.gt(0), "green", "red")
+    ax.bar(frame.index, position, width=1.0, color=colors, alpha=0.25, linewidth=0)
+    ax.set_ylim(-position_limit, position_limit)
+    ax.axhline(0, color="gray", linewidth=0.8)
+    ax.set_ylabel("Position (units)")
+    ax.grid(axis="y", alpha=0.2)
+    price_axis = ax.twinx()
+    price_axis.plot(frame.index, frame["price"], color="#263445", linewidth=1)
+    price_axis.set_ylabel("Futures price")
+
+
+def save_price_positions_plot(
+    frames: dict[str, pd.DataFrame], labels: dict[str, str],
+    instrument: str, period: str, directory: Path,
+) -> None:
+    fig, axes = plt.subplots(4, 1, figsize=(18, 14), sharex=True)
+    for ax, (name, frame) in zip(axes, frames.items()):
+        plot_price_and_position(ax, frame)
+        ax.set_title(f"{name}: {labels[name]}", loc="left", fontsize=11, weight="bold")
+    axes[-1].set_xlabel("Date")
+    fig.suptitle(f"{instrument} price and positions: {period}", fontsize=16, weight="bold")
+    fig.legend(handles=[Patch(color="green", alpha=0.25, label="Long position"),
+                        Patch(color="red", alpha=0.25, label="Short position"),
+                        Patch(facecolor="white", edgecolor="gray", label="Flat or no observation")],
+               loc="upper right", ncol=3)
+    fig.tight_layout(rect=(0, 0, 1, 0.97))
+    fig.savefig(directory / f"{period}_price_positions.png", dpi=150)
+    plt.close(fig)
+
+
 def save_plots(
     frames: dict[str, pd.DataFrame], labels: dict[str, str],
     instrument: str, period: str, directory: Path,
@@ -251,28 +287,7 @@ def save_plots(
         fig.savefig(directory / f"{period}_{filename}.png", dpi=150)
         plt.close(fig)
 
-    fig, axes = plt.subplots(4, 1, figsize=(18, 14), sharex=True)
-    for ax, (name, frame) in zip(axes, frames.items()):
-        sign = np.sign(frame["position"])
-        groups = sign.ne(sign.shift()).cumsum()
-        for _, group in frame.groupby(groups):
-            position = group["position"].iloc[0]
-            if position:
-                ax.axvspan(group.index[0], group.index[-1] + pd.Timedelta(days=1),
-                           color="green" if position > 0 else "red", alpha=0.2, linewidth=0)
-        ax.plot(frame.index, frame["price"], color="#263445", linewidth=1)
-        ax.set_title(f"{name}: {labels[name]}", loc="left", fontsize=11, weight="bold")
-        ax.set_ylabel("Futures price")
-        ax.grid(alpha=0.2)
-    axes[-1].set_xlabel("Date")
-    fig.suptitle(f"{instrument} price and positions: {period}", fontsize=16, weight="bold")
-    fig.legend(handles=[Patch(color="green", alpha=0.2, label="Long"),
-                        Patch(color="red", alpha=0.2, label="Short"),
-                        Patch(facecolor="white", edgecolor="gray", label="Flat")],
-               loc="upper right", ncol=3)
-    fig.tight_layout(rect=(0, 0, 1, 0.97))
-    fig.savefig(directory / f"{period}_price_positions.png", dpi=150)
-    plt.close(fig)
+    save_price_positions_plot(frames, labels, instrument, period, directory)
 
 
 def generate(instrument: str, prices: pd.Series) -> None:

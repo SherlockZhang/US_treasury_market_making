@@ -151,6 +151,10 @@ data, unless a script explicitly reads them.
   2026 comparison of the four selected 10Y strategies with market factors
   applied only to the rank-3 scaled CDF model. Results are saved under
   `results/10y_four_gross_filtered_scaled_market_factors_2026/`.
+  Four-strategy price/position plots use separate axes for price and position;
+  daily green/red bars extend above/below zero in proportion to position units,
+  with each strategy's position axis symmetric about zero. No bar is drawn for
+  flat positions or dates without observations, including non-trading days.
 - Run `python analyze_2y_cost_adjusted_best_strategies.py` to reproduce the
   2Y four-strategy report using the cost-adjusted CDF, EWMA, and KAMA grid
   winners. The script checks training Sharpe and the current cost ratio against
