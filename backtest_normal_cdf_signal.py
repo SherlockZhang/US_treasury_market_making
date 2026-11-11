@@ -133,6 +133,31 @@ SINGLE_FUTURE_STRATEGIES = {
     "10Y future": {"stem": "10y_future", "color": "#4f772d"},
 }
 
+TRADING_COST_RATIOS = {
+    "2Y future": 0.0042 / 100,
+    "5Y future": 0.00813 / 100,
+    "10Y future": 0.0155 / 100,
+}
+
+
+def apply_trading_cost(
+    results: pd.DataFrame,
+    instrument: object,
+    trading_cost_ratio: float | None = None,
+) -> None:
+    """Set net returns from turnover; unrecognized instruments default to no cost."""
+    if trading_cost_ratio is None:
+        trading_cost_ratio = TRADING_COST_RATIOS.get(instrument, 0.0)
+    if not np.isfinite(trading_cost_ratio) or trading_cost_ratio < 0:
+        raise ValueError("Trading cost ratio must be finite and non-negative.")
+    position = results["position"]
+    results["position_change"] = position.diff().fillna(position).abs()
+    results["trading_cost"] = results["position_change"] * trading_cost_ratio
+    results["gross_strategy_return"] = (
+        position * results["daily_return"]
+    ).fillna(0.0)
+    results["strategy_return"] = results["gross_strategy_return"] - results["trading_cost"]
+
 
 def signal_lookbacks_for_mode(
     signal_mode: SignalMode, lookback_days: int
@@ -661,8 +686,10 @@ def run_backtest(
     ] = (),
     use_volatility_scaling: bool = True,
     target_annualized_volatility: float = TARGET_ANNUALIZED_VOLATILITY,
+    trading_cost_ratio: float | None = None,
 ) -> pd.DataFrame:
-    """Apply the signal with optional volatility scaling and scheduled sizing."""
+    """Apply the signal and trading costs, with optional volatility scaling."""
+    instrument = prices.name
     if lookback_days <= 0:
         raise ValueError("Lookback days must be a positive integer.")
     if volatility_lookback_days <= 0:
@@ -964,9 +991,7 @@ def run_backtest(
     results["target_position"] = pd.Series(target_position, index=results.index)
     position_at_close = results["target_position"]
     results["position"] = position_at_close.shift(1).fillna(0.0)
-    results["strategy_return"] = (
-        results["position"] * results["daily_return"]
-    ).fillna(0.0)
+    apply_trading_cost(results, instrument, trading_cost_ratio)
 
     results["wealth"] = (1 + results["strategy_return"]).cumprod()
     if (results["wealth"] <= 0).any():
@@ -1660,6 +1685,7 @@ def run_instrument(
         xau_factor_probability,
         (),
         use_volatility_scaling,
+        trading_cost_ratio=TRADING_COST_RATIOS.get(instrument, 0.0),
     )
     stats_frame = calculate_stats(
         results,
@@ -1953,6 +1979,7 @@ def run_single_future_presentation_backtest(
         xau_factor_probability=xau_factor_probability,
         instrument_factor_data=instrument_factor_data,
         use_volatility_scaling=use_volatility_scaling,
+        trading_cost_ratio=TRADING_COST_RATIOS[instrument],
     )
 
     signal_lookbacks = signal_lookbacks_for_mode(signal_mode, lookback_days)
@@ -2117,6 +2144,7 @@ def run_single_future_presentation_backtest(
             output_start_date=start_date,
             position_rounding_increment=position_rounding_increment,
             use_volatility_scaling=use_volatility_scaling,
+            trading_cost_ratio=TRADING_COST_RATIOS[instrument],
         )
         save_market_factor_return_comparison(
             results,

@@ -41,7 +41,8 @@ class BestScaledCdfReportsTests(unittest.TestCase):
                     scaled = frames["Normal CDF scaled"]
                     self.assertLessEqual(scaled.index.max(), end)
                     if period == "2016_2025":
-                        stats = reference.statistics(scaled)
+                        gross = scaled.assign(strategy_return=scaled["gross_strategy_return"])
+                        stats = reference.statistics(gross)
                         for metric in ("sharpe_ratio", "total_return_pct",
                                        "annualized_return_pct", "annualized_volatility_pct",
                                        "max_drawdown_pct"):
@@ -54,7 +55,7 @@ class BestScaledCdfReportsTests(unittest.TestCase):
                         self.assertEqual(list(actual.index), list(original.index))
                         np.testing.assert_allclose(actual["position"], original["position"], atol=1e-9)
                         np.testing.assert_allclose(
-                            actual["strategy_return"], original["strategy_return"], atol=1e-9
+                            actual["gross_strategy_return"], original["strategy_return"], atol=1e-9
                         )
 
 

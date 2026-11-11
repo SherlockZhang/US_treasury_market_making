@@ -28,11 +28,12 @@ class BestFourFuturesTests(unittest.TestCase):
                     actual = frames[name]
                     self.assertEqual(list(actual.index), list(reference.index))
                     np.testing.assert_allclose(actual["position"], reference["position"], atol=1e-9)
-                    np.testing.assert_allclose(actual["strategy_return"], reference["strategy_return"], atol=1e-9)
+                    np.testing.assert_allclose(actual["gross_strategy_return"], reference["strategy_return"], atol=1e-9)
                     expected = summary.loc[
                         summary["period"].eq(period) & summary["strategy"].eq(name)
                     ].iloc[0]
-                    stats = analysis.statistics(actual)
+                    gross = actual.assign(strategy_return=actual["gross_strategy_return"])
+                    stats = analysis.statistics(gross)
                     for metric in (
                         "total_return_pct", "annualized_return_pct", "annualized_volatility_pct",
                         "sharpe_ratio", "max_drawdown_pct", "calmar_ratio",
@@ -65,7 +66,8 @@ class BestFourFuturesTests(unittest.TestCase):
                 expected = reference.loc[
                     reference["strategy"].eq(name) & reference["year"].eq(year)
                 ].iloc[0]
-                actual = analysis.statistics(yearly)
+                gross = yearly.assign(strategy_return=yearly["gross_strategy_return"])
+                actual = analysis.statistics(gross)
                 for metric in (
                     "total_return_pct", "annualized_return_pct", "annualized_volatility_pct",
                     "sharpe_ratio", "max_drawdown_pct", "calmar_ratio",

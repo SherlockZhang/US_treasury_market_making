@@ -40,6 +40,7 @@ def search(
                 output_start_date=reference.START,
                 position_rounding_increment=increment,
                 use_volatility_scaling=use_volatility_scaling,
+                trading_cost_ratio=reference.cdf.TRADING_COST_RATIOS[instrument],
             )
             rows.append({
                 "instrument": instrument,

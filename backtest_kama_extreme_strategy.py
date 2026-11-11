@@ -90,8 +90,10 @@ def run_backtest(
     er_lookback_days: int = DEFAULT_ER_LOOKBACK_DAYS,
     extreme_lookback_days: int = DEFAULT_EXTREME_LOOKBACK_DAYS,
     start_date: pd.Timestamp | None = None,
+    trading_cost_ratio: float | None = None,
 ) -> pd.DataFrame:
     """Go long at rolling KAMA highs and short at lows, starting next day."""
+    instrument = prices.name
     if extreme_lookback_days <= 0:
         raise ValueError("Extreme lookback must be a positive integer.")
     kama_data = calculate_kama(prices, fast_n, slow_n, er_lookback_days)
@@ -149,9 +151,7 @@ def run_backtest(
     )
     results["position"] = position
     results["daily_return"] = prices.pct_change(fill_method=None)
-    results["strategy_return"] = (
-        results["position"] * results["daily_return"]
-    ).fillna(0.0)
+    normal_cdf.apply_trading_cost(results, instrument, trading_cost_ratio)
     results["wealth"] = (1 + results["strategy_return"]).cumprod()
     if (results["wealth"].iloc[first_position:] <= 0).any():
         raise ValueError(
@@ -299,6 +299,7 @@ def main() -> None:
             er_lookback_days=args.er_lookback_days,
             extreme_lookback_days=args.extreme_lookback_days,
             start_date=args.start_date,
+            trading_cost_ratio=normal_cdf.TRADING_COST_RATIOS[instrument],
         )
         summary = save_outputs(
             instrument,

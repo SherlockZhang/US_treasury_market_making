@@ -217,6 +217,15 @@ def statistics(frame: pd.DataFrame) -> dict[str, object]:
     }
 
 
+def trading_statistics(frame: pd.DataFrame) -> dict[str, float | int]:
+    """Summarize trade days, position turnover, and uncompounded costs."""
+    return {
+        "trading_volume": int(frame["position_changed"].sum()),
+        "position_turnover": float(frame["position_change"].sum()),
+        "trading_cost_accumulated": float(frame["trading_cost"].sum()),
+    }
+
+
 def save_plots(
     frames: dict[str, pd.DataFrame], labels: dict[str, str],
     instrument: str, period: str, directory: Path,
@@ -262,6 +271,7 @@ def save_plots(
 
 
 def generate(instrument: str, prices: pd.Series) -> None:
+    prices = prices.rename(instrument)
     parameters = selected_parameters(instrument)
     directory = RESULTS / f"{instrument.split()[0].lower()}_best_four_strategies_rounded_0p5_2016_2025_and_2026"
     directory.mkdir(parents=True, exist_ok=True)
@@ -286,7 +296,10 @@ def save_report(
 
     The first position is measured against flat at the period start. Annual
     counts use the previous trading day's position across year boundaries.
+    Position turnover sums absolute changes; accumulated trading cost is the
+    sum of daily return deductions, not a compounded dollar expense.
     """
+    prices = prices.rename(instrument)
     directory.mkdir(parents=True, exist_ok=True)
     labels = parameter_labels(
         parameters, scaled_position_rounding, unscaled_position_rounding,
@@ -311,17 +324,17 @@ def save_report(
             frame.to_csv(directory / f"{period}_{slug}_daily.csv", index_label="date", float_format="%.10f")
             summary.append({"period": period, "instrument": instrument, "strategy": name,
                             "parameters": labels[name], **statistics(frame),
-                            "trading_volume": int(frame["position_changed"].sum())})
+                            **trading_statistics(frame)})
             if period == "2016_2025":
                 for year, yearly in frame.groupby(frame.index.year):
                     annual.append({"instrument": instrument, "strategy": name,
                                    "parameters": labels[name], "year": year,
                                    **statistics(yearly),
-                                   "trading_volume": int(yearly["position_changed"].sum())})
+                                   **trading_statistics(yearly)})
         if annual:
             table = pd.DataFrame(annual)
             table.to_csv(directory / f"{period}_annual_stats.csv", index=False, float_format="%.8f")
-            metrics = (*METRICS, "trading_volume")
+            metrics = (*METRICS, "trading_volume", "position_turnover", "trading_cost_accumulated")
             pivot = table.pivot(index="year", columns="strategy", values=list(metrics))
             pivot = pivot.reindex(columns=pd.MultiIndex.from_product([metrics, STRATEGIES]))
             pivot.columns.names = ["metric", "strategy"]

@@ -1,6 +1,7 @@
 """Reproduce the 2Y four-strategy comparison with a 1.5% scaled-CDF target."""
 
 import argparse
+from pathlib import Path
 
 import pandas as pd
 
@@ -43,8 +44,19 @@ def main() -> None:
         default=ROUNDING,
         help="Position rounding for both CDF models.",
     )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        help="Write the report to this directory instead of the default results directory.",
+    )
+    parser.add_argument(
+        "--skip-reference-validation",
+        action="store_true",
+        help="Use the fixed parameters without validating an existing reference report.",
+    )
     args = parser.parse_args()
-    validate_reference()
+    if not args.skip_reference_validation:
+        validate_reference()
     prices = reference.cdf.load_single_future_prices(include_dbmf=False)[INSTRUMENT]
     if args.rounding == ROUNDING:
         output = OUTPUT
@@ -53,6 +65,8 @@ def main() -> None:
         output = reference.RESULTS / (
             f"2y_four_strategies_cdf_rounded_{tag}_target_vol_1p5pct_2016_2025_and_2026"
         )
+    if args.output_dir is not None:
+        output = args.output_dir
     reference.save_report(INSTRUMENT, prices, PARAMETERS, output, args.rounding, args.rounding, TARGET)
 
 

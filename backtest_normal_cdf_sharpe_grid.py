@@ -10,6 +10,7 @@ from backtest_normal_cdf_signal import (
     AVERAGED_SIGNAL_LOOKBACK_DAYS,
     NORMAL_CDF_VOLATILITY_LOOKBACK_DAYS,
     STRATEGIES,
+    TRADING_COST_RATIOS,
     run_backtest,
 )
 
@@ -52,6 +53,7 @@ def main() -> None:
                     signal_cutoff=0.0,
                     signal_mode="single",
                     volatility_lookback_days=NORMAL_CDF_VOLATILITY_LOOKBACK_DAYS,
+                    trading_cost_ratio=TRADING_COST_RATIOS.get(instrument, 0.0),
                 )
                 row[f"T={lookback_days}"] = calculate_statistics(results)[
                     "sharpe_ratio"
@@ -65,6 +67,7 @@ def main() -> None:
                 signal_cutoff=0.0,
                 signal_mode="average",
                 volatility_lookback_days=NORMAL_CDF_VOLATILITY_LOOKBACK_DAYS,
+                trading_cost_ratio=TRADING_COST_RATIOS.get(instrument, 0.0),
             )
             row[
                 f"Average T ({','.join(str(days) for days in AVERAGED_SIGNAL_LOOKBACK_DAYS)})"

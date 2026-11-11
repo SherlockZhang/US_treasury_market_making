@@ -40,7 +40,7 @@ class TwoYearIntegerRoundingTests(unittest.TestCase):
                     self.assertEqual(list(frames[name].index), list(old.index))
                     np.testing.assert_allclose(frames[name]["position"], old["position"], atol=1e-9)
                     np.testing.assert_allclose(
-                        frames[name]["strategy_return"], old["strategy_return"], atol=1e-9
+                        frames[name]["gross_strategy_return"], old["strategy_return"], atol=1e-9
                     )
                 labels = reference.parameter_labels(analysis.PARAMETERS, 1.0, 1.0, analysis.TARGET)
                 for name in reference.STRATEGIES[:2]:

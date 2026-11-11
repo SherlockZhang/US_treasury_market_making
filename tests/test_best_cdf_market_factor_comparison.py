@@ -36,11 +36,12 @@ class BestCdfMarketFactorComparisonTests(unittest.TestCase):
                 frame = frames[mode]
                 self.assertEqual(list(frame.index), list(reference.index))
                 np.testing.assert_allclose(frame["position"], reference["position"], atol=1e-9)
-                np.testing.assert_allclose(frame["strategy_return"], reference["strategy_return"], atol=1e-9)
+                np.testing.assert_allclose(frame["gross_strategy_return"], reference["strategy_return"], atol=1e-9)
                 expected = original_summary.loc[
                     original_summary.instrument.eq(instrument) & original_summary.market_factor_mode.eq(mode)
                 ].iloc[0]
-                summary = comparison.summarize(instrument, mode, 64, frame)
+                gross = frame.assign(strategy_return=frame["gross_strategy_return"])
+                summary = comparison.summarize(instrument, mode, 64, gross)
                 for metric in ("total_return_pct", "sharpe_ratio", "max_drawdown_pct", "position_change_count"):
                     self.assertAlmostEqual(summary[metric], expected[metric], delta=0.000001)
 
@@ -59,7 +60,7 @@ class BestCdfMarketFactorComparisonTests(unittest.TestCase):
                 ).set_index("date")
                 self.assertEqual(list(reference.index), list(frames["none"].index))
                 np.testing.assert_allclose(reference["position"], frames["none"]["position"], atol=1e-9)
-                np.testing.assert_allclose(reference["strategy_return"], frames["none"]["strategy_return"], atol=1e-9)
+                np.testing.assert_allclose(reference["strategy_return"], frames["none"]["gross_strategy_return"], atol=1e-9)
                 for mode, frame in frames.items():
                     summary = comparison.summarize(instrument, mode, lookback, frame)
                     self.assertEqual(summary["signal_lookback_days"], 64)

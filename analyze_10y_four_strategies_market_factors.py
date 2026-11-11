@@ -15,6 +15,7 @@ OUTPUT_DIR = reference.RESULTS / "10y_four_strategies_2026_scaled_cdf_market_fac
 
 
 def backtest(prices: pd.Series) -> dict[str, pd.DataFrame]:
+    prices = prices.rename(INSTRUMENT)
     if PARAMETERS[reference.STRATEGIES[0]]["lookback"] != LOOKBACK:
         raise ValueError("Scaled CDF lookback does not match the previous factor comparison.")
     frames = reference.run_period(
@@ -52,7 +53,7 @@ def main() -> None:
             "market_factor_profile": factors.profile_description(INSTRUMENT)
             if name == reference.STRATEGIES[0] else "",
             **reference.statistics(frame),
-            "trading_volume": int(frame["position_changed"].sum()),
+            **reference.trading_statistics(frame),
         })
     pd.DataFrame(summaries).to_csv(
         OUTPUT_DIR / "summary.csv", index=False, float_format="%.8f"

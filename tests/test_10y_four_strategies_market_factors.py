@@ -22,7 +22,8 @@ class TenYearFourStrategyFactorTests(unittest.TestCase):
         frame = self.frames[reference.STRATEGIES[0]]
         self.assertEqual(list(frame.index), list(previous.index))
         for column in ("signal", "position", "strategy_return", "market_factor_signal_multiplier"):
-            np.testing.assert_allclose(frame[column], previous[column], atol=1e-9)
+            actual = "gross_strategy_return" if column == "strategy_return" else column
+            np.testing.assert_allclose(frame[actual], previous[column], atol=1e-9)
         self.assertTrue(frame["market_factor_signal_multiplier"].ne(1).any())
 
     def test_other_strategies_match_four_strategy_reference(self):
@@ -35,7 +36,8 @@ class TenYearFourStrategyFactorTests(unittest.TestCase):
                 frame = self.frames[name]
                 self.assertEqual(list(frame.index), list(previous.index))
                 for column in ("position", "strategy_return"):
-                    np.testing.assert_allclose(frame[column], previous[column], atol=1e-9)
+                    actual = "gross_strategy_return" if column == "strategy_return" else column
+                    np.testing.assert_allclose(frame[actual], previous[column], atol=1e-9)
                 self.assertGreaterEqual(frame.index.min(), reference.TEST_START)
                 self.assertLessEqual(frame.index.max(), reference.TEST_END)
 

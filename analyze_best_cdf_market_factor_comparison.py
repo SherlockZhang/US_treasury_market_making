@@ -41,6 +41,7 @@ def backtest_pair(
             position_rounding_increment=position_rounding_increment,
             instrument_factor_data=factor_data,
             target_annualized_volatility=target_annualized_volatility,
+            trading_cost_ratio=cdf.TRADING_COST_RATIOS[instrument],
         )
     return results
 

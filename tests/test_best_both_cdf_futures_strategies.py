@@ -34,7 +34,8 @@ class BothCdfComparisonTests(unittest.TestCase):
                         expected = selected.loc[selected["volatility_scaling"].eq(scaled)].iloc[0]
                         self.assertLessEqual(frame.index.max(), end)
                         if period == "2016_2025":
-                            stats = reference.statistics(frame)
+                            gross = frame.assign(strategy_return=frame["gross_strategy_return"])
+                            stats = reference.statistics(gross)
                             for metric in ("sharpe_ratio", "total_return_pct",
                                            "annualized_return_pct", "annualized_volatility_pct",
                                            "max_drawdown_pct"):
@@ -51,7 +52,7 @@ class BothCdfComparisonTests(unittest.TestCase):
                         self.assertEqual(list(frames[name].index), list(original.index))
                         np.testing.assert_allclose(frames[name]["position"], original["position"], atol=1e-9)
                         np.testing.assert_allclose(
-                            frames[name]["strategy_return"], original["strategy_return"], atol=1e-9
+                            frames[name]["gross_strategy_return"], original["strategy_return"], atol=1e-9
                         )
                     labels = reference.parameter_labels(
                         config["parameters"], config["rounding"], config["rounding"]

@@ -59,9 +59,35 @@ data, unless a script explicitly reads them.
   EWMA, and KAMA best-parameter tables supply the other models. The 2026 results use prior prices
   for indicator warmup but restart positions according to each backtest's
   period-start convention. The 2016–2025 results are in-sample, 2026 is
-  out-of-sample, and returns do not account for transaction costs. Returns are
-  based on percentage price changes and normalized positions, not contract
-  dollar P&L. Annualized return and volatility use 252 trading days.
+  out-of-sample. Returns are based on percentage price changes and normalized
+  positions, not contract dollar P&L. Annualized return and volatility use 252
+  trading days.
+- The normal-CDF, EWMA, and KAMA backtests deduct daily trading costs for
+  recognized single futures: 2Y 0.0042%, 5Y 0.00813%, and 10Y 0.0155% per
+  unit of absolute position change. A position reversal incurs both legs;
+  the initial position is measured against flat, including at a fresh period
+  start. The cost is subtracted from the daily normalized strategy return
+  before compounding wealth and calculating P&L and statistics. Daily outputs
+  include `position_change`, `trading_cost`, and `gross_strategy_return`.
+  The Python backtest functions infer these rates from the input series name
+  (`2Y future`, `5Y future`, or `10Y future`); other series default to zero
+  cost. Pass `trading_cost_ratio=0` to reproduce a gross backtest or an
+  explicit non-negative decimal rate for other inputs. No costs are assumed
+  for the multi-leg spread. Existing saved reports and previously selected
+  parameter tables are historical gross results until regenerated or
+  reselected; a new report can still use parameters selected from those
+  gross tables.
+- Four-strategy report statistics include `trading_volume` (the number of
+  days with a position change), `position_turnover` (the sum of absolute
+  position changes), and `trading_cost_accumulated` (the sum of daily cost
+  deductions, in decimal return units). For a single future, accumulated
+  cost equals position turnover times its cost ratio; it does not equal
+  trade-day count times the ratio when position changes differ from one unit.
+  Annual totals preserve positions across calendar-year boundaries.
+- To run the fixed 2Y 1.5%-target models without an existing reference report,
+  use `python analyze_2y_four_strategies_target_volatility.py --rounding 1
+  --skip-reference-validation --output-dir <directory>`. The flag explicitly
+  skips reference-parameter validation and uses the script's fixed parameters.
 - Run `python analyze_best_cdf_market_factor_comparison.py` to compare the
   rounded weekly scaled CDF models with and without their configured
   instrument-specific market factors in 2026. The lookbacks match the

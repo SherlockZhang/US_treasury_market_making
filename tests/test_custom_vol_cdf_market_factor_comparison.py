@@ -25,7 +25,8 @@ class CustomVolMarketFactorTests(unittest.TestCase):
                 ).set_index("date")
                 self.assertEqual(list(frames["none"].index), list(previous.index))
                 for column in ("position", "strategy_return"):
-                    np.testing.assert_allclose(frames["none"][column], previous[column], atol=1e-9)
+                    actual = "gross_strategy_return" if column == "strategy_return" else column
+                    np.testing.assert_allclose(frames["none"][actual], previous[column], atol=1e-9)
                 frame = frames["instrument"]
                 eligible = frame["signal"].notna() & frame["realized_volatility"].gt(0)
                 expected = (

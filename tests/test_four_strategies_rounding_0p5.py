@@ -54,7 +54,7 @@ class CdfHalfRoundingTests(unittest.TestCase):
                         self.assertEqual(list(frames[name].index), list(original.index))
                         np.testing.assert_allclose(frames[name]["position"], original["position"], atol=1e-9)
                         np.testing.assert_allclose(
-                            frames[name]["strategy_return"], original["strategy_return"], atol=1e-9
+                            frames[name]["gross_strategy_return"], original["strategy_return"], atol=1e-9
                         )
                     labels = reference.parameter_labels(config["parameters"], 0.5, 0.5, target)
                     self.assertIn(f"vol target {target * 100:g}%", labels[reference.STRATEGIES[0]])

@@ -31,8 +31,10 @@ def run_backtest(
     ewma_span: int = DEFAULT_EWMA_SPAN,
     extreme_lookback_days: int = DEFAULT_EXTREME_LOOKBACK_DAYS,
     start_date: pd.Timestamp | None = None,
+    trading_cost_ratio: float | None = None,
 ) -> pd.DataFrame:
     """Go long at rolling highs and short at rolling lows, starting next day."""
+    instrument = prices.name
     if ewma_span <= 0:
         raise ValueError("EWMA span must be a positive integer.")
     if extreme_lookback_days <= 0:
@@ -103,9 +105,7 @@ def run_backtest(
     )
     results["position"] = position
     results["daily_return"] = prices.pct_change(fill_method=None)
-    results["strategy_return"] = (
-        results["position"] * results["daily_return"]
-    ).fillna(0.0)
+    normal_cdf.apply_trading_cost(results, instrument, trading_cost_ratio)
     results["wealth"] = (1 + results["strategy_return"]).cumprod()
     if (results["wealth"].iloc[first_position:] <= 0).any():
         raise ValueError(
@@ -236,6 +236,7 @@ def main() -> None:
             ewma_span=args.ewma_span,
             extreme_lookback_days=args.extreme_lookback_days,
             start_date=args.start_date,
+            trading_cost_ratio=normal_cdf.TRADING_COST_RATIOS[instrument],
         )
         summary = save_outputs(
             instrument,
