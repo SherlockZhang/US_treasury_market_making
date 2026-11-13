@@ -6,7 +6,7 @@ from pathlib import Path
 import search_cdf_custom_vol_daily_weekly as previous
 
 
-ROUNDING_INCREMENTS = (0.5, 1.0, 1.5, 2.5, 3.0)
+ROUNDING_INCREMENTS = (0.5, 1.0, 1.5, 2.0, 2.5, 3.0)
 OUTPUT_DIR = previous.reference.RESULTS / "cdf_custom_vol_rounding_daily_weekly_grid_2016_2025"
 
 

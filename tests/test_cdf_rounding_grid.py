@@ -19,7 +19,7 @@ class CdfRoundingGridTests(unittest.TestCase):
         )
 
     def test_grid_rankings_and_zero_volatility(self):
-        self.assertEqual(len(self.grid), 300)
+        self.assertEqual(len(self.grid), 360)
         combinations = set(product(common.FREQUENCIES, reference.CDF_LOOKBACKS, search.ROUNDING_INCREMENTS))
         for instrument, (target, _) in common.CONFIGURATIONS.items():
             for scaled in (True, False):
@@ -28,7 +28,7 @@ class CdfRoundingGridTests(unittest.TestCase):
                         self.grid["instrument"].eq(instrument)
                         & self.grid["volatility_scaling"].eq(scaled)
                     ]
-                    self.assertEqual(len(grid), 50)
+                    self.assertEqual(len(grid), 60)
                     self.assertEqual(
                         set(zip(grid["rebalance_frequency"], grid["signal_lookback_days"], grid["position_rounding_increment"])),
                         combinations,
@@ -48,10 +48,6 @@ class CdfRoundingGridTests(unittest.TestCase):
                         np.testing.assert_allclose(grid["target_annualized_volatility_pct"], target * 100)
                     else:
                         self.assertTrue(grid["target_annualized_volatility_pct"].isna().all())
-                    np.testing.assert_allclose(
-                        grid["trading_cost_accumulated"],
-                        grid["position_turnover"] * reference.cdf.TRADING_COST_RATIOS[instrument],
-                    )
 
     def test_each_winner_and_coarse_unscaled_candidate(self):
         for instrument, (target, _) in common.CONFIGURATIONS.items():
@@ -76,6 +72,15 @@ class CdfRoundingGridTests(unittest.TestCase):
                         output_start_date=reference.START,
                         position_rounding_increment=row["position_rounding_increment"],
                         use_volatility_scaling=scaled, target_annualized_volatility=target,
+                    )
+                    expected_cost = (
+                        frame["position_change"]
+                        * reference.cdf.TRADING_COST_RATIOS[instrument]
+                        / frame["price"].shift(1).fillna(frame["price"])
+                    )
+                    np.testing.assert_allclose(frame["trading_cost"], expected_cost)
+                    self.assertAlmostEqual(
+                        row["trading_cost_accumulated"], expected_cost.sum(),
                     )
                     actual = reference.statistics(frame)["sharpe_ratio"]
                     if row["sharpe_status"] == "ok":

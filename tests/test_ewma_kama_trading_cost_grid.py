@@ -43,12 +43,16 @@ class CostAdjustedGridTests(unittest.TestCase):
                 net = run(prices, *args)
                 self.assertAlmostEqual(reference.statistics(gross)["sharpe_ratio"], expected, places=7)
                 np.testing.assert_allclose(net["position"], gross["position"])
+                expected_cost = (
+                    net["position_change"] * 0.0039
+                    / net["price"].shift(1).fillna(net["price"])
+                )
                 np.testing.assert_allclose(
-                    net["strategy_return"], gross["strategy_return"] - net["position_change"] * 0.000042,
+                    net["strategy_return"], gross["strategy_return"] - expected_cost,
                 )
                 self.assertEqual(net["trading_cost"].dtype, np.dtype("float64"))
                 self.assertAlmostEqual(
-                    net["trading_cost"].sum(), net["position_change"].sum() * 0.000042, places=14,
+                    net["trading_cost"].sum(), expected_cost.sum(), places=14,
                 )
 
     def test_search_ranks_net_sharpe_and_ignores_out_of_sample_prices(self):
@@ -76,9 +80,6 @@ class CostAdjustedGridTests(unittest.TestCase):
             pd.testing.assert_frame_equal(grid, repeated[model])
             self.assertTrue(grid["sharpe_ratio"].is_monotonic_decreasing)
             self.assertEqual(grid["selected_best"].sum(), 1)
-            np.testing.assert_allclose(
-                grid["trading_cost_accumulated"], grid["position_turnover"] * 0.000042,
-            )
             row = grid.iloc[0]
             training = prices.loc[reference.START:reference.TRAIN_END].rename("2Y future")
             if model == "EWMA":
@@ -86,6 +87,9 @@ class CostAdjustedGridTests(unittest.TestCase):
             else:
                 frame = kama.run_backtest(training, 2, 10, 5, 3)
             self.assertAlmostEqual(row["sharpe_ratio"], reference.statistics(frame)["sharpe_ratio"])
+            self.assertAlmostEqual(
+                row["trading_cost_accumulated"], frame["trading_cost"].sum(),
+            )
             self.assertEqual(row["training_start_date"], training.index[0].date())
             self.assertEqual(row["training_end_date"], training.index[-1].date())
 
