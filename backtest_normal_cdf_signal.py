@@ -136,9 +136,9 @@ SINGLE_FUTURE_STRATEGIES = {
 }
 
 TRADING_COST_RATIOS = {
-    "2Y future": 0.0039,
-    "5Y future": 0.0078,
-    "10Y future": 0.0156,
+    "2Y future": 0.0039/2,
+    "5Y future": 0.0078/2,
+    "10Y future": 0.0156/2,
 }
 # TRADING_COST_RATIOS = {
 #     "2Y future": 0.00 / 100,
@@ -696,6 +696,7 @@ def run_backtest(
     use_volatility_scaling: bool = True,
     target_annualized_volatility: float = TARGET_ANNUALIZED_VOLATILITY,
     trading_cost_ratio: float | None = None,
+    position_cap: float | None = None,
 ) -> pd.DataFrame:
     """Apply the signal and trading costs, with optional volatility scaling."""
     instrument = prices.name
@@ -705,6 +706,8 @@ def run_backtest(
         raise ValueError("Volatility lookback days must be a positive integer.")
     if not np.isfinite(target_annualized_volatility) or target_annualized_volatility <= 0:
         raise ValueError("Target annualized volatility must be finite and positive.")
+    if position_cap is not None and (not np.isfinite(position_cap) or position_cap <= 0):
+        raise ValueError("Position cap must be finite and positive.")
     if rebalance_frequency not in ("daily", "weekly", "monthly", "yearly"):
         raise ValueError(
             f"Unsupported rebalance frequency: {rebalance_frequency}"
@@ -1000,6 +1003,9 @@ def run_backtest(
     results["target_position"] = pd.Series(target_position, index=results.index)
     position_at_close = results["target_position"]
     results["position"] = position_at_close.shift(1).fillna(0.0)
+    if position_cap is not None:
+        results["uncapped_position"] = results["position"]
+        results["position"] = results["position"].clip(-position_cap, position_cap)
     apply_trading_cost(results, instrument, trading_cost_ratio)
 
     results["wealth"] = (1 + results["strategy_return"]).cumprod()

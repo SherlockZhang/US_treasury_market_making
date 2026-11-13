@@ -95,6 +95,7 @@ def summarize(
 def save_plots(
     instrument: str, frames: dict[str, pd.DataFrame], lookback: int,
     output_dir: Path = OUTPUT_DIR,
+    rebalance_frequency: str | None = None,
 ) -> None:
     stem = instrument.split()[0].lower()
     for column, scale, label, slug in (
@@ -106,7 +107,8 @@ def save_plots(
             frame = frames[mode]
             ax.plot(frame.index, frame[column] * scale, label=name)
         ax.axhline(0, color="black", linewidth=0.8)
-        ax.set(title=f"{instrument}: market factor comparison (T={lookback}, 2026)",
+        frequency = f", {rebalance_frequency}" if rebalance_frequency else ""
+        ax.set(title=f"{instrument}: market factor comparison (T={lookback}{frequency}, 2026)",
                xlabel="Date", ylabel=label)
         ax.grid(alpha=0.25)
         ax.legend()
