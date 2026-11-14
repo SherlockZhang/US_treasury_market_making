@@ -47,6 +47,12 @@ data, unless a script explicitly reads them.
 - These scripts resolve their bundled input files relative to the script or
   repository location, so run them with the listed files available in the
   repository.
+- Normal-CDF backtests identify the 2Y future by the input price series name
+  `2Y future`. Its unfiltered signal is `(8 / 3) * norm.cdf(t_stat) - 4 / 3`;
+  other instruments retain `4 * norm.cdf(t_stat) - 2`. The formula is applied
+  before signal cutoffs, market factors, volatility scaling, and position
+  rounding, including to each component of an averaged signal. Previously
+  saved results are not updated automatically and must be rerun.
 - Run `python analyze_best_four_futures_strategies.py` to generate separate 5Y
   and 10Y four-strategy reports under `results/`, including daily results,
   period and annual statistics, plots, and the scaled CDF selection grid. As in
@@ -61,7 +67,14 @@ data, unless a script explicitly reads them.
   period-start convention. The 2016–2025 results are in-sample, 2026 is
   out-of-sample. Returns are based on percentage price changes and normalized
   positions, not contract dollar P&L. Annualized return and volatility use 252
-  trading days.
+  trading days. CAGR is the compounded annual growth rate of net strategy
+  wealth: `((ending wealth) ** (365.25 / elapsed calendar days) - 1) * 100`,
+  where ending wealth is the product of `(1 + daily net strategy return)` over
+  the report period and elapsed calendar days is the difference between the
+  first and last observation dates. CAGR is undefined for a nonpositive ending
+  wealth or a period with no elapsed calendar days. Unlike CAGR, the existing
+  `annualized_return_pct` is the arithmetic mean daily net return multiplied by
+  252 trading days.
 - The normal-CDF, EWMA, and KAMA backtests deduct daily trading costs for
   recognized single futures: 2Y 0.0042%, 5Y 0.00813%, and 10Y 0.0155% per
   unit of absolute position change. A position reversal incurs both legs;

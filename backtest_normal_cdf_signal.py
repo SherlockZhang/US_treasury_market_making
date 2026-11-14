@@ -630,8 +630,10 @@ def calculate_normal_cdf_signal(
     daily_returns: pd.Series,
     lookback_days: int,
     signal_cutoff: float = NORMAL_CDF_SIGNAL_CUTOFF,
+    *,
+    instrument: object = None,
 ) -> pd.DataFrame:
-    """Calculate rolling t-statistics and map them to signals in [-1, 1]."""
+    """Calculate rolling t-statistics and instrument-specific CDF signals."""
     if lookback_days <= 0:
         raise ValueError("Lookback days must be a positive integer.")
     if not np.isfinite(signal_cutoff) or signal_cutoff < 0:
@@ -646,9 +648,12 @@ def calculate_normal_cdf_signal(
         np.sqrt(lookback_days) * average_return / return_volatility,
         index=daily_returns.index,
     )
-    unfiltered_signal = pd.Series(
-        3 * norm.cdf(t_stat) - 1.5, index=daily_returns.index
-    )
+    cdf_values = norm.cdf(t_stat)
+    if instrument == "2Y future":
+        unfiltered_values = (8 / 3) * cdf_values - 4 / 3
+    else:
+        unfiltered_values = 4 * cdf_values - 2
+    unfiltered_signal = pd.Series(unfiltered_values, index=daily_returns.index)
     unfiltered_signal = unfiltered_signal.where(return_volatility.gt(0))
     signal = unfiltered_signal.where(
         unfiltered_signal.isna()
@@ -752,7 +757,7 @@ def run_backtest(
     results.index = dates
     results["daily_return"] = results["price"].pct_change(fill_method=None)
     signal_data = calculate_normal_cdf_signal(
-        results["daily_return"], lookback_days, signal_cutoff
+        results["daily_return"], lookback_days, signal_cutoff, instrument=instrument
     )
     if signal_mode == "average":
         component_signals = pd.DataFrame(
@@ -761,6 +766,7 @@ def run_backtest(
                     results["daily_return"],
                     component_lookback,
                     signal_cutoff,
+                    instrument=instrument,
                 )["signal"]
                 for component_lookback in AVERAGED_SIGNAL_LOOKBACK_DAYS
             },

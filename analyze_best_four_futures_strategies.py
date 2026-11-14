@@ -179,6 +179,12 @@ def statistics(frame: pd.DataFrame) -> dict[str, object]:
     drawdown = wealth / wealth.cummax() - 1
     vol = returns.std(ddof=1) * np.sqrt(252)
     annual_return = returns.mean() * 252
+    elapsed_days = (frame.index[-1] - frame.index[0]).days
+    cagr = (
+        (wealth.iloc[-1] ** (365.25 / elapsed_days) - 1) * 100
+        if elapsed_days > 0 and wealth.iloc[-1] > 0
+        else np.nan
+    )
     wins, losses = returns[returns > 0], returns[returns < 0]
     gross_wins = gross_returns.gt(0).sum()
     gross_losses = gross_returns.lt(0).sum()
@@ -204,6 +210,7 @@ def statistics(frame: pd.DataFrame) -> dict[str, object]:
         "observations": len(frame),
         "first_active_date": frame.index[active][0].date() if active.any() else None,
         "total_return_pct": (wealth.iloc[-1] - 1) * 100,
+        "cagr_pct": cagr,
         "annualized_return_pct": annual_return * 100,
         "annualized_volatility_pct": vol * 100,
         "sharpe_ratio": annual_return / vol if vol > 0 else np.nan,

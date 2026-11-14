@@ -1,0 +1,18 @@
+instrument,period,ticker,first_source_date,latest_source_date,period_end,days_since_latest_source,observations,observations_with_factor_value,observations_with_rolling_stats,observations_outside_one_std
+2Y future,out-of-sample 2026,TFF2GLFN Index,2016-01-05,2026-10-20,2026-11-02,13,211,211,211,85
+2Y future,out-of-sample 2026,CTA US Equity,2022-03-08,2026-10-27,2026-11-02,6,211,211,211,124
+2Y future,out-of-sample 2026,SPX,2016-01-04,2026-10-27,2026-11-02,6,211,211,211,55
+2Y future,out-of-sample 2026,TFF2ILFN Index,2016-01-05,2026-10-20,2026-11-02,13,211,211,211,63
+2Y future,out-of-sample 2026,CL1 COMB Comdty,2016-01-04,2026-10-28,2026-11-02,5,211,211,211,97
+5Y future,out-of-sample 2026,TFF2GLFN Index,2016-01-05,2026-10-20,2026-11-02,13,211,211,211,85
+5Y future,out-of-sample 2026,CTA US Equity,2022-03-08,2026-10-27,2026-11-02,6,211,211,211,124
+5Y future,out-of-sample 2026,UKX,2016-01-04,2026-10-28,2026-11-02,5,211,211,211,69
+5Y future,out-of-sample 2026,CL1 COMB Comdty,2016-01-04,2026-10-28,2026-11-02,5,211,211,211,97
+5Y future,out-of-sample 2026,SPX,2016-01-04,2026-10-27,2026-11-02,6,211,211,211,55
+5Y future,out-of-sample 2026,TFF2ILFN Index,2016-01-05,2026-10-20,2026-11-02,13,211,211,211,63
+5Y future,out-of-sample 2026,SOFRRATE Index,2018-04-02,2026-10-26,2026-11-02,7,211,211,211,15
+10Y future,out-of-sample 2026,TFF2GLFN Index,2016-01-05,2026-10-20,2026-11-02,13,211,211,211,85
+10Y future,out-of-sample 2026,UKX,2016-01-04,2026-10-28,2026-11-02,5,211,211,211,69
+10Y future,out-of-sample 2026,CTA US Equity,2022-03-08,2026-10-27,2026-11-02,6,211,211,211,124
+10Y future,out-of-sample 2026,SOFRRATE Index,2018-04-02,2026-10-26,2026-11-02,7,211,211,211,15
+10Y future,out-of-sample 2026,TFF2HLFN Index,2016-01-05,2026-10-20,2026-11-02,13,211,211,211,81

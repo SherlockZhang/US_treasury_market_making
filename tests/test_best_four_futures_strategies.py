@@ -11,6 +11,33 @@ class BestFourFuturesTests(unittest.TestCase):
     def setUpClass(cls):
         cls.prices = analysis.cdf.load_single_future_prices(include_dbmf=False)
 
+    def test_cagr_uses_compounded_returns_and_elapsed_calendar_time(self):
+        frame = pd.DataFrame(
+            {
+                "strategy_return": [0.1, 0.2],
+                "gross_strategy_return": [0.1, 0.2],
+                "position": [0, 1],
+            },
+            index=pd.to_datetime(["2020-01-01", "2021-01-01"]),
+        )
+        expected = ((1.1 * 1.2) ** (365.25 / 366) - 1) * 100
+        self.assertAlmostEqual(analysis.statistics(frame)["cagr_pct"], expected)
+
+    def test_cagr_is_undefined_for_zero_duration_or_nonpositive_wealth(self):
+        for dates, returns in (
+            (["2020-01-01"], [0.1]),
+            (["2020-01-01", "2021-01-01"], [-1.0, 0.0]),
+        ):
+            frame = pd.DataFrame(
+                {
+                    "strategy_return": returns,
+                    "gross_strategy_return": returns,
+                    "position": [0] * len(returns),
+                },
+                index=pd.to_datetime(dates),
+            )
+            self.assertTrue(np.isnan(analysis.statistics(frame)["cagr_pct"]))
+
     def test_reference_2y_daily_results_and_summary(self):
         root = analysis.RESULTS / "2y_best_four_strategies_rounded_0p5_2016_2025_and_2026"
         summary = pd.read_csv(root / "summary.csv")
