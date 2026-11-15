@@ -55,7 +55,7 @@ XAU_FACTOR_LOOKBACK_WEEKS = 52
 DEFAULT_XAU_FACTOR_PROBABILITY = 0.54
 REBALANCE_POSITION_CHANGE_THRESHOLD_FRACTION = 0.25
 POSITION_ROUNDING_INCREMENTS = (
-    0.1, 0.2, 0.3, 0.4, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0,
+    0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0,
 )
 DEFAULT_POSITION_ROUNDING_INCREMENT = 0.1
 RebalanceFrequency = Literal["daily", "weekly", "monthly", "yearly"]
@@ -139,6 +139,7 @@ TRADING_COST_RATIOS = {
     "2Y future": 0.0039/2,
     "5Y future": 0.0078/2,
     "10Y future": 0.0156/2,
+    "GC": 0.1/2,
 }
 # TRADING_COST_RATIOS = {
 #     "2Y future": 0.00 / 100,
@@ -651,6 +652,8 @@ def calculate_normal_cdf_signal(
     cdf_values = norm.cdf(t_stat)
     if instrument == "2Y future":
         unfiltered_values = (8 / 3) * cdf_values - 4 / 3
+    elif instrument == "GC":
+        unfiltered_values = 4 * cdf_values - 2
     else:
         unfiltered_values = 4 * cdf_values - 2
     unfiltered_signal = pd.Series(unfiltered_values, index=daily_returns.index)
@@ -702,6 +705,7 @@ def run_backtest(
     target_annualized_volatility: float = TARGET_ANNUALIZED_VOLATILITY,
     trading_cost_ratio: float | None = None,
     position_cap: float | None = None,
+    round_average_positions: bool = False,
 ) -> pd.DataFrame:
     """Apply the signal and trading costs, with optional volatility scaling."""
     instrument = prices.name
@@ -739,6 +743,8 @@ def run_backtest(
         raise ValueError("XAU factor probability must be between 0 and 1.")
     if signal_mode not in ("single", "average", "rounded"):
         raise ValueError(f"Unsupported signal mode: {signal_mode}")
+    if round_average_positions and signal_mode != "average":
+        raise ValueError("round_average_positions requires average signal mode.")
     if position_rounding_increment not in POSITION_ROUNDING_INCREMENTS:
         raise ValueError(
             "Position-rounding increment must be one of "
@@ -957,12 +963,12 @@ def run_backtest(
         )
     else:
         desired_position.loc[eligible] = results.loc[eligible, "signal"]
-    if signal_mode == "rounded":
+    if signal_mode == "rounded" or round_average_positions:
         desired_position = (
             (desired_position / position_rounding_increment)
             .round()
             .mul(position_rounding_increment)
-            .round(1)
+            .round(10)
         )
     if rebalance_frequency == "daily":
         rebalance_dates = np.ones(len(dates), dtype=bool)

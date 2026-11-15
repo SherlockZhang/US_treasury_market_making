@@ -49,10 +49,17 @@ data, unless a script explicitly reads them.
   repository.
 - Normal-CDF backtests identify the 2Y future by the input price series name
   `2Y future`. Its unfiltered signal is `(8 / 3) * norm.cdf(t_stat) - 4 / 3`;
-  other instruments retain `4 * norm.cdf(t_stat) - 2`. The formula is applied
+  for series named `GC`, it is `2 * norm.cdf(t_stat) - 1`. Other instruments
+  retain `4 * norm.cdf(t_stat) - 2`. The formula is applied
   before signal cutoffs, market factors, volatility scaling, and position
   rounding, including to each component of an averaged signal. Previously
   saved results are not updated automatically and must be rerun.
+- The Normal-CDF Python backtest supports averaging the T=32, 64, 126, 252,
+  and 504 signals with `signal_mode="average"`. Average-mode positions are
+  unrounded by default; pass `round_average_positions=True` to round the
+  averaged signal's resulting positions using `position_rounding_increment`.
+  A 0.25 position increment is supported for both single-lookback and averaged
+  signals.
 - Run `python analyze_best_four_futures_strategies.py` to generate separate 5Y
   and 10Y four-strategy reports under `results/`, including daily results,
   period and annual statistics, plots, and the scaled CDF selection grid. As in
