@@ -32,13 +32,20 @@ def run_backtest(
     extreme_lookback_days: int = DEFAULT_EXTREME_LOOKBACK_DAYS,
     start_date: pd.Timestamp | None = None,
     trading_cost_ratio: float | None = None,
+    position_size: int = 1,
 ) -> pd.DataFrame:
-    """Go long at rolling highs and short at rolling lows, starting next day."""
+    """Trade rolling extremes at the requested position size, starting next day."""
     instrument = prices.name
     if ewma_span <= 0:
         raise ValueError("EWMA span must be a positive integer.")
     if extreme_lookback_days <= 0:
         raise ValueError("Extreme lookback must be a positive integer.")
+    if (
+        isinstance(position_size, bool)
+        or not isinstance(position_size, (int, np.integer))
+        or position_size <= 0
+    ):
+        raise ValueError("Position size must be a positive integer.")
     if prices.empty:
         raise ValueError("No prices are available for this backtest.")
     if (
@@ -77,7 +84,7 @@ def run_backtest(
                 f"No prices are available on or after {start_date:%Y-%m-%d}."
             )
 
-    position = np.zeros(len(prices), dtype=np.int8)
+    position = np.zeros(len(prices), dtype=np.int64)
     current_position = 0
     for index in range(first_position, len(prices)):
         if index > first_position:
@@ -90,7 +97,7 @@ def run_backtest(
                 current_position = 0
         elif index > 0:
             current_position = int(entry_signal.iloc[index - 1])
-        position[index] = current_position
+        position[index] = current_position * position_size
 
     results = pd.concat(
         [

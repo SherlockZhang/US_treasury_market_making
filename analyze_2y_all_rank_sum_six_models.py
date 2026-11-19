@@ -19,8 +19,15 @@ def selected_trend_winner(model: str, instrument: str = report.INSTRUMENT) -> pd
     path = trend_rank.OUTPUT_DIR / f"{model.lower()}_best_parameters.csv"
     table = pd.read_csv(path)
     rows = table.loc[table["instrument"].eq(instrument) & table["selected_best"].eq(True)]
-    if len(rows) != 1:
-        raise ValueError(f"Expected one rank-sum {model} winner for {instrument}.")
+    if rows.empty:
+        raise ValueError(f"Expected a rank-sum {model} winner for {instrument}.")
+    if len(rows) > 1:
+        parameter_columns = list(trend_rank.previous.PARAMETERS[model])
+        rows = rows.sort_values(
+            ["sharpe_ratio", *parameter_columns],
+            ascending=[False, *([True] * len(parameter_columns))],
+            kind="stable",
+        )
     row = rows.iloc[0]
     if (
         row["end_date"] != "2025-12-31"
@@ -46,7 +53,10 @@ def main() -> None:
         raise ValueError("Current CDF winners do not match the saved rank-sum grid.")
     ewma = selected_trend_winner("EWMA")
     kama = selected_trend_winner("KAMA")
-    report.save_report(prices, winners, OUTPUT, ewma_winner=ewma, kama_winner=kama)
+    report.save_report(
+        prices, winners, OUTPUT, ewma_winner=ewma, kama_winner=kama,
+        trend_position_size=3,
+    )
     grid.to_csv(OUTPUT / "cdf_parameter_grid.csv", index=False, float_format="%.10f")
     pd.DataFrame([ewma]).to_csv(
         OUTPUT / "ewma_best_parameters.csv", index=False, float_format="%.10f"

@@ -97,6 +97,11 @@ data, unless a script explicitly reads them.
   parameter tables are historical gross results until regenerated or
   reselected; a new report can still use parameters selected from those
   gross tables.
+- EWMA and KAMA `run_backtest` functions accept a positive `position_size`
+  (default `1`). The all-rank-sum six-model reports for 2Y, 5Y, and 10Y pass
+  `position_size=3`, so their trend-model positions are `+3`, `-3`, or flat.
+  Returns and trading costs are calculated from those sized positions; model
+  selection remains based on the saved one-unit training results.
 - Four-strategy report statistics include `trading_volume` (the number of
   days with a position change), `position_turnover` (the sum of absolute
   position changes), and `trading_cost_accumulated` (the sum of daily cost
@@ -109,13 +114,19 @@ data, unless a script explicitly reads them.
   --skip-reference-validation --output-dir <directory>`. The flag explicitly
   skips reference-parameter validation and uses the script's fixed parameters.
 - Run `python search_ewma_kama_trading_cost_grid.py` for cost-adjusted EWMA
-  and KAMA searches for all three futures. The script reuses the original
-  grids (121 and 60 parameter combinations per future), starts indicators
-  with prices from 2016, stops on 2025-12-31, and ranks by annualized Sharpe
-  using net daily returns. It writes full ranked grids, best-parameter files,
-  and a parameter-space CSV under
+  and KAMA searches for all three futures. The current grids contain 64 EWMA
+  combinations (`N` and `M` each in 5, 10, 20, 32, 64, 126, 252, 504) and 560
+  KAMA combinations (`N_fast` in 2, 3, 5, 10; `N_slow` in 15, 20, 25, 64,
+  126, 252, 504; `ER` in 5, 10, 15, 20, 25; `M` in 3, 32, 64, 252) per
+  future. The search starts indicators with prices from 2016, stops on
+  2025-12-31, and ranks by annualized Sharpe using net daily returns. It writes
+  full ranked grids, best-parameter files, and a parameter-space CSV under
   `results/ewma_kama_cost_adjusted_grid_2016_2025/`. Existing gross grids
   and model-selection tables remain unchanged.
+- Run `python search_ewma_kama_rank_sum.py` to rank the same configured
+  candidates by the sum of Sharpe, maximum-drawdown, and Calmar ranks. It writes
+  the rank-sum grids and selected parameters under
+  `results/ewma_kama_rank_sum_cost_adjusted_grid_2016_2025/`.
 - Run `python search_cdf_custom_vol_daily_weekly.py` to rank scaled and
   unscaled normal-CDF models for each future over 2016-2025. It tests daily
   and weekly rebalancing and signal lookbacks 32, 64, 126, 252, and 504,

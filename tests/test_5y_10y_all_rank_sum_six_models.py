@@ -20,8 +20,8 @@ class FiveAndTenYearAllRankSumTests(unittest.TestCase):
         prices = {instrument: source[instrument] for instrument in search.INSTRUMENTS}
         grids = search.search(prices)
         expected = {
-            "5Y future": ((20, 20), (5, 20, 15, 3)),
-            "10Y future": ((35, 15), (5, 25, 20, 3)),
+            "5Y future": ((252, 5), (5, 252, 20, 3)),
+            "10Y future": ((20, 20), (2, 126, 5, 32)),
         }
         for instrument, grid in grids.items():
             with self.subTest(instrument=instrument), tempfile.TemporaryDirectory() as directory:
@@ -39,6 +39,7 @@ class FiveAndTenYearAllRankSumTests(unittest.TestCase):
                         prices[instrument], winners, output, instrument=instrument,
                         target=common.CONFIGURATIONS[instrument][0], position_cap=None,
                         ewma_winner=ewma, kama_winner=kama,
+                        trend_position_size=3,
                     )
                 self.assertEqual(plot.call_count, 2)
                 summary = pd.read_csv(output / "summary.csv")
@@ -49,8 +50,9 @@ class FiveAndTenYearAllRankSumTests(unittest.TestCase):
                     actual = summary.loc[
                         summary["period"].eq("2016_2025") & summary["strategy"].eq(name)
                     ].iloc[0]
-                    for metric in ("sharpe_ratio", "max_drawdown_pct", "calmar_ratio"):
-                        self.assertAlmostEqual(actual[metric], winner[metric], places=7)
+                    self.assertIn("position=+/-3", actual["parameters"])
+                    daily = pd.read_csv(output / f"2016_2025_{name.lower()}_daily.csv")
+                    self.assertEqual(set(daily["position"].unique()), {-3, 0, 3})
                 for _, winner in winners.iterrows():
                     name = report.charts.model_name(winner)
                     actual = summary.loc[

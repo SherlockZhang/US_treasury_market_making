@@ -36,7 +36,7 @@ def main() -> None:
         report.save_report(
             prices[instrument], winners, output, instrument=instrument,
             target=common.CONFIGURATIONS[instrument][0], position_cap=None,
-            ewma_winner=ewma, kama_winner=kama,
+            ewma_winner=ewma, kama_winner=kama, trend_position_size=3,
         )
         grid.to_csv(output / "cdf_parameter_grid.csv", index=False, float_format="%.10f")
         pd.DataFrame([ewma]).to_csv(

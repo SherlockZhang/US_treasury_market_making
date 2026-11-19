@@ -14,12 +14,15 @@ import backtest_kama_extreme_strategy as kama
 
 INSTRUMENTS = ("2Y future", "5Y future", "10Y future")
 PARAMETERS = {
-    "EWMA": {"n": tuple(range(5, 56, 5)), "m": tuple(range(5, 56, 5))},
+    "EWMA": {
+        "n": (5, 10, 20, 32, 64, 126, 252, 504),
+        "m": (5, 10, 20, 32, 64, 126, 252, 504),
+    },
     "KAMA": {
-        "alpha_fast_n": (2, 3, 5),
-        "alpha_slow_n": (10, 15, 20, 25),
+        "alpha_fast_n": (2, 3, 5, 10),
+        "alpha_slow_n": (15, 20, 25, 64, 126, 252, 504),
         "er_lookback_days": (5, 10, 15, 20, 25),
-        "kama_extreme_window_m": (3,),
+        "kama_extreme_window_m": (3, 32, 64, 252),
     },
 }
 OUTPUT_DIR = reference.RESULTS / "ewma_kama_cost_adjusted_grid_2016_2025"
@@ -38,7 +41,7 @@ def parameter_space() -> pd.DataFrame:
 
 
 def search(prices_by_instrument: dict[str, pd.Series]) -> dict[str, pd.DataFrame]:
-    """Run the original parameter grids over the 2016-2025 training window."""
+    """Run the configured parameter grids over the 2016-2025 training window."""
     grids = {}
     for model, parameters in PARAMETERS.items():
         rows = []

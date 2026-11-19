@@ -12,22 +12,31 @@ import search_ewma_kama_trading_cost_grid as search
 
 class CostAdjustedGridTests(unittest.TestCase):
     def test_parameter_space_matches_reference_grids(self):
-        for model in ("EWMA", "KAMA"):
-            filename = (
-                "ewma_parameter_grid_2y_5y_10y_through_20251231.csv"
-                if model == "EWMA"
-                else "kama_parameter_grid_2y_5y_10y_through_20251231_extended_stats.csv"
+        expected = {
+            "EWMA": {
+                "n": (5, 10, 20, 32, 64, 126, 252, 504),
+                "m": (5, 10, 20, 32, 64, 126, 252, 504),
+            },
+            "KAMA": {
+                "alpha_fast_n": (2, 3, 5, 10),
+                "alpha_slow_n": (15, 20, 25, 64, 126, 252, 504),
+                "er_lookback_days": (5, 10, 15, 20, 25),
+                "kama_extreme_window_m": (3, 32, 64, 252),
+            },
+        }
+        self.assertEqual(search.PARAMETERS, expected)
+        expected_counts = {"EWMA": 64, "KAMA": 560}
+        for model, parameters in expected.items():
+            self.assertEqual(
+                len(list(product(*parameters.values()))), expected_counts[model]
             )
-            original = pd.read_csv(reference.RESULTS / filename)
-            parameters = search.PARAMETERS[model]
-            expected = set(product(*parameters.values()))
-            for instrument in search.INSTRUMENTS:
-                subset = original.loc[original["instrument"].eq(instrument)]
-                self.assertEqual(len(subset), len(expected))
-                self.assertEqual(set(subset[list(parameters)].itertuples(index=False, name=None)), expected)
-            space = search.parameter_space()
+        space = search.parameter_space()
+        for model, parameters in expected.items():
             for parameter, values in parameters.items():
-                listed = space.loc[space["model"].eq(model) & space["parameter"].eq(parameter), "value"]
+                listed = space.loc[
+                    space["model"].eq(model) & space["parameter"].eq(parameter),
+                    "value",
+                ]
                 self.assertEqual(list(listed), list(values))
 
     def test_gross_matches_historical_and_net_uses_costs(self):
@@ -54,6 +63,31 @@ class CostAdjustedGridTests(unittest.TestCase):
                 self.assertAlmostEqual(
                     net["trading_cost"].sum(), expected_cost.sum(), places=14,
                 )
+
+    def test_position_size_scales_ewma_and_kama_exposure_and_costs(self):
+        prices = reference.cdf.load_single_future_prices(False)["2Y future"].loc[
+            reference.START:reference.TRAIN_END
+        ]
+        for run, args in (
+            (ewma.run_backtest, (5, 40)),
+            (kama.run_backtest, (5, 25, 25, 3)),
+        ):
+            with self.subTest(model=run.__module__):
+                unit = run(prices, *args)
+                triple = run(prices, *args, position_size=3)
+                np.testing.assert_array_equal(
+                    triple["position"], unit["position"] * 3,
+                )
+                np.testing.assert_allclose(
+                    triple["position_change"], unit["position_change"] * 3,
+                )
+                np.testing.assert_allclose(
+                    triple["trading_cost"], unit["trading_cost"] * 3,
+                )
+                np.testing.assert_allclose(
+                    triple["strategy_return"], unit["strategy_return"] * 3,
+                )
+                self.assertEqual(set(triple["position"].unique()), {-3, 0, 3})
 
     def test_search_ranks_net_sharpe_and_ignores_out_of_sample_prices(self):
         dates = pd.bdate_range("2015-12-01", "2026-03-01")

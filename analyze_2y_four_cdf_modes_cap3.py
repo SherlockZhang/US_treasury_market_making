@@ -95,6 +95,7 @@ def build_frames(
     position_cap: float | None = POSITION_CAP,
     ewma_winner: pd.Series | None = None,
     kama_winner: pd.Series | None = None,
+    trend_position_size: int = 1,
 ) -> tuple[dict[str, pd.DataFrame], dict[str, str]]:
     frames = {}
     labels = {}
@@ -126,20 +127,38 @@ def build_frames(
     )
     active_prices = prices.loc[reference.START:end]
     frames["EWMA"] = reference.ewma.run_backtest(
-        active_prices, int(e["n"]), int(e["m"]), start_date=start
+        active_prices, int(e["n"]), int(e["m"]), start_date=start,
+        position_size=trend_position_size,
     ).loc[start:].copy()
     frames["KAMA"] = reference.kama.run_backtest(
         active_prices, int(k["alpha_fast_n"]), int(k["alpha_slow_n"]),
         int(k["er_lookback_days"]), int(k["kama_extreme_window_m"]), start_date=start,
+        position_size=trend_position_size,
     ).loc[start:].copy()
-    labels["EWMA"] = f"N={int(e['n'])}, M={int(e['m'])}"
+    labels["EWMA"] = (
+        f"N={int(e['n'])}, M={int(e['m'])}, position=+/-{trend_position_size}"
+    )
     labels["KAMA"] = (
         f"fast={int(k['alpha_fast_n'])}, slow={int(k['alpha_slow_n'])}, "
-        f"ER={int(k['er_lookback_days'])}, M={int(k['kama_extreme_window_m'])}"
+        f"ER={int(k['er_lookback_days'])}, M={int(k['kama_extreme_window_m'])}, "
+        f"position=+/-{trend_position_size}"
     )
     if start == reference.START:
         for name, row in (("EWMA", e), ("KAMA", k)):
-            actual = reference.statistics(frames[name])
+            if trend_position_size == 1:
+                validation_frame = frames[name]
+            elif name == "EWMA":
+                validation_frame = reference.ewma.run_backtest(
+                    active_prices, int(e["n"]), int(e["m"]), start_date=start,
+                    position_size=1,
+                ).loc[start:]
+            else:
+                validation_frame = reference.kama.run_backtest(
+                    active_prices, int(k["alpha_fast_n"]), int(k["alpha_slow_n"]),
+                    int(k["er_lookback_days"]), int(k["kama_extreme_window_m"]),
+                    start_date=start, position_size=1,
+                ).loc[start:]
+            actual = reference.statistics(validation_frame)
             for metric in ("sharpe_ratio", "max_drawdown_pct", "calmar_ratio"):
                 if not np.isclose(actual[metric], row[metric], rtol=0, atol=1e-8):
                     raise ValueError(f"{name} training {metric} does not match its net-cost grid.")
@@ -157,6 +176,7 @@ def save_report(
     position_cap: float | None = POSITION_CAP,
     ewma_winner: pd.Series | None = None,
     kama_winner: pd.Series | None = None,
+    trend_position_size: int = 1,
 ) -> None:
     modes = set(zip(winners["volatility_scaling"], winners["rebalance_frequency"]))
     expected_modes = {(scaled, frequency) for scaled in (True, False) for frequency in FREQUENCIES}
@@ -171,7 +191,7 @@ def save_report(
     ):
         frames, labels = build_frames(
             prices, winners, start, end, instrument, target, position_cap,
-            ewma_winner, kama_winner,
+            ewma_winner, kama_winner, trend_position_size,
         )
         annual = []
         for name, frame in frames.items():
