@@ -1,18 +1,33 @@
-"""Compare 2Y CDF, EWMA, and KAMA rank-sum grid winners."""
+"""Compare 2Y CDF winners with trained or user-specified trend models."""
 
+import argparse
 import numpy as np
 import pandas as pd
 
 import analyze_2y_four_cdf_modes_cap3 as report
 import analyze_best_four_futures_strategies as reference
+import averaged_trend_signals as averaged_trends
 import search_2y_cdf_rank_sum as cdf_rank
 import search_ewma_kama_rank_sum as trend_rank
 
 
 OUTPUT = (
     reference.RESULTS
+    / "2y_six_models_all_rank_sum_trained_trends_rounding_0p5_cap_3_target_vol_1p5pct_2016_2025_and_2026"
+)
+AVERAGED_OUTPUT = (
+    reference.RESULTS
     / "2y_six_models_all_rank_sum_rounding_0p5_cap_3_target_vol_1p5pct_2016_2025_and_2026"
 )
+
+
+def parse_args(description: str | None = __doc__) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument(
+        "--trend-model", choices=("trained", "averaged"), default="trained",
+        help="Use rank-sum trend winners (default) or the fixed averaged signals.",
+    )
+    return parser.parse_args()
 
 
 def selected_trend_winner(model: str, instrument: str = report.INSTRUMENT) -> pd.Series:
@@ -41,8 +56,11 @@ def selected_trend_winner(model: str, instrument: str = report.INSTRUMENT) -> pd
     return row
 
 
-def main() -> None:
-    prices = reference.cdf.load_single_future_prices(include_dbmf=False)[report.INSTRUMENT]
+def main(trend_model: str = "trained") -> None:
+    if trend_model not in ("trained", "averaged"):
+        raise ValueError(f"Unknown trend model {trend_model!r}.")
+    all_prices = reference.cdf.load_single_future_prices(include_dbmf=False)
+    prices = all_prices[report.INSTRUMENT]
     saved = pd.read_csv(cdf_rank.OUTPUT / "cdf_best_parameters.csv")
     grid = cdf_rank.rank_grid(report.search(prices))
     winners = grid.loc[grid["selected_best"]].copy()
@@ -51,20 +69,28 @@ def main() -> None:
         winners[keys].sort_values(keys).reset_index(drop=True)
     ):
         raise ValueError("Current CDF winners do not match the saved rank-sum grid.")
-    ewma = selected_trend_winner("EWMA")
-    kama = selected_trend_winner("KAMA")
-    report.save_report(
-        prices, winners, OUTPUT, ewma_winner=ewma, kama_winner=kama,
-        trend_position_size=3,
-    )
-    grid.to_csv(OUTPUT / "cdf_parameter_grid.csv", index=False, float_format="%.10f")
-    pd.DataFrame([ewma]).to_csv(
-        OUTPUT / "ewma_best_parameters.csv", index=False, float_format="%.10f"
-    )
-    pd.DataFrame([kama]).to_csv(
-        OUTPUT / "kama_best_parameters.csv", index=False, float_format="%.10f"
-    )
+    if trend_model == "trained":
+        output = OUTPUT
+        ewma = selected_trend_winner("EWMA")
+        kama = selected_trend_winner("KAMA")
+        report.save_report(
+            prices, winners, output, ewma_winner=ewma, kama_winner=kama,
+            trend_position_size=3,
+        )
+        parameters = {"EWMA": pd.DataFrame([ewma]), "KAMA": pd.DataFrame([kama])}
+    else:
+        output = AVERAGED_OUTPUT
+        report.save_report(
+            prices, winners, output, trend_position_size=3, trend_prices=all_prices,
+        )
+        parameters = {
+            model: averaged_trends.parameter_rows(report.INSTRUMENT, model, 3)
+            for model in ("EWMA", "KAMA")
+        }
+    grid.to_csv(output / "cdf_parameter_grid.csv", index=False, float_format="%.10f")
+    for model, table in parameters.items():
+        table.to_csv(output / f"{model.lower()}_best_parameters.csv", index=False, float_format="%.10f")
 
 
 if __name__ == "__main__":
-    main()
+    main(parse_args().trend_model)

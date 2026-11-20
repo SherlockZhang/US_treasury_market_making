@@ -1,0 +1,2 @@
+instrument,model,selection_source,component_1,component_2,position_size
+10Y future,EWMA,user specified,"EWMA(25,15)@5y","EWMA(15,20)@10y",3

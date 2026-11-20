@@ -1,0 +1,2 @@
+instrument,model,selection_source,component_1,component_2,position_size
+5Y future,KAMA,user specified,"KAMA(10,5,30,3)@10y","KAMA(30,5,30,3)@2y",3

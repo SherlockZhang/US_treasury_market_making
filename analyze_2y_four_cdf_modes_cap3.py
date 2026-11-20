@@ -8,6 +8,7 @@ import pandas as pd
 import analyze_2y_cost_adjusted_best_strategies as cost_grid
 import analyze_10y_six_best_models_normal_grid as charts
 import analyze_best_four_futures_strategies as reference
+import averaged_trend_signals as averaged_trends
 
 
 INSTRUMENT = "2Y future"
@@ -96,6 +97,7 @@ def build_frames(
     ewma_winner: pd.Series | None = None,
     kama_winner: pd.Series | None = None,
     trend_position_size: int = 1,
+    trend_prices: dict[str, pd.Series] | None = None,
 ) -> tuple[dict[str, pd.DataFrame], dict[str, str]]:
     frames = {}
     labels = {}
@@ -119,6 +121,36 @@ def build_frames(
             + (f"; target={target * 100:g}%" if scaled else "")
         )
 
+    if trend_prices is not None:
+        if not prices.sort_index().equals(trend_prices[instrument].sort_index()):
+            raise ValueError("CDF and trend backtests must use the same target prices.")
+        for name in ("EWMA", "KAMA"):
+            frames[name] = averaged_trends.run_backtest(
+                trend_prices, instrument, name, start, end, reference.START,
+                position_size=trend_position_size,
+            )
+            labels[name] = averaged_trends.model_label(instrument, name, trend_position_size)
+    else:
+        trend_frames, trend_labels = build_single_trend_frames(
+            prices, start, end, instrument, ewma_winner, kama_winner, trend_position_size
+        )
+        frames.update(trend_frames)
+        labels.update(trend_labels)
+    for frame in frames.values():
+        frame["drawdown"] = frame["wealth"] / frame["wealth"].cummax() - 1
+        position_change = frame["position"].diff()
+        position_change.iloc[0] = frame["position"].iloc[0]
+        frame["position_changed"] = position_change.ne(0)
+    return frames, labels
+
+
+def build_single_trend_frames(
+    prices: pd.Series, start: pd.Timestamp, end: pd.Timestamp, instrument: str,
+    ewma_winner: pd.Series | None, kama_winner: pd.Series | None,
+    trend_position_size: int,
+) -> tuple[dict[str, pd.DataFrame], dict[str, str]]:
+    frames = {}
+    labels = {}
     e = ewma_winner if ewma_winner is not None else cost_grid.selected_row(
         cost_grid.EWMA_BEST, instrument=instrument
     )
@@ -162,11 +194,6 @@ def build_frames(
             for metric in ("sharpe_ratio", "max_drawdown_pct", "calmar_ratio"):
                 if not np.isclose(actual[metric], row[metric], rtol=0, atol=1e-8):
                     raise ValueError(f"{name} training {metric} does not match its net-cost grid.")
-    for frame in frames.values():
-        frame["drawdown"] = frame["wealth"] / frame["wealth"].cummax() - 1
-        position_change = frame["position"].diff()
-        position_change.iloc[0] = frame["position"].iloc[0]
-        frame["position_changed"] = position_change.ne(0)
     return frames, labels
 
 
@@ -177,6 +204,7 @@ def save_report(
     ewma_winner: pd.Series | None = None,
     kama_winner: pd.Series | None = None,
     trend_position_size: int = 1,
+    trend_prices: dict[str, pd.Series] | None = None,
 ) -> None:
     modes = set(zip(winners["volatility_scaling"], winners["rebalance_frequency"]))
     expected_modes = {(scaled, frequency) for scaled in (True, False) for frequency in FREQUENCIES}
@@ -191,7 +219,7 @@ def save_report(
     ):
         frames, labels = build_frames(
             prices, winners, start, end, instrument, target, position_cap,
-            ewma_winner, kama_winner, trend_position_size,
+            ewma_winner, kama_winner, trend_position_size, trend_prices,
         )
         annual = []
         for name, frame in frames.items():

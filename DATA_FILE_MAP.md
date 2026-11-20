@@ -97,11 +97,42 @@ data, unless a script explicitly reads them.
   parameter tables are historical gross results until regenerated or
   reselected; a new report can still use parameters selected from those
   gross tables.
+- Run `python analyze_2y_all_rank_sum_six_models.py` and
+  `python analyze_5y_10y_all_rank_sum_six_models.py` for separate 2Y, 5Y,
+  and 10Y six-model reports using trained rank-sum winners for all four CDF
+  modes, EWMA, and KAMA. The scripts validate the current CDF grid against
+  saved selections and the one-unit trend results against their saved
+  rank-sum winners; run `search_2y_cdf_rank_sum.py`,
+  `search_5y_10y_cdf_rank_sum.py`, and `search_ewma_kama_rank_sum.py` first
+  when the required current selections are missing or stale. Trained reports
+  write to `results/*_six_models_all_rank_sum_trained_trends_*`.
+  Add `--trend-model averaged` to either report command to regenerate the
+  separate user-specified trend reports in the existing
+  `results/*_six_models_all_rank_sum_rounding_*` folders. Both variants use
+  the same trained CDF winners and 3-unit maximum trend position. Rerunning
+  either variant overwrites its generated report files, including any manual
+  edits to them.
 - EWMA and KAMA `run_backtest` functions accept a positive `position_size`
-  (default `1`). The all-rank-sum six-model reports for 2Y, 5Y, and 10Y pass
-  `position_size=3`, so their trend-model positions are `+3`, `-3`, or flat.
-  Returns and trading costs are calculated from those sized positions; model
-  selection remains based on the saved one-unit training results.
+  (default `1`). In the averaged-trend six-model reports, fixed user-specified
+  pairs replace trend grid winners. Each component produces its own
+  rolling-extreme entry signal (-1, 0, or 1) from the indicated future; their
+  equally weighted average is applied on the next trading date to the traded
+  future. From flat, a half-strength signal opens a half-sized position; a
+  subsequent opposite signal exits to flat, while same-direction signals do
+  not resize it. Opposing component signals cancel. The position size is 3,
+  so possible exposures are -3, -1.5, 0, 1.5, and 3. Returns and costs use
+  the traded future, and the 2026 run resets positions but retains earlier
+  observations for indicator warmup. Source and traded price dates must match.
+  The pairs, using KAMA's slow, fast, ER, M order, are:
+  - 2Y: `EWMA(5,40)@2y + EWMA(10,30)@2y`;
+    `KAMA(30,5,30,3)@2y + KAMA(30,5,30,3)@5y`.
+  - 5Y: `EWMA(5,40)@2y + EWMA(20,20)@10y`;
+    `KAMA(10,5,30,3)@10y + KAMA(30,5,30,3)@2y`.
+  - 10Y: `EWMA(25,15)@5y + EWMA(15,20)@10y`;
+    `KAMA(10,3,30,3)@2y + KAMA(5,5,30,3)@5y`.
+  The saved trend parameter files identify these as user-specified, not
+  rank-sum winners. Other report families and parameter searches retain their
+  original single-signal behavior.
 - Four-strategy report statistics include `trading_volume` (the number of
   days with a position change), `position_turnover` (the sum of absolute
   position changes), and `trading_cost_accumulated` (the sum of daily cost
