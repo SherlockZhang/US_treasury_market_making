@@ -105,13 +105,14 @@ data, unless a script explicitly reads them.
   rank-sum winners; run `search_2y_cdf_rank_sum.py`,
   `search_5y_10y_cdf_rank_sum.py`, and `search_ewma_kama_rank_sum.py` first
   when the required current selections are missing or stale. Trained reports
-  write to `results/*_six_models_all_rank_sum_trained_trends_*`.
-  Add `--trend-model averaged` to either report command to regenerate the
-  separate user-specified trend reports in the existing
-  `results/*_six_models_all_rank_sum_rounding_*` folders. Both variants use
-  the same trained CDF winners and 3-unit maximum trend position. Rerunning
+  write to `results/*_six_models_all_rank_sum_trained_trends_unit_position_*`.
+  Add `--trend-model averaged` to either report command to generate the
+  separate user-specified trend reports in
+  `results/*_six_models_all_rank_sum_averaged_trends_unit_position_*`.
+  Both variants use the same trained CDF winners. Trained trends use
+  positions -1, 0, or 1; averaged trends use a 1-unit maximum. Rerunning
   either variant overwrites its generated report files, including any manual
-  edits to them.
+  edits.
 - EWMA and KAMA `run_backtest` functions accept a positive `position_size`
   (default `1`). In the averaged-trend six-model reports, fixed user-specified
   pairs replace trend grid winners. Each component produces its own
@@ -119,8 +120,8 @@ data, unless a script explicitly reads them.
   equally weighted average is applied on the next trading date to the traded
   future. From flat, a half-strength signal opens a half-sized position; a
   subsequent opposite signal exits to flat, while same-direction signals do
-  not resize it. Opposing component signals cancel. The position size is 3,
-  so possible exposures are -3, -1.5, 0, 1.5, and 3. Returns and costs use
+  not resize it. Opposing component signals cancel. The position size is 1,
+  so possible exposures are -1, -0.5, 0, 0.5, and 1. Returns and costs use
   the traded future, and the 2026 run resets positions but retains earlier
   observations for indicator warmup. Source and traded price dates must match.
   The pairs, using KAMA's slow, fast, ER, M order, are:

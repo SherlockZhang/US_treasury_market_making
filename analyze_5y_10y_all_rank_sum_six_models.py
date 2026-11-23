@@ -12,12 +12,12 @@ import search_cdf_custom_vol_daily_weekly as common
 
 
 OUTPUTS = {
-    "5Y future": reference.RESULTS / "5y_six_models_all_rank_sum_trained_trends_rounding_0p5_target_vol_3pct_2016_2025_and_2026",
-    "10Y future": reference.RESULTS / "10y_six_models_all_rank_sum_trained_trends_rounding_0p5_target_vol_5pct_2016_2025_and_2026",
+    "5Y future": reference.RESULTS / "5y_six_models_all_rank_sum_trained_trends_unit_position_rounding_0p5_target_vol_3pct_2016_2025_and_2026",
+    "10Y future": reference.RESULTS / "10y_six_models_all_rank_sum_trained_trends_unit_position_rounding_0p5_target_vol_5pct_2016_2025_and_2026",
 }
 AVERAGED_OUTPUTS = {
-    "5Y future": reference.RESULTS / "5y_six_models_all_rank_sum_rounding_0p5_target_vol_3pct_2016_2025_and_2026",
-    "10Y future": reference.RESULTS / "10y_six_models_all_rank_sum_rounding_0p5_target_vol_5pct_2016_2025_and_2026",
+    "5Y future": reference.RESULTS / "5y_six_models_all_rank_sum_averaged_trends_unit_position_rounding_0p5_target_vol_3pct_2016_2025_and_2026",
+    "10Y future": reference.RESULTS / "10y_six_models_all_rank_sum_averaged_trends_unit_position_rounding_0p5_target_vol_5pct_2016_2025_and_2026",
 }
 
 
@@ -44,7 +44,7 @@ def main(trend_model: str = "trained") -> None:
             report.save_report(
                 prices[instrument], winners, output, instrument=instrument,
                 target=common.CONFIGURATIONS[instrument][0], position_cap=None,
-                ewma_winner=ewma, kama_winner=kama, trend_position_size=3,
+                ewma_winner=ewma, kama_winner=kama, trend_position_size=1,
             )
             parameters = {"EWMA": pd.DataFrame([ewma]), "KAMA": pd.DataFrame([kama])}
         else:
@@ -52,10 +52,10 @@ def main(trend_model: str = "trained") -> None:
             report.save_report(
                 prices[instrument], winners, output, instrument=instrument,
                 target=common.CONFIGURATIONS[instrument][0], position_cap=None,
-                trend_position_size=3, trend_prices=all_prices,
+                trend_position_size=1, trend_prices=all_prices,
             )
             parameters = {
-                model: averaged_trends.parameter_rows(instrument, model, 3)
+                model: averaged_trends.parameter_rows(instrument, model, 1)
                 for model in ("EWMA", "KAMA")
             }
         grid.to_csv(output / "cdf_parameter_grid.csv", index=False, float_format="%.10f")

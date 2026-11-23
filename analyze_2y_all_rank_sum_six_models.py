@@ -13,11 +13,11 @@ import search_ewma_kama_rank_sum as trend_rank
 
 OUTPUT = (
     reference.RESULTS
-    / "2y_six_models_all_rank_sum_trained_trends_rounding_0p5_cap_3_target_vol_1p5pct_2016_2025_and_2026"
+    / "2y_six_models_all_rank_sum_trained_trends_unit_position_rounding_0p5_cap_3_target_vol_1p5pct_2016_2025_and_2026"
 )
 AVERAGED_OUTPUT = (
     reference.RESULTS
-    / "2y_six_models_all_rank_sum_rounding_0p5_cap_3_target_vol_1p5pct_2016_2025_and_2026"
+    / "2y_six_models_all_rank_sum_averaged_trends_unit_position_rounding_0p5_cap_3_target_vol_1p5pct_2016_2025_and_2026"
 )
 
 
@@ -75,16 +75,16 @@ def main(trend_model: str = "trained") -> None:
         kama = selected_trend_winner("KAMA")
         report.save_report(
             prices, winners, output, ewma_winner=ewma, kama_winner=kama,
-            trend_position_size=3,
+            trend_position_size=1,
         )
         parameters = {"EWMA": pd.DataFrame([ewma]), "KAMA": pd.DataFrame([kama])}
     else:
         output = AVERAGED_OUTPUT
         report.save_report(
-            prices, winners, output, trend_position_size=3, trend_prices=all_prices,
+            prices, winners, output, trend_position_size=1, trend_prices=all_prices,
         )
         parameters = {
-            model: averaged_trends.parameter_rows(report.INSTRUMENT, model, 3)
+            model: averaged_trends.parameter_rows(report.INSTRUMENT, model, 1)
             for model in ("EWMA", "KAMA")
         }
     grid.to_csv(output / "cdf_parameter_grid.csv", index=False, float_format="%.10f")

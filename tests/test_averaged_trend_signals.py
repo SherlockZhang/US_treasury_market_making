@@ -46,6 +46,8 @@ class AveragedTrendTests(unittest.TestCase):
         signal = pd.Series([0.5, 1, -0.5, -1, 0, 0.5, 0, -0.5, 1, 0, 0], index=dates)
         position = trends.positions_from_signals(signal, dates[1], 3)
         self.assertEqual(position.tolist(), [0, 1.5, 1.5, 0, -3, -3, 0, 0, -1.5, 0, 0])
+        unit_position = trends.positions_from_signals(signal, dates[1], 1)
+        self.assertEqual(unit_position.tolist(), [0, 0.5, 0.5, 0, -1, -1, 0, 0, -0.5, 0, 0])
         reset = trends.positions_from_signals(signal, dates[3], 3)
         self.assertEqual(reset.iloc[:4].tolist(), [0, 0, 0, -1.5])
 
@@ -127,13 +129,19 @@ class AveragedTrendTests(unittest.TestCase):
                     for model in ("EWMA", "KAMA"):
                         rows = summary.loc[summary["strategy"].eq(model)]
                         self.assertEqual(len(rows), 2)
-                        self.assertTrue(rows["parameters"].eq(trends.model_label(instrument, model, 3)).all())
+                        self.assertTrue(rows["parameters"].eq(trends.model_label(instrument, model, 1)).all())
                         parameters = pd.read_csv(output / f"{model.lower()}_best_parameters.csv")
                         self.assertEqual(parameters.loc[0, "selection_source"], "user specified")
+                        self.assertEqual(parameters.loc[0, "position_size"], 1)
                         trained_parameters = pd.read_csv(trained_output / f"{model.lower()}_best_parameters.csv").iloc[0]
                         winner = two_year_report.selected_trend_winner(model, instrument)
                         self.assertTrue(trained_parameters["selected_best"])
                         self.assertEqual(trained_parameters["rank_sum"], winner["rank_sum"])
+                        trained_rows = trained_summary.loc[trained_summary["strategy"].eq(model)]
+                        self.assertTrue(trained_rows["parameters"].str.contains("position=+/-1", regex=False).all())
+                        training = trained_rows.loc[trained_rows["period"].eq("2016_2025")].iloc[0]
+                        for metric in ("sharpe_ratio", "max_drawdown_pct", "calmar_ratio"):
+                            self.assertAlmostEqual(training[metric], winner[metric], places=7)
                         parameter_names = (
                             ("n", "m") if model == "EWMA"
                             else ("alpha_slow_n", "alpha_fast_n", "er_lookback_days", "kama_extreme_window_m")
@@ -144,12 +152,14 @@ class AveragedTrendTests(unittest.TestCase):
                             daily = pd.read_csv(output / f"{period}_{model.lower()}_daily.csv")
                             trained_daily = pd.read_csv(trained_output / f"{period}_{model.lower()}_daily.csv")
                             self.assertNotIn("component_1_signal", trained_daily.columns)
-                            self.assertTrue(set(trained_daily["position"]).issubset({-3, 0, 3}))
+                            self.assertTrue(set(trained_daily["position"]).issubset({-1, 0, 1}))
                             np.testing.assert_allclose(
                                 daily["entry_signal"],
                                 (daily["component_1_signal"] + daily["component_2_signal"]) / 2,
                             )
-                            self.assertTrue(set(daily["position"]).issubset({-3, -1.5, 0, 1.5, 3}))
+                            for component in ("component_1_signal", "component_2_signal"):
+                                self.assertTrue(set(daily[component]).issubset({-1, 0, 1}))
+                            self.assertTrue(set(daily["position"]).issubset({-1, -0.5, 0, 0.5, 1}))
 
 
 if __name__ == "__main__":
