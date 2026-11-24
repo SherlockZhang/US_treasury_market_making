@@ -159,6 +159,23 @@ data, unless a script explicitly reads them.
   candidates by the sum of Sharpe, maximum-drawdown, and Calmar ranks. It writes
   the rank-sum grids and selected parameters under
   `results/ewma_kama_rank_sum_cost_adjusted_grid_2016_2025/`.
+- Run `python analyze_long_future_tstat_correlation.py` to compare each future's
+  selected weekly scaled CDF model with a long-one-position benchmark. It buys
+  at the first period close, charges the initial entry cost, and holds without
+  an exit charge. It reports Pearson correlations of paired daily net returns,
+  including flat and indicator-warmup days, for 2016-2025 and 2026 separately.
+  The 2026 backtests restart positions; the CDF indicators retain earlier
+  prices for warmup. Outputs are saved under
+  `results/long_one_future_vs_weekly_scaled_tstat/`. Generate the rank-sum CDF
+  winner files first with `search_2y_cdf_rank_sum.py` and
+  `search_5y_10y_cdf_rank_sum.py` if they are missing.
+- Run `python analyze_ewma_kama_correlation.py` after the long/T-stat analysis
+  to correlate daily net returns of the long strategy with the trained rank-sum
+  EWMA and KAMA models at unit position size and the weekly scaled T-stat model.
+  The report also includes EWMA/KAMA correlation for the same dates.
+  Results and paired daily returns are saved under
+  `results/ewma_kama_and_long_tstat_correlations/`. The EWMA and KAMA winner
+  CSVs from `search_ewma_kama_rank_sum.py` are required.
 - Run `python search_cdf_custom_vol_daily_weekly.py` to rank scaled and
   unscaled normal-CDF models for each future over 2016-2025. It tests daily
   and weekly rebalancing and signal lookbacks 32, 64, 126, 252, and 504,
